@@ -17,7 +17,7 @@ namespace Hydrology.Entity
         public string StationID { get; set; }
 
         /// <summary>
-        ///  雨量值的采集时间
+        ///  雨量值的采集时间  cc
         /// </summary>
         public DateTime TimeCollect { get; set; }
 
