@@ -250,6 +250,7 @@
     <Compile Include="CControls\CTreeView\CTreeNode.cs" />
     <Compile Include="CControls\CTreeView\CTreeType.cs" />
     <Compile Include="CControls\Interface\ITabPage.cs" />
+    <Compile Include="DataMgr\Cal.cs" />
     <Compile Include="DataMgr\CDBDataMgr.cs" />
     <Compile Include="DataMgr\CDBSoilDataMgr.cs" />
     <Compile Include="DataMgr\CPortDataMgr.cs" />
