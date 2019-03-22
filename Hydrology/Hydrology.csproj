@@ -72,6 +72,9 @@
     <Compile Include="CControls\CChart\CChartRain.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CControls\CChart\CChartEva.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CControls\CChart\CChartSoilData.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -107,6 +110,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CControls\CDataGridView\CDataGridViewRealityWater.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CControls\CDataGridView\CDataGridViewEva.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CControls\CDataGridView\CDataGridViewEvaRTD.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CControls\CDataGridView\CDataGridViewSerialPort.cs">
@@ -225,11 +234,11 @@
     <Compile Include="CControls\CTabPage\CListViewTabPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CControls\CTabPage\CRTDSoilForm.cs">
+    <Compile Include="CControls\CTabPage\CRTDEvaForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CControls\CTabPage\CRTDSoilForm.Designer.cs">
-      <DependentUpon>CRTDSoilForm.cs</DependentUpon>
+    <Compile Include="CControls\CTabPage\CRTDEvaForm.Designer.cs">
+      <DependentUpon>CRTDEvaForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CControls\CTabPage\CRTDForm.cs">
       <SubType>Form</SubType>
@@ -250,7 +259,7 @@
     <Compile Include="CControls\CTreeView\CTreeNode.cs" />
     <Compile Include="CControls\CTreeView\CTreeType.cs" />
     <Compile Include="CControls\Interface\ITabPage.cs" />
-    <Compile Include="DataMgr\Cal.cs" />
+    <Compile Include="DataMgr\CCALDataMgr.cs" />
     <Compile Include="DataMgr\CDBDataMgr.cs" />
     <Compile Include="DataMgr\CDBSoilDataMgr.cs" />
     <Compile Include="DataMgr\CPortDataMgr.cs" />

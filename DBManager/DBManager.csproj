@@ -54,6 +54,8 @@
     <Compile Include="DB\SQLServer\CSQLCurrentData.cs" />
     <Compile Include="DB\SQLServer\CSQLPartitionMgr.cs" />
     <Compile Include="DB\SQLServer\CSQLRain.cs" />
+    <Compile Include="DB\SQLServer\CSQLRealEva.cs" />
+    <Compile Include="DB\SQLServer\CSQLEva.cs" />
     <Compile Include="DB\SQLServer\CSQLSerialPort.cs" />
     <Compile Include="DB\SQLServer\CSQLSoilData.cs" />
     <Compile Include="DB\SQLServer\CSQLSoilStation.cs" />
@@ -66,8 +68,10 @@
     <Compile Include="DB\SQLServer\CSQLWaterFlowMap.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Interface\ICurrentDataProxy.cs" />
+    <Compile Include="Interface\ICurrentEva.cs" />
     <Compile Include="Interface\IMultiThread.cs" />
     <Compile Include="Interface\IRainProxy.cs" />
+    <Compile Include="Interface\IEvaProxy.cs" />
     <Compile Include="Interface\ISerialPortProxy.cs" />
     <Compile Include="Interface\ISoilDataProxy.cs" />
     <Compile Include="Interface\ISoilStationProxy.cs" />

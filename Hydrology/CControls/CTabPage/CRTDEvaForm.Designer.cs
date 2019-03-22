@@ -1,6 +1,6 @@
 ﻿namespace Hydrology.CControls
 {
-    partial class CRTDSoilForm
+    partial class CRTDSanilityForm
     {
         /// <summary>
         /// Required designer variable.

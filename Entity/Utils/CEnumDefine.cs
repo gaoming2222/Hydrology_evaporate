@@ -423,6 +423,12 @@ namespace Hydrology.Entity
         }
         #endregion ///< ChannelType
 
+        #region ERTDState
+        public static readonly string CS_ERTDState_ENormal_DBStr = "ENormal";
+        public static readonly string CS_ERTDState_EWarning_DBStr = "EWarning";
+        public static readonly string CS_ERTDState_EError_DBStr = "EError";
+        #endregion
+
         #region 站点类型
         public static readonly string CS_EStationType_ERainFall_UIStr = "雨量站";
         public static readonly string CS_EStationType_ERainFall_DBStr = "0";
@@ -518,6 +524,26 @@ namespace Hydrology.Entity
                 return EStationType.ESoilHydrology;
             throw new Exception("UIStrToStationType ERROR");
         }
+        public static EStationType DBRTStrToStationType(string type)
+        {
+            type = type.Trim();
+            if (type.Equals("ERainFall"))
+                return EStationType.ERainFall;
+            else if (type.Equals("ERiverWater"))
+                return EStationType.ERiverWater;
+            else if (type.Equals("EHydrology"))
+                return EStationType.EHydrology;
+            else if (type.Equals("ESoil"))
+                return EStationType.ESoil;
+            else if (type.Equals("ESoilRain"))
+                return EStationType.ESoilRain;
+            else if (type.Equals("ESoilWater"))
+                return EStationType.ESoilWater;
+            else if (type.Equals("ESoilHydrology"))
+                return EStationType.ESoilHydrology;
+            throw new Exception("DBStrToStationType ERROR");
+        }
+
         public static EStationType DBStrToStationType(string type)
         {
             type = type.Trim();
@@ -535,8 +561,21 @@ namespace Hydrology.Entity
                 return EStationType.ESoilWater;
             else if (type.Equals(CS_EStationType_ESoilHydrology_DBStr))
                 return EStationType.ESoilHydrology;
-            throw new Exception("DBStrToStationType ERROR");
+            throw new Exception("DBRTStrToStationType ERROR");
         }
+
+        public static ERTDDataState DBStrToState(string state)
+        {
+            state = state.Trim();
+            if (state.Equals(CS_ERTDState_ENormal_DBStr))
+                return ERTDDataState.ENormal;
+            else if (state.Equals(CS_ERTDState_EWarning_DBStr))
+                return ERTDDataState.EWarning;
+            else if (state.Equals(CS_ERTDState_EError_DBStr))
+                return ERTDDataState.EError;
+            throw new Exception("DBStrToRTDState ERROR");
+        }
+
         public static string StationTypeToDBStr(EStationType type)
         {
             switch (type)

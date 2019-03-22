@@ -45,6 +45,8 @@
     <Compile Include="CEntityPackage.cs" />
     <Compile Include="CEntityRain.cs" />
     <Compile Include="CEntityRainAndWater.cs" />
+    <Compile Include="CEntityRealEva.cs" />
+    <Compile Include="CEntityEva.cs" />
     <Compile Include="CEntitySerialPort.cs" />
     <Compile Include="CEntitySoilData.cs" />
     <Compile Include="CEntitySoilStation.cs" />

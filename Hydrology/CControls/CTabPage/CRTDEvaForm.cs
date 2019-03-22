@@ -7,7 +7,7 @@ using Hydrology.Entity;
 
 namespace Hydrology.CControls
 {
-    partial class CRTDSoilForm : Form, ITabPage
+    partial class CRTDSanilityForm : Form, ITabPage
     {
         #region  ITABPAGE
         // 页面关闭事件
@@ -71,7 +71,7 @@ namespace Hydrology.CControls
         #endregion ///<PRIVATE_MEMBER
 
         #region 公共方法
-        public CRTDSoilForm()
+        public CRTDSanilityForm()
             : base()
         {
             // 初始化定时器
@@ -91,45 +91,44 @@ namespace Hydrology.CControls
         /// 添加实时数据
         /// </summary>
         /// <param name="entity"></param>
-        public void AddRTD(CEntitySoilData entity)
+        public void AddRTD(CEntityRealEva entity)
         {
             // 根据ID进行分中心分发
-            (m_dgvAllPage.DataGrid as CDataGridViewSoilRTD).AddRTD(entity);
+            (m_dgvAllPage.DataGrid as CDataGridViewEvaRTD).AddRTD(entity);
 
             // 获取每个站点分中心的ID
-           // CEntityStation station = CDBDataMgr.Instance.GetStationById(entity.StationID);
+            // CEntityStation station = CDBDataMgr.Instance.GetStationById(entity.StationID);
 
-            CEntitySoilStation soilstation = CDBSoilDataMgr.Instance.GetSoilStationInfoByStationId(entity.StationID);
-
-            if (null != soilstation && m_mapSubCenterPage.ContainsKey(soilstation.SubCenterID.Value))
+            CEntityStation station = CDBDataMgr.Instance.GetStationById(entity.StrStationID);
+            if (m_mapSubCenterPage.ContainsKey(station.SubCenterID.Value))
             {
-                (m_mapSubCenterPage[soilstation.SubCenterID.Value].DataGrid as CDataGridViewSoilRTD).AddRTD(entity);
+                (m_mapSubCenterPage[station.SubCenterID.Value].DataGrid as CDataGridViewEvaRTD).AddRTD(entity);
             }
-            //(m_dgvAllPage.DataGrid as CDataGridViewSoilRTD).RecalculateHeaderSize(); //计算表头宽度
+            //(m_dgvAllPage.DataGrid as CDataGridViewSanilityRTD).RecalculateHeaderSize(); //计算表头宽度
         }
         /// <summary>
         /// 更新实时数据
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public bool UpdateRTD(CEntitySoilData entity)
+        public bool UpdateRTD(CEntityRealEva entity)
         {
             // 根据ID进行分中心分发
-            bool result = (m_dgvAllPage.DataGrid as CDataGridViewSoilRTD).UpdateRTD(entity);
+            bool result = (m_dgvAllPage.DataGrid as CDataGridViewEvaRTD).UpdateRTD(entity);
             // 获取每个站点分中心的ID
-           // CEntityStation station = CDBDataMgr.Instance.GetStationById(entity.StationID);
-            CEntitySoilStation soilstation = CDBSoilDataMgr.Instance.GetSoilStationInfoByStationId(entity.StationID);
+            // CEntityStation station = CDBDataMgr.Instance.GetStationById(entity.StationID);
+            CEntityStation station = CDBDataMgr.Instance.GetStationById(entity.StrStationID);
 
-            if (null != soilstation && m_mapSubCenterPage.ContainsKey(soilstation.SubCenterID.Value))
+            if (null != station && m_mapSubCenterPage.ContainsKey(station.SubCenterID.Value))
             {
-                result = result && (m_mapSubCenterPage[soilstation.SubCenterID.Value].DataGrid as CDataGridViewSoilRTD).UpdateRTD(entity);
+                result = result && (m_mapSubCenterPage[station.SubCenterID.Value].DataGrid as CDataGridViewEvaRTD).UpdateRTD(entity);
             }
             return result;
         }
 
-        public List<CEntitySoilData> GetRTDList()
+        public List<CEntityRealEva> GetRTDList()
         {
-            return (m_dgvAllPage.DataGrid as CDataGridViewSoilRTD).GetRTDList();
+            return (m_dgvAllPage.DataGrid as CDataGridViewEvaRTD).GetRTDList();
         }
 
         /// <summary>
@@ -179,7 +178,7 @@ namespace Hydrology.CControls
             m_mapSubCenterPage = new Dictionary<int, CDataGridTabPage>();
             m_tabControl.SuspendLayout();
             m_dgvAllPage = new CDataGridTabPage() { Title = "所有站点", BTabRectClosable = false };
-            m_dgvAllPage.DataGrid = new CDataGridViewSoilRTD() { AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill };
+            m_dgvAllPage.DataGrid = new CDataGridViewEvaRTD() { AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill };
             m_dgvAllPage.Padding = new System.Windows.Forms.Padding(0, 0, 0, 3);
             m_tabControl.AddPage(m_dgvAllPage);
 
@@ -189,25 +188,25 @@ namespace Hydrology.CControls
             {
                 CDataGridTabPage tmp = new CDataGridTabPage() { Title = listSubCenter[i].SubCenterName, BTabRectClosable = false };
                 m_mapSubCenterPage.Add(listSubCenter[i].SubCenterID, tmp);
-                tmp.DataGrid = new CDataGridViewSoilRTD() { AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill };
+                tmp.DataGrid = new CDataGridViewEvaRTD() { AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill };
                 tmp.Padding = new System.Windows.Forms.Padding(0, 0, 0, 3);
                 m_tabControl.AddPage(tmp);
-                //(tmp.DataGrid as CDataGridViewSoilRTD).RecalculateHeaderSize(); //计算表头宽度
+                //(tmp.DataGrid as CDataGridViewSanilityRTD).RecalculateHeaderSize(); //计算表头宽度
             }
 
             // 绑定消息，分中心变更消息
             CDBDataMgr.Instance.SubCenterUpdated += new EventHandler(this.EHSubCenterChanged);
             // 收到RTD消息
-            CDBSoilDataMgr.Instance.RecvedRTDSoilData += new EventHandler<CEventSingleArgs<CEntitySoilData>>(EHRecvRTD);
+            CDBDataMgr.Instance.RecvedRTD_Sanility += new EventHandler<CEventSingleArgs<CEntityRealEva>>(EHRecvRTD);
             // 收到清空RTD消息
-            CDBSoilDataMgr.Instance.RTDSoilDataClear += new EventHandler(EHClearRTD);
+            CDBDataMgr.Instance.RTDCleared_Sanility += new EventHandler(EHClearRTD);
 
             m_tabControl.ResumeLayout(false);
 
             // 开启定时器
             m_timer.Start();
 
-            //(m_dgvAllPage.DataGrid as CDataGridViewSoilRTD).RecalculateHeaderSize();
+            //(m_dgvAllPage.DataGrid as CDataGridViewSanilityRTD).RecalculateHeaderSize();
         }
 
         #endregion ///<帮助方法
@@ -246,7 +245,7 @@ namespace Hydrology.CControls
                 else
                 {
                     // 新建数据项
-                    tmp.DataGrid = new CDataGridViewSoilRTD();
+                    tmp.DataGrid = new CDataGridViewEvaRTD();
                     tmp.DataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
                 }
                 m_tabControl.AddPage(tmp);
@@ -254,7 +253,7 @@ namespace Hydrology.CControls
             m_tabControl.ResumeLayout(false);
         }
 
-        private void EHRecvRTD(object sender, CEventSingleArgs<CEntitySoilData> e)
+        private void EHRecvRTD(object sender, CEventSingleArgs<CEntityRealEva> e)
         {
             // 如果更新失败，那么就添加
             if (!UpdateRTD(e.Value))
@@ -277,12 +276,12 @@ namespace Hydrology.CControls
         {
             // 每十分钟刷新界面
             // 切换数据库时，会清空RTD数据
-            bool result = (m_dgvAllPage.DataGrid as CDataGridViewSoilRTD).RefreshRTDTimeOutStatus();
+            bool result = (m_dgvAllPage.DataGrid as CDataGridViewEvaRTD).RefreshRTDTimeOutStatus();
             foreach (KeyValuePair<int, CDataGridTabPage> entity in m_mapSubCenterPage)
             {
-                result = result && (entity.Value.DataGrid as CDataGridViewSoilRTD).RefreshRTDTimeOutStatus();
+                result = result && (entity.Value.DataGrid as CDataGridViewEvaRTD).RefreshRTDTimeOutStatus();
             }
-            CSystemInfoMgr.Instance.AddInfo("刷新土壤墒情实时数据状态");
+            CSystemInfoMgr.Instance.AddInfo("刷新盐度实时数据状态");
         }
 
         private void EHFormClosing(object sender, FormClosingEventArgs e)

@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 
 namespace EvaCal
 {
-    class Cal
+    public class CCALDataMgr
     {
         string[] sqlConStr = new string[4];
         string[] rawDataNew = new string[8];
