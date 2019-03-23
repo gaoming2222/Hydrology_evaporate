@@ -474,29 +474,11 @@ namespace Hydrology.Forms
             m_proxyWater = new CSQLWater();
             m_proxyRain = new CSQLRain();
             m_proxyStation = new CSQLStation();
-
-
         }
         public void Import(CBatchStruct batch, DateTime DStartTime, DateTime DEndTime, bool isUpdate = false)
         {
             DateTime? lastTime = null;
             ERTDDataState tmpRTDWaterDataState = ERTDDataState.ENormal;
-            ////gm  1024 $60091K02031610220800084505230800084505
-            //string rawString = rawData;
-            //string startTime = rawString.Substring(11, 10);
-            //string endTime = rawString.Substring(27, 6);
-            //string strYear = 20 + startTime.Substring(0, 2);
-            //string strMonth = startTime.Substring(2, 2);
-            //string strStartDay = startTime.Substring(4, 2);
-            //string strStartHour = startTime.Substring(6, 2);
-            //string strStartMinute = startTime.Substring(8, 2);
-            //string strEndDay = endTime.Substring(0, 2);
-            //string strEndHour = endTime.Substring(2, 2);
-            //string strEndMinute = endTime.Substring(4, 2);
-
-            ////DateTime DStartTime = new DateTime(int.Parse(strYear), int.Parse(strMonth), int.Parse(strStartDay), int.Parse(strStartHour), int.Parse(strStartMinute), 0);
-            ////DateTime DEndTime = new DateTime(int.Parse(strYear), int.Parse(strMonth), int.Parse(strEndDay), int.Parse(strEndHour), int.Parse(strEndMinute), 0);
-
             List<CTimeAndData> datas = batch.Datas;
             string stationid = batch.StationID;
             EStationType type = batch.StationType;

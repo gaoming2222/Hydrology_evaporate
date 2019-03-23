@@ -536,6 +536,20 @@ namespace Hydrology.DataMgr
             return query;
         }
 
+        public String SendSetMsgEV(string id, string stationID, IList<EDownParamEV> cmds, CDownConfEV down, EChannelType ctype)
+        {
+            string query = string.Empty;
+            if (EChannelType.GPRS == ctype)
+            {
+                query = SendGprsSetEV(id, stationID, cmds, down);
+            }
+            else if (EChannelType.GSM == ctype)
+            {
+                query = SendGsmSetEV(id, stationID, cmds, down);
+            }
+            return query;
+        }
+
         public String SendSetHDMsg(string id, string stationID, IList<EDownParam> cmds, CDownConf down, EChannelType ctype)
         {
             string query = string.Empty;
@@ -546,6 +560,20 @@ namespace Hydrology.DataMgr
             else if (EChannelType.GSM == ctype)
             {
                 query = SendGsmSet(id, stationID, cmds, down);
+            }
+            return query;
+        }
+
+        public String SendSetHDMsgEV(string id, string stationID, IList<EDownParamEV> cmds, CDownConfEV down, EChannelType ctype)
+        {
+            string query = string.Empty;
+            if (EChannelType.GPRS == ctype)
+            {
+                query = SendHDGprsSetEV(id, stationID, cmds, down);
+            }
+            else if (EChannelType.GSM == ctype)
+            {
+                query = SendGsmSetEV(id, stationID, cmds, down);
             }
             return query;
         }
@@ -1185,6 +1213,30 @@ namespace Hydrology.DataMgr
             return query;
         }
 
+        public String SendGprsSetEV(string userid, string stationID, IList<EDownParamEV> cmds, CDownConfEV down)
+        {
+            string query = string.Empty;
+            var gprs = FindGprsByUserid(userid);
+            if (gprs != null)
+            {
+                uint dtuID = 0;
+                if (gprs.FindByID(userid, out dtuID))
+                {
+                    query = gprs.Down.BuildSet(stationID, cmds, down, EChannelType.GPRS);
+                    gprs.SendDataTwice(dtuID, query);
+                }
+                else
+                {
+                    MessageBox.Show("站点" + stationID + "当前不在线！");
+                }
+            }
+            else
+            {
+                MessageBox.Show("站点" + stationID + "当前不在线！");
+            }
+            return query;
+        }
+
 
         public String SendHDGprsSet(string userid, string stationID, IList<EDownParam> cmds, CDownConf down)
         {
@@ -1193,6 +1245,32 @@ namespace Hydrology.DataMgr
             if (hdgprs != null)
             {
                 byte [] dtuID = null;
+                if (hdgprs.FindByID(userid, out dtuID))
+                {
+                    query = hdgprs.Down.BuildSet(stationID, cmds, down, EChannelType.GPRS);
+                    string id = System.Text.Encoding.Default.GetString(dtuID);
+                    hdgprs.SendDataTwice(id, query);
+                }
+                else
+                {
+                    MessageBox.Show("站点" + stationID + "当前不在线！");
+                }
+            }
+            else
+            {
+                MessageBox.Show("站点" + stationID + "当前不在线！");
+            }
+            return query;
+        }
+
+
+        public String SendHDGprsSetEV(string userid, string stationID, IList<EDownParamEV> cmds, CDownConfEV down)
+        {
+            string query = string.Empty; ;
+            var hdgprs = FindHDGprsByUserid(userid);
+            if (hdgprs != null)
+            {
+                byte[] dtuID = null;
                 if (hdgprs.FindByID(userid, out dtuID))
                 {
                     query = hdgprs.Down.BuildSet(stationID, cmds, down, EChannelType.GPRS);
@@ -1632,6 +1710,22 @@ namespace Hydrology.DataMgr
         /// <param name="down">查询参数</param>
         /// <returns></returns>
         private string SendGsmSet(string gsmNum, string stationID, IList<EDownParam> cmds, CDownConf down)
+        {
+            string qry = string.Empty;
+            var gsm = FindGsm(stationID);
+            if (gsm != null)
+            {
+                qry = gsm.Down.BuildSet(stationID, cmds, down, EChannelType.GSM);
+                Debug.Write(qry);
+                // 写入系统日志
+                String returnMsg = string.Empty;
+                gsm.SendMsg(gsmNum, qry);
+            }
+            return qry;
+        }
+
+
+        private string SendGsmSetEV(string gsmNum, string stationID, IList<EDownParamEV> cmds, CDownConfEV down)
         {
             string qry = string.Empty;
             var gsm = FindGsm(stationID);
