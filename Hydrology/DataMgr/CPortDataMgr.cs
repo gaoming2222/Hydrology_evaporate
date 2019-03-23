@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using Hydrology.Entity;
-
+﻿using Hydrology.Entity;
+using Hydrology.Forms;
 using Protocol.Channel.Interface;
 using Protocol.Manager;
-using System.Windows.Forms;
-using Hydrology.Forms;
-using System.Text;
-using System.Threading;
-using System.Collections;
-using System.Text.RegularExpressions;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace Hydrology.DataMgr
 {
     public class CPortDataMgr
     {
-        public static  int gsmNum = 0;
+        public static int gsmNum = 0;
         public string addr = "";
 
         #region CPortDataMgr单例模式
@@ -142,7 +140,7 @@ namespace Hydrology.DataMgr
                     CProtocolEventManager.GPRS_OffLine(null, null);
                 }
             }
-            if(hdgprs != null)
+            if (hdgprs != null)
             {
                 byte[] dtuID;
                 if (hdgprs.FindByID(userID, out dtuID))
@@ -169,7 +167,7 @@ namespace Hydrology.DataMgr
             var gprs = FindGprsByUserid(userID);
             if (gprs == null)
             {
-           //     CProtocolEventManager.GPRS_OffLine(null, null);
+                //     CProtocolEventManager.GPRS_OffLine(null, null);
             }
             else
             {
@@ -187,7 +185,7 @@ namespace Hydrology.DataMgr
                 }
                 else
                 {
-                   // CProtocolEventManager.GPRS_OffLine(null, null);
+                    // CProtocolEventManager.GPRS_OffLine(null, null);
                 }
             }
             return query;
@@ -206,7 +204,7 @@ namespace Hydrology.DataMgr
             var hdgprs = FindHDGprsByUserid(userID);
             if (gprs == null)
             {
-             //   CProtocolEventManager.GPRS_OffLine(null, null);
+                //   CProtocolEventManager.GPRS_OffLine(null, null);
             }
             else
             {
@@ -221,7 +219,7 @@ namespace Hydrology.DataMgr
                 }
                 else
                 {
-                 //   CProtocolEventManager.GPRS_OffLine(null, null);
+                    //   CProtocolEventManager.GPRS_OffLine(null, null);
                 }
             }
             if (hdgprs != null)
@@ -244,7 +242,7 @@ namespace Hydrology.DataMgr
             var gprs = FindGprsByUserid(userID);
             if (gprs == null)
             {
-            //    CProtocolEventManager.GPRS_OffLine(null, null);
+                //    CProtocolEventManager.GPRS_OffLine(null, null);
             }
             else
             {
@@ -262,7 +260,7 @@ namespace Hydrology.DataMgr
                 }
                 else
                 {
-               //     CProtocolEventManager.GPRS_OffLine(null, null);
+                    //     CProtocolEventManager.GPRS_OffLine(null, null);
                 }
             }
             return query;
@@ -318,7 +316,7 @@ namespace Hydrology.DataMgr
             var gprs = FindGprsByUserid(userID);
             if (gprs == null)
             {
-             //   CProtocolEventManager.GPRS_OffLine(null, null);
+                //   CProtocolEventManager.GPRS_OffLine(null, null);
             }
             else
             {
@@ -336,7 +334,7 @@ namespace Hydrology.DataMgr
                 }
                 else
                 {
-                 //   CProtocolEventManager.GPRS_OffLine(null, null);
+                    //   CProtocolEventManager.GPRS_OffLine(null, null);
                 }
             }
             return query;
@@ -393,7 +391,7 @@ namespace Hydrology.DataMgr
             var gprs = FindGprsByUserid(userID);
             if (gprs == null)
             {
-            //    CProtocolEventManager.GPRS_OffLine(null, null);
+                //    CProtocolEventManager.GPRS_OffLine(null, null);
             }
             else
             {
@@ -411,7 +409,7 @@ namespace Hydrology.DataMgr
                 }
                 else
                 {
-              //      CProtocolEventManager.GPRS_OffLine(null, null);
+                    //      CProtocolEventManager.GPRS_OffLine(null, null);
                 }
             }
             return query;
@@ -425,7 +423,7 @@ namespace Hydrology.DataMgr
             var gprs = FindGprsByUserid(userID);
             if (gprs == null)
             {
-            //    CProtocolEventManager.GPRS_OffLine(null, null);
+                //    CProtocolEventManager.GPRS_OffLine(null, null);
             }
             else
             {
@@ -443,7 +441,7 @@ namespace Hydrology.DataMgr
                 }
                 else
                 {
-                //    CProtocolEventManager.GPRS_OffLine(null, null);
+                    //    CProtocolEventManager.GPRS_OffLine(null, null);
                 }
             }
             return query;
@@ -582,13 +580,13 @@ namespace Hydrology.DataMgr
                 return SendGsmFlash(id, stationID, stype, trans, beginTime, endTime);
             return query;
         }
-        private String SendSDMsg(string id, string stationID, DateTime beginTime,EChannelType ctype)
+        private String SendSDMsg(string id, string stationID, DateTime beginTime, EChannelType ctype)
         {
             string query = string.Empty;
             if (ctype == EChannelType.GPRS)
-                return SendGprsSD(id, stationID,beginTime);
+                return SendGprsSD(id, stationID, beginTime);
             else if (ctype == EChannelType.GSM)
-                return SendGsmSD(id, stationID,beginTime);
+                return SendGsmSD(id, stationID, beginTime);
             return query;
         }
         private String SendBoardMsg(string userid, string stationID, EStationType stype, ETrans trans, DateTime beginTime, EChannelType ctype)
@@ -597,7 +595,7 @@ namespace Hydrology.DataMgr
             if (ctype == EChannelType.GPRS)
                 return SendGprsBoard(userid, stationID, stype, trans, beginTime);
             //else if (ctype == EChannelType.GSM)
-                //return SendGsmBoard(userid, stationID, stype, trans, beginTime);
+            //return SendGsmBoard(userid, stationID, stype, trans, beginTime);
             return query;
         }
         public String SendFlashMsg(CEntityStation station, ETrans trans, DateTime beginTime, DateTime endTime, EChannelType ctype)
@@ -669,10 +667,10 @@ namespace Hydrology.DataMgr
         public List<IHDGprs> HDGprsLists { get { return this.m_hdgprsLists; } }
         public void StartHDGprs(bool bIsSysLoad = true)
         {
-            
-                // 停止之前的所有监听端口，然后重新打开
-             StopHDGprs();
-          
+
+            // 停止之前的所有监听端口，然后重新打开
+            StopHDGprs();
+
             m_hdgprsLists = new List<IHDGprs>();
             //  读取配置文件，加载所有gprs信道协议
             var gprsNameLists = XmlDocManager.Instance.GPRSProtocolNames;
@@ -943,7 +941,7 @@ namespace Hydrology.DataMgr
             return gprs;
         }
 
-       
+
 
 
 
@@ -1117,7 +1115,7 @@ namespace Hydrology.DataMgr
                 //1109
                 else
                 {
-                    MessageBox.Show("站点"+stationID+"当前不在线！");
+                    MessageBox.Show("站点" + stationID + "当前不在线！");
                 }
             }
             else
@@ -1135,7 +1133,7 @@ namespace Hydrology.DataMgr
             if (hdgprs != null)
             {
                 byte[] dtuID = null;
-               
+
                 if (hdgprs.FindByID(userid, out dtuID))
                 {
                     query = hdgprs.Down.BuildQuery(stationID, cmds, EChannelType.GPRS);
@@ -1192,7 +1190,7 @@ namespace Hydrology.DataMgr
             var hdgprs = FindHDGprsByUserid(userid);
             if (hdgprs != null)
             {
-                byte [] dtuID = null;
+                byte[] dtuID = null;
                 if (hdgprs.FindByID(userid, out dtuID))
                 {
                     query = hdgprs.Down.BuildSet(stationID, cmds, down, EChannelType.GPRS);
@@ -1279,7 +1277,7 @@ namespace Hydrology.DataMgr
             }
             return query;
         }
-        public String SendGprsSD(string userid, string stationID,DateTime beginTime)
+        public String SendGprsSD(string userid, string stationID, DateTime beginTime)
         {
             string query = string.Empty;
             var gprs = FindGprsByUserid(userid);
@@ -1462,7 +1460,7 @@ namespace Hydrology.DataMgr
                     //gsm.SerialPortStateChanged += CProtocolEventManager.SerialPortStateChanged;
                     //gsm.SoilDataReceived += CProtocolEventManager.SoilDataReceived;
                     //gsm.GSMTimeOut += CProtocolEventManager.GSM_TimeOut;
-                   
+
                     //gsm.InitPort(comPortName, portInfo.Baudrate);
                     //if (!gsm.OpenPort())
                     //{
@@ -1471,10 +1469,10 @@ namespace Hydrology.DataMgr
                     //}
                     //if (!gsm.InitGsm())
                     //{
-                        
+
                     //    gsm.ClosePort();
                     //    gsm.OpenPort();
-                       
+
                     //}
                     ////gsm.OpenPort();
                     //gsm.InitGsm();
@@ -1949,7 +1947,7 @@ namespace Hydrology.DataMgr
                 CSystemInfoMgr.Instance.AddInfo(string.Format("请人工进行北斗普通级本地通讯"));
                 return;
             }
-                //组合CTTCAStruct结构
+            //组合CTTCAStruct结构
             CTTCAStruct cTTCAStruct = new CTTCAStruct();
             cTTCAStruct.SenderID = addr.ToString();
             cTTCAStruct.RecvAddr = addr.ToString();
@@ -1963,18 +1961,19 @@ namespace Hydrology.DataMgr
 
             //端口号
             List<CPortProtocolConfig> m_listPortConfig = XmlDocManager.Instance.GetComOrPortConfig(true);
-            if(m_listPortConfig != null)
+            if (m_listPortConfig != null)
             {
-                for(int i = 0; i < m_listPortConfig.Count; i++)
+                for (int i = 0; i < m_listPortConfig.Count; i++)
                 {
                     CPortProtocolConfig cPortProtocolConfig = m_listPortConfig[i];
-                    if(cPortProtocolConfig.ProtocolChannelName == "Beidou-Normal")
+                    if (cPortProtocolConfig.ProtocolChannelName == "Beidou-Normal")
                     {
                         comPort = comPort + cPortProtocolConfig.PortNumber.ToString();
                         break;
                     }
                 }
-            }else
+            }
+            else
             {
                 CSystemInfoMgr.Instance.AddInfo(string.Format("系统未配置北斗通信"));
             }
@@ -2390,7 +2389,7 @@ namespace Hydrology.DataMgr
                 catch (Exception exp) { Debug.WriteLine(exp.Message); }
                 cable.Close();
             }
-           
+
         }
 
         #endregion
@@ -2526,7 +2525,7 @@ namespace Hydrology.DataMgr
 
 
                 // string type = msg.Substring(4, 2);
-               // int a1 = 0;
+                // int a1 = 0;
                 //CProtocolEventManager.AddTRUEvent(stationid);
                 //Form1 f1 = new Form1();
                 //f1.ShowDialog();
@@ -2628,11 +2627,11 @@ namespace Hydrology.DataMgr
         public static void UpDataReceived(object sender, UpEventArgs e)
         {
             //Console.WriteLine("..." + Decimal.Parse("111111") * (Decimal)0.01);
-            
+
             CReportStruct report = e.Value;
-            
-            string flagId = CDBDataMgr.Instance.GetComFlagById(report.Stationid,report.ChannelType);
-            if(flagId != report.flagId)
+
+            string flagId = CDBDataMgr.Instance.GetComFlagById(report.Stationid, report.ChannelType);
+            if (flagId != report.flagId)
             {
                 if (report.ChannelType == EChannelType.GPRS || report.ChannelType == EChannelType.GSM)
                 {
@@ -2657,25 +2656,26 @@ namespace Hydrology.DataMgr
                 //string hour = str.Substring(11, 2);
                 //string minute = str.Substring(13, 2);
                 //DateTime collect = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minute, 0);
-                string [] lists = str.Substring(15).Split(CSpecialChars.BALNK_CHAR);
+                string[] lists = str.Substring(15).Split(CSpecialChars.BALNK_CHAR);
                 //stationDatas.Datas
                 try
                 {
                     int hour = int.Parse(str.Substring(11, 2));
-                    int  minute = int.Parse(str.Substring(13, 2));
+                    int minute = int.Parse(str.Substring(13, 2));
                     DateTime collect = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minute, 0);
-                    
+
                     foreach (var item in lists)
                     {
                         stationDatas.Datas.Add(new CSingleStationData()
                         {
 
-                            WaterStage = decimal.Parse(item.Substring(0,6)) / 100,
+                            WaterStage = decimal.Parse(item.Substring(0, 6)) / 100,
                             DataTime = collect
                         });
                     }
 #pragma warning disable CS0168 // 声明了变量“e8”，但从未使用过
-                }catch(Exception e8)
+                }
+                catch (Exception e8)
 #pragma warning restore CS0168 // 声明了变量“e8”，但从未使用过
                 {
 
@@ -2705,7 +2705,7 @@ namespace Hydrology.DataMgr
                     int day = int.Parse(str.Substring(9, 2));
                     int hour = int.Parse(str.Substring(11, 2));
                     int minute = int.Parse(str.Substring(13, 2));
-                   
+
                     DateTime collect = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minute, 0);
 
                     foreach (var item in lists)
@@ -2719,7 +2719,7 @@ namespace Hydrology.DataMgr
                         {
 
                             WaterStage = decimal.Parse(item.Substring(0, 6)) / 100,
-                            
+
                             DataTime = collect
                         });
                     }
@@ -2751,7 +2751,7 @@ namespace Hydrology.DataMgr
                 fs.Close();
 
             }
-                if (str.Contains("TS"))
+            if (str.Contains("TS"))
             {
                 var stationDatas = new CEventRecvStationDatasArgs()
                 {
@@ -2784,7 +2784,40 @@ namespace Hydrology.DataMgr
 
             }
             ///TODO 调用计算部分 report
-            else {
+            else if(report.ReportType == EMessageType.Evp){
+                var stationDatas = new CEventRecvStationDatasArgs()
+                {
+                    StrStationID = report.Stationid,
+                    EStationType = report.StationType,
+                    EMessageType = report.ReportType,
+                    RecvDataTime = report.RecvTime,
+                    EChannelType = report.ChannelType,
+                    StrSerialPort = report.ListenPort
+                };
+                if (report.Datas.Count == 0)
+                {
+                    string rawStr = e.RawData;
+                    report.Datas.Add(WrongParser(rawStr));
+                }
+
+                foreach (var item in report.Datas)
+                {
+                    stationDatas.Datas.Add(new CSingleStationData()
+                    {
+                        TotalRain = item.Rain,
+                        Voltage = item.Voltge.Value,
+                        Temp = item.Temperature.Value,
+                        Eva = item.Evp,
+                        DataTime = item.Time,
+                        EvpType = item.EvpType
+                    });
+                }
+
+                //  写入内存，写库
+                CDBDataMgr.Instance.EHRecvEvaDatas(null, stationDatas);
+            }
+            else
+            {
                 if (report != null)
                 {
                     var stationDatas = new CEventRecvStationDatasArgs()
@@ -2806,9 +2839,9 @@ namespace Hydrology.DataMgr
                     {
                         stationDatas.Datas.Add(new CSingleStationData()
                         {
+                            WaterStage = item.Water,
                             TotalRain = item.Rain,
                             Voltage = item.Voltge.Value,
-
                             DataTime = item.Time
                         });
                     }
@@ -2824,11 +2857,11 @@ namespace Hydrology.DataMgr
             //Hydrology.Entity.CUpReport
             List<CUpReport> reports = e.Value;
             string str = e.RawData;
-            if(reports.Count != 0)
+            if (reports.Count != 0)
             {
-                foreach(var report in reports)
+                foreach (var report in reports)
                 {
-                    if(report != null)
+                    if (report != null)
                     {
                         var stationDatas = new CEventRecvStationDatasArgs()
                         {
@@ -2839,15 +2872,15 @@ namespace Hydrology.DataMgr
                             EChannelType = report.ChannelType,
                             StrSerialPort = report.ListenPort
                         };
-                        
-                            stationDatas.Datas.Add(new CSingleStationData()
-                            {
-                                WaterStage = report.Data.Water1,
-                                TotalRain = report.Data.Rain,
-                                Voltage = report.Data.Voltage,
-                                DataTime = report.RecvTime
-                            });
-                        
+
+                        stationDatas.Datas.Add(new CSingleStationData()
+                        {
+                            WaterStage = report.Data.Water1,
+                            TotalRain = report.Data.Rain,
+                            Voltage = report.Data.Voltage,
+                            DataTime = report.RecvTime
+                        });
+
 
                         CDBDataMgr.Instance.EHRecvStationDatas(null, stationDatas);
                     }
@@ -2915,7 +2948,8 @@ namespace Hydrology.DataMgr
                                 Debug.WriteLine("drop");
                                 return null;
                             }
-                        } break;
+                        }
+                        break;
                     case EStationType.EHydrology:
                         {
                             //  水文

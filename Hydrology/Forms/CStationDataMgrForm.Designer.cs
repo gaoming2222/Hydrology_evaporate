@@ -413,7 +413,7 @@
             // 
             // m_lablePageIndex
             // 
-            this.m_lablePageIndex.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.m_lablePageIndex.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)));
             this.m_lablePageIndex.AutoSize = true;
             this.m_lablePageIndex.Location = new System.Drawing.Point(4, 7);

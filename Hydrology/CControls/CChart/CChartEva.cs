@@ -11,101 +11,101 @@ using Hydrology.DBManager.Interface;
 
 namespace Hydrology.CControls
 {
-    public class CChartSanility : CExChart
+    public class CChartEva : CExChart
     {
         #region 静态常量
-        // 数据源中盐度的列名
-        public static readonly string CS_CN_Sanility = "sanility";
+        // 数据源中蒸发的列名
+        public static readonly string CS_CN_Eva = "eva";
 
-        // 数据源中电导率的列名
-        public static readonly string CS_CN_Conduct = "conduct";
+        // 数据源中降雨的列名
+        public static readonly string CS_CN_Rain = "Rain";
 
-        // 盐度的坐标名字
-        public static readonly string CS_AsixY_Name = "盐度(%)";
+        // 蒸发的坐标名字
+        public static readonly string CS_AsixY_Name = "蒸发(mm)";
 
-        // 电导率的坐标名字
-        public static readonly string CS_AsixY2_Name = "电导率(mS/cm)";
+        // 降雨的坐标名字
+        public static readonly string CS_AsixY2_Name = "降雨(mm)";
 
         // 图表名字
-        public static readonly string CS_Chart_Name = "盐度电导率过程线";
+        public static readonly string CS_Chart_Name = "蒸发降雨过程线";
 
-        // 盐度线条名字
-        public static readonly string CS_Serial_Name_Sanility = "Serial_Sanility";
+        // 蒸发线条名字
+        public static readonly string CS_Serial_Name_Eva = "Serial_Eva";
 
-        // 电导率线条名字
-        public static readonly string CS_Serial_Name_Conduct = "Serial_Conduct";
+        // 降雨线条名字
+        public static readonly string CS_Serial_Name_Rain = "Serial_Rain";
 
         #endregion 静态常量
 
-        private Nullable<decimal> m_dMinSanility; //最小的盐度值,实际值，不是计算后的值
-        private Nullable<decimal> m_dMaxSanility; //最大的盐度值，实际值，不是计算后的值
+        private Nullable<decimal> m_dMinEva; //最小的蒸发值,实际值，不是计算后的值
+        private Nullable<decimal> m_dMaxEva; //最大的蒸发值，实际值，不是计算后的值
 
-        private Nullable<decimal> m_dMinConductivity; //最小的电导率，实际值，不是计算后的值
-        private Nullable<decimal> m_dMaxConductivity; //最大的电导率，实际值，不是计算后的值
+        private Nullable<decimal> m_dMinRain; //最小的降雨，实际值，不是计算后的值
+        private Nullable<decimal> m_dMaxRain; //最大的降雨，实际值，不是计算后的值
 
         private Nullable<DateTime> m_maxDateTime;   //最大的日期
         private Nullable<DateTime> m_minDateTime;   //最小的日期
 
-        private Series m_serialSanility;         //盐度过程线
-        private Series m_serialConduct;         //电导率过程线
+        private Series m_serialEva;         //蒸发过程线
+        private Series m_serialRain;         //降雨过程线
 
         private Legend m_legend;     //图例
 
-        private MenuItem m_MISanilitySerial; //盐度
-        private MenuItem m_MIConductSerial;  //电导率
+        private MenuItem m_MIEvaSerial; //蒸发
+        private MenuItem m_MIRainSerial;  //降雨
 
-        private IEvaProxy m_proxySanility;
+        private IEvaProxy m_proxyEva;
 
-        public CChartSanility()
+        public CChartEva()
             : base()
         {
             // 设定数据表的列
             base.m_dataTable.Columns.Add(CS_CN_DateTime, typeof(DateTime));
-            base.m_dataTable.Columns.Add(CS_CN_Sanility, typeof(Decimal));
-            base.m_dataTable.Columns.Add(CS_CN_Conduct, typeof(Decimal));
+            base.m_dataTable.Columns.Add(CS_CN_Eva, typeof(Decimal));
+            base.m_dataTable.Columns.Add(CS_CN_Rain, typeof(Decimal));
         }
-        // 外部添加盐度电导率接口
-        public void AddSanilities(List<CEntityEva> Sanilities)
+        // 外部添加蒸发降雨接口
+        public void AddEvas(List<CEntityEva> Evas)
         {
-            m_dMinSanility = null;
-            m_dMaxSanility = null;
-            foreach (CEntityEva entity in Sanilities)
+            m_dMinEva = null;
+            m_dMaxEva = null;
+            foreach (CEntityEva entity in Evas)
             {
-                //    if (Sanility.Sanility > 0 && Sanility.Conductivity > 0)
+                //    if (Eva.Eva > 0 && Eva.Rain > 0)
                 
-                    // 判断盐度最大值和最小值
-                    if (m_dMinSanility.HasValue)
+                    // 判断蒸发最大值和最小值
+                    if (m_dMinEva.HasValue)
                     {
-                        m_dMinSanility = m_dMinSanility > entity.Eva ? entity.Eva : m_dMinSanility;
+                        m_dMinEva = m_dMinEva > entity.Eva ? entity.Eva : m_dMinEva;
                     }
                     else
                     {
-                        m_dMinSanility = entity.Eva;
+                        m_dMinEva = entity.Eva;
                     }
-                    if (m_dMaxSanility.HasValue)
+                    if (m_dMaxEva.HasValue)
                     {
-                        m_dMaxSanility = m_dMaxSanility < entity.Eva ? entity.Eva : m_dMaxSanility;
-                    }
-                    else
-                    {
-                        m_dMaxSanility = entity.Eva;
-                    }
-                    // 判断电导率的最大值和最小值
-                    if (m_dMinConductivity.HasValue)
-                    {
-                        m_dMinConductivity = m_dMinConductivity > entity.Voltage ? entity.Voltage : m_dMinConductivity;
+                        m_dMaxEva = m_dMaxEva < entity.Eva ? entity.Eva : m_dMaxEva;
                     }
                     else
                     {
-                        m_dMinConductivity = entity.Voltage;
+                        m_dMaxEva = entity.Eva;
                     }
-                    if (m_dMaxConductivity.HasValue)
+                    // 判断降雨的最大值和最小值
+                    if (m_dMinRain.HasValue)
                     {
-                        m_dMaxConductivity = m_dMaxConductivity < entity.Voltage ? entity.Voltage : m_dMaxConductivity;
+                        m_dMinRain = m_dMinRain > entity.Rain ? entity.Rain : m_dMinRain;
                     }
                     else
                     {
-                        m_dMaxConductivity = entity.Voltage;
+                        m_dMinRain = entity.Rain;
+                    }
+                    if (m_dMaxRain.HasValue)
+                    {
+                        m_dMaxRain = m_dMaxRain < entity.Rain ? entity.Rain : m_dMaxRain;
+                    }
+                    else
+                    {
+                        m_dMaxRain = entity.Rain;
                     }
 
                 // 判断日期, 更新日期最大值和最小值
@@ -126,36 +126,36 @@ namespace Hydrology.CControls
                     m_minDateTime = entity.TimeCollect;
                 }
 
-                if (entity.Eva != -9999 && entity.Voltage >= 0)
+                if (entity.Eva != -9999 && entity.Rain >= 0)
                 {
                     //赋值到内部数据表中
-                    m_dataTable.Rows.Add(entity.TimeCollect, entity.Eva, entity.Voltage);
-                    // m_dataTable.Rows.Add(Sanility.TimeCollect, Sanility.Sanility);
+                    m_dataTable.Rows.Add(entity.TimeCollect, entity.Eva, entity.Rain);
+                    // m_dataTable.Rows.Add(Eva.TimeCollect, Eva.Eva);
                 }
-                //  if( Sanility.Conductivity != -9999)
+                //  if( Eva.Rain != -9999)
                 //{
-                //    m_dataTable.Rows.Add(Sanility.TimeCollect, Sanility.Conductivity);
+                //    m_dataTable.Rows.Add(Eva.TimeCollect, Eva.Rain);
                 //}
 
 
             }
-            if (Sanilities.Count >= 3)
+            if (Evas.Count >= 3)
             {
-                // 盐度和电导率最大值和最小值
+                // 蒸发和降雨最大值和最小值
                 decimal offset = 0;
-                m_dMaxSanility = m_dMaxSanility == null ? 0 : m_dMaxSanility;
-                m_dMinSanility = m_dMinSanility == null ? 0 : m_dMinSanility;
-                if (m_dMaxSanility != m_dMinSanility)
+                m_dMaxEva = m_dMaxEva == null ? 0 : m_dMaxEva;
+                m_dMinEva = m_dMinEva == null ? 0 : m_dMinEva;
+                if (m_dMaxEva != m_dMinEva)
                 {
-                    offset = (m_dMaxSanility.Value - m_dMinSanility.Value) * (decimal)0.1;
+                    offset = (m_dMaxEva.Value - m_dMinEva.Value) * (decimal)0.1;
                 }
                 else
                 {
                     // 如果相等的话
-                    offset = (decimal)m_dMaxSanility * (decimal)0.1;
+                    offset = (decimal)m_dMaxEva * (decimal)0.1;
                 }
-                m_chartAreaDefault.AxisY.Maximum = (double)(m_dMaxSanility + offset);
-                m_chartAreaDefault.AxisY.Minimum = (double)(m_dMinSanility - offset);
+                m_chartAreaDefault.AxisY.Maximum = (double)(m_dMaxEva + offset);
+                m_chartAreaDefault.AxisY.Minimum = (double)(m_dMinEva - offset);
                 m_chartAreaDefault.AxisY.Minimum = m_chartAreaDefault.AxisY.Minimum >= 0 ? m_chartAreaDefault.AxisY.Minimum : 0;
                 if (offset == 0)
                 {
@@ -163,18 +163,18 @@ namespace Hydrology.CControls
                     m_chartAreaDefault.AxisY.Maximum = m_chartAreaDefault.AxisY.Minimum + 10;
                 }
 
-                if (m_dMaxConductivity.HasValue && m_dMinConductivity.HasValue)
+                if (m_dMaxRain.HasValue && m_dMinRain.HasValue)
                 {
-                    if (m_dMaxConductivity != m_dMinConductivity)
+                    if (m_dMaxRain != m_dMinRain)
                     {
-                        offset = (m_dMaxConductivity.Value - m_dMinConductivity.Value) * (decimal)0.1;
+                        offset = (m_dMaxRain.Value - m_dMinRain.Value) * (decimal)0.1;
                     }
                     else
                     {
-                        offset = (decimal)m_dMaxConductivity / 2;
+                        offset = (decimal)m_dMaxRain / 2;
                     }
-                    m_chartAreaDefault.AxisY2.Maximum = (double)(m_dMaxConductivity + offset);
-                    m_chartAreaDefault.AxisY2.Minimum = (double)(m_dMinConductivity - offset);
+                    m_chartAreaDefault.AxisY2.Maximum = (double)(m_dMaxRain + offset);
+                    m_chartAreaDefault.AxisY2.Minimum = (double)(m_dMinRain - offset);
                     m_chartAreaDefault.AxisY2.Minimum = m_chartAreaDefault.AxisY2.Minimum >= 0 ? m_chartAreaDefault.AxisY2.Minimum : 0;
 
                     if (offset == 0)
@@ -185,8 +185,8 @@ namespace Hydrology.CControls
                 }
                 else
                 {
-                    // 没有电导率数据
-                    // 人为电导率最大最小值
+                    // 没有降雨数据
+                    // 人为降雨最大最小值
                     m_chartAreaDefault.AxisY2.Maximum = (double)100;
                     m_chartAreaDefault.AxisY2.Minimum = (double)0;
                     m_chartAreaDefault.AxisY2.Enabled = AxisEnabled.False;
@@ -203,8 +203,8 @@ namespace Hydrology.CControls
         {
             m_annotation.Visible = false;
             ClearAllDatas();
-            m_proxySanility.SetFilter(iStationId, timeStart, timeEnd, TimeSelect);
-            if (-1 == m_proxySanility.GetPageCount())
+            m_proxyEva.SetFilter(iStationId, timeStart, timeEnd, TimeSelect);
+            if (-1 == m_proxyEva.GetPageCount())
             {
                 // 查询失败
                 // MessageBox.Show("数据库忙，查询失败，请稍后再试！");
@@ -213,12 +213,12 @@ namespace Hydrology.CControls
             else
             {
                 // 并查询数据，显示第一页
-                m_dMaxConductivity = null;
-                m_dMaxSanility = null;
-                m_dMinConductivity = null;
-                m_dMinSanility = null;
-                int iTotalPage = m_proxySanility.GetPageCount();
-                int rowcount = m_proxySanility.GetRowCount();
+                m_dMaxRain = null;
+                m_dMaxEva = null;
+                m_dMinRain = null;
+                m_dMinEva = null;
+                int iTotalPage = m_proxyEva.GetPageCount();
+                int rowcount = m_proxyEva.GetRowCount();
                 if (rowcount > CI_Chart_Max_Count)
                 {
                     // 数据量太大，退出绘图
@@ -228,7 +228,7 @@ namespace Hydrology.CControls
                 for (int i = 0; i < iTotalPage; ++i)
                 {
                     // 查询所有的数据
-                    this.AddSanilities(m_proxySanility.GetPageData(i + 1, false));
+                    this.AddEvas(m_proxyEva.GetPageData(i + 1, false));
                 }
                 return true;
             }
@@ -236,23 +236,23 @@ namespace Hydrology.CControls
 
         public void InitDataSource(IEvaProxy proxy)
         {
-            m_proxySanility = proxy;
+            m_proxyEva = proxy;
         }
 
-        //电导率
-        private void EH_MI_ConductSerial(object sender, EventArgs e)
+        //降雨
+        private void EH_MI_RainSerial(object sender, EventArgs e)
         {
-            m_MIConductSerial.Checked = !m_MIConductSerial.Checked;
-            m_serialConduct.Enabled = m_MIConductSerial.Checked;
-            //m_serialConductivity.Enabled = true;
-            //m_serialSanilityState.Enabled = true;
-            if (m_MIConductSerial.Checked && (!m_MISanilitySerial.Checked))
+            m_MIRainSerial.Checked = !m_MIRainSerial.Checked;
+            m_serialRain.Enabled = m_MIRainSerial.Checked;
+            //m_serialRain.Enabled = true;
+            //m_serialEvaState.Enabled = true;
+            if (m_MIRainSerial.Checked && (!m_MIEvaSerial.Checked))
             {
-                // 开启右边的滚动条，当且仅当电导率可见的时候
+                // 开启右边的滚动条，当且仅当降雨可见的时候
                 //m_chartAreaDefault.AxisY2.ScaleView.Zoomable = false;
                 //m_chartAreaDefault.AxisY2.ScrollBar.Enabled = true;
                 //m_chartAreaDefault.CursorY.AxisType = AxisType.Secondary;
-                //m_serialConductivity.YAxisType = AxisType.Primary;
+                //m_serialRain.YAxisType = AxisType.Primary;
                 m_chartAreaDefault.CursorY.IsUserEnabled = false;
                 m_chartAreaDefault.CursorY.IsUserSelectionEnabled = false;
             }
@@ -263,46 +263,46 @@ namespace Hydrology.CControls
                 m_chartAreaDefault.CursorY.IsUserSelectionEnabled = true;
                 //m_chartAreaDefault.AxisY2.ScrollBar.Enabled = false;
                 //m_chartAreaDefault.AxisY.ScrollBar.Enabled = true;
-                //m_serialConductivity.YAxisType = AxisType.Secondary;
-                //m_serialSanilityState.YAxisType = AxisType.Primary;
+                //m_serialRain.YAxisType = AxisType.Secondary;
+                //m_serialEvaState.YAxisType = AxisType.Primary;
             }
-            //电导率过程线
-            if (m_serialConduct.Enabled)
+            //降雨过程线
+            if (m_serialRain.Enabled)
             {
-                // 电导率可见
+                // 降雨可见
                 m_chartAreaDefault.AxisY2.Enabled = AxisEnabled.True;
             }
             else
             {
-                // 电导率不可见
+                // 降雨不可见
                 m_chartAreaDefault.AxisY2.Enabled = AxisEnabled.False;
             }
-            //盐度过程线
-            if (m_serialSanility.Enabled)
+            //蒸发过程线
+            if (m_serialEva.Enabled)
             {
-                // 盐度可见
+                // 蒸发可见
                 m_chartAreaDefault.AxisY.Enabled = AxisEnabled.True;
             }
             else
             {
-                // 盐度不可见
+                // 蒸发不可见
                 m_chartAreaDefault.AxisY.Enabled = AxisEnabled.False;
             }
         }
 
-        //盐度
-        private void EH_MI_SanilitySerial(object sender, EventArgs e)
+        //蒸发
+        private void EH_MI_EvaSerial(object sender, EventArgs e)
         {
-            m_MISanilitySerial.Checked = !m_MISanilitySerial.Checked;
-            //盐度
-            m_serialSanility.Enabled = m_MISanilitySerial.Checked;
-            if (m_MIConductSerial.Checked && (!m_MISanilitySerial.Checked))
+            m_MIEvaSerial.Checked = !m_MIEvaSerial.Checked;
+            //蒸发
+            m_serialEva.Enabled = m_MIEvaSerial.Checked;
+            if (m_MIRainSerial.Checked && (!m_MIEvaSerial.Checked))
             {
-                // 开启右边的滚动条，当且仅当电导率可见的时候
+                // 开启右边的滚动条，当且仅当降雨可见的时候
                 m_chartAreaDefault.CursorY.IsUserEnabled = false;
                 m_chartAreaDefault.CursorY.IsUserSelectionEnabled = false;
                 //m_chartAreaDefault.CursorY.AxisType = AxisType.Secondary;
-                //m_serialConductivity.YAxisType = AxisType.Primary;
+                //m_serialRain.YAxisType = AxisType.Primary;
             }
             else
             {
@@ -311,27 +311,27 @@ namespace Hydrology.CControls
                 m_chartAreaDefault.CursorY.IsUserSelectionEnabled = true;
                 //m_chartAreaDefault.AxisY2.ScrollBar.Enabled = false;
                 //m_chartAreaDefault.AxisY2.ScaleView.Zoomable = true;
-                //m_serialConductivity.YAxisType = AxisType.Secondary;
-                //m_serialSanilityState.YAxisType = AxisType.Primary;
+                //m_serialRain.YAxisType = AxisType.Secondary;
+                //m_serialEvaState.YAxisType = AxisType.Primary;
             }
-            if (m_serialConduct.Enabled)
+            if (m_serialRain.Enabled)
             {
-                // 电导率可见
+                // 降雨可见
                 m_chartAreaDefault.AxisY2.Enabled = AxisEnabled.True;
             }
             else
             {
-                // 电导率不可见
+                // 降雨不可见
                 m_chartAreaDefault.AxisY2.Enabled = AxisEnabled.False;
             }
-            if (m_serialSanility.Enabled)
+            if (m_serialEva.Enabled)
             {
-                // 盐度可见
+                // 蒸发可见
                 m_chartAreaDefault.AxisY.Enabled = AxisEnabled.True;
             }
             else
             {
-                // 盐度不可见
+                // 蒸发不可见
                 m_chartAreaDefault.AxisY.Enabled = AxisEnabled.False;
             }
         }
@@ -343,15 +343,15 @@ namespace Hydrology.CControls
         protected override void InitContextMenu()
         {
             base.InitContextMenu();
-            m_MIConductSerial = new MenuItem() { Text = "电导率线" };
-            m_MISanilitySerial = new MenuItem() { Text = "盐度线" };
-            base.m_contextMenu.MenuItems.Add(0, m_MISanilitySerial);
-            base.m_contextMenu.MenuItems.Add(0, m_MIConductSerial);
-            m_MIConductSerial.Checked = true;
-            m_MISanilitySerial.Checked = true;
+            m_MIRainSerial = new MenuItem() { Text = "降雨线" };
+            m_MIEvaSerial = new MenuItem() { Text = "蒸发线" };
+            base.m_contextMenu.MenuItems.Add(0, m_MIEvaSerial);
+            base.m_contextMenu.MenuItems.Add(0, m_MIRainSerial);
+            m_MIRainSerial.Checked = true;
+            m_MIEvaSerial.Checked = true;
 
-            m_MISanilitySerial.Click += new EventHandler(EH_MI_SanilitySerial);
-            m_MIConductSerial.Click += new EventHandler(EH_MI_ConductSerial);
+            m_MIEvaSerial.Click += new EventHandler(EH_MI_EvaSerial);
+            m_MIRainSerial.Click += new EventHandler(EH_MI_RainSerial);
         }
 
 
@@ -362,9 +362,9 @@ namespace Hydrology.CControls
             // 设置图表标题
             m_title.Text = CS_Chart_Name;
 
-            // 设置盐度和电导率格式
-            m_chartAreaDefault.AxisY.LabelStyle.Format = "0.000";
-            m_chartAreaDefault.AxisY2.LabelStyle.Format = "0.000";
+            // 设置蒸发和降雨格式
+            m_chartAreaDefault.AxisY.LabelStyle.Format = "0.00";
+            m_chartAreaDefault.AxisY2.LabelStyle.Format = "0.00";
 
             // m_chartAreaDefault.AxisX.Title = CS_Asix_DateTime; //不显示名字
             m_chartAreaDefault.AxisY.Title = CS_AsixY_Name;
@@ -378,46 +378,46 @@ namespace Hydrology.CControls
             m_chartAreaDefault.AxisX.LabelStyle.Format = "MM-dd HH";
             m_chartAreaDefault.AxisX.LabelStyle.Angle = 90;
 
-            #region 盐度
-            m_serialSanility = this.Series.Add(CS_Serial_Name_Sanility);
-            m_serialSanility.Name = "盐度"; //用来显示图例的
-            m_serialSanility.ChartArea = CS_ChartAreaName_Default;
-            m_serialSanility.ChartType = SeriesChartType.Line; //如果点数过多， 画图很慢，初步测试不能超过2000个
-            m_serialSanility.BorderWidth = 1;
-            //m_serialSanilityState.Color = Color.FromArgb(22,99,1);
-            m_serialSanility.Color = Color.Red;
-            //m_serialSanilityState.BorderColor = Color.FromArgb(120, 147, 190);
-            //m_serialSanilityState.ShadowColor = Color.FromArgb(64, 0, 0, 0);
-            //m_serialSanilityState.ShadowOffset = 2;
+            #region 蒸发
+            m_serialEva = this.Series.Add(CS_Serial_Name_Eva);
+            m_serialEva.Name = "蒸发"; //用来显示图例的
+            m_serialEva.ChartArea = CS_ChartAreaName_Default;
+            m_serialEva.ChartType = SeriesChartType.Line; //如果点数过多， 画图很慢，初步测试不能超过2000个
+            m_serialEva.BorderWidth = 1;
+            //m_serialEvaState.Color = Color.FromArgb(22,99,1);
+            m_serialEva.Color = Color.Red;
+            //m_serialEvaState.BorderColor = Color.FromArgb(120, 147, 190);
+            //m_serialEvaState.ShadowColor = Color.FromArgb(64, 0, 0, 0);
+            //m_serialEvaState.ShadowOffset = 2;
             //  设置时间类型,对于serial来说
-            m_serialSanility.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-            m_serialSanility.IsXValueIndexed = false; // 自己计算X值，以及边界值,否则翻译不出正确的值
+            m_serialEva.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            m_serialEva.IsXValueIndexed = false; // 自己计算X值，以及边界值,否则翻译不出正确的值
 
             //  绑定数据
-            m_serialSanility.XValueMember = CS_CN_DateTime;
-            m_serialSanility.YValueMembers = CS_CN_Sanility;
+            m_serialEva.XValueMember = CS_CN_DateTime;
+            m_serialEva.YValueMembers = CS_CN_Eva;
 
-            m_serialSanility.YAxisType = AxisType.Primary;
-            #endregion 盐度
+            m_serialEva.YAxisType = AxisType.Primary;
+            #endregion 蒸发
 
-            #region 电导率
-            m_serialConduct = this.Series.Add(CS_Serial_Name_Conduct);
-            m_serialConduct.Name = "电导率"; //用来显示图例的
-            m_serialConduct.ChartArea = CS_ChartAreaName_Default;
-            m_serialConduct.ChartType = SeriesChartType.Line; //如果点数过多， 画图很慢，初步测试不能超过2000个
-            m_serialConduct.BorderWidth = 1;
-            //m_serialConductivity.BorderColor = Color.FromArgb(120, 147, 190);
-            m_serialConduct.Color = Color.Blue;
-            //m_serialConductivity.ShadowOffset = 2;
+            #region 降雨
+            m_serialRain = this.Series.Add(CS_Serial_Name_Rain);
+            m_serialRain.Name = "降雨"; //用来显示图例的
+            m_serialRain.ChartArea = CS_ChartAreaName_Default;
+            m_serialRain.ChartType = SeriesChartType.Line; //如果点数过多， 画图很慢，初步测试不能超过2000个
+            m_serialRain.BorderWidth = 1;
+            //m_serialRain.BorderColor = Color.FromArgb(120, 147, 190);
+            m_serialRain.Color = Color.Blue;
+            //m_serialRain.ShadowOffset = 2;
             //  设置时间类型,对于serial来说
-            m_serialConduct.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-            m_serialConduct.IsXValueIndexed = false; // 自己计算X值，以及边界值,否则翻译不出正确的值
+            m_serialRain.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            m_serialRain.IsXValueIndexed = false; // 自己计算X值，以及边界值,否则翻译不出正确的值
 
             //  绑定数据
-            m_serialConduct.XValueMember = CS_CN_DateTime;
-            m_serialConduct.YValueMembers = CS_CN_Conduct;
-            m_serialConduct.YAxisType = AxisType.Secondary;
-            #endregion 电导率
+            m_serialRain.XValueMember = CS_CN_DateTime;
+            m_serialRain.YValueMembers = CS_CN_Rain;
+            m_serialRain.YAxisType = AxisType.Secondary;
+            #endregion 降雨
 
             #region 图例
             m_legend = new System.Windows.Forms.DataVisualization.Charting.Legend();
@@ -435,22 +435,22 @@ namespace Hydrology.CControls
         {
             if (null == point)
             {
-                Debug.WriteLine("CChartSanility UpdateAnnotationByDataPoint Failed");
+                Debug.WriteLine("CChartEva UpdateAnnotationByDataPoint Failed");
                 return;
             }
             String prompt = "";
             DateTime dateTimeX = DateTime.FromOADate(point.XValue);
-            if (m_serialSanility.Points.Contains(point))
+            if (m_serialEva.Points.Contains(point))
             {
-                // 盐度
-                prompt = string.Format("盐度：{0:0.00}\n日期：{1}\n时间：{2}", point.YValues[0],
+                // 蒸发
+                prompt = string.Format("蒸发：{0:0.00}\n日期：{1}\n时间：{2}", point.YValues[0],
                             dateTimeX.ToString("yyyy-MM-dd"),
                             dateTimeX.ToString("HH:mm:ss"));
             }
             else
             {
-                // 就是电导率了
-                prompt = string.Format("电导率：{0:0.00}\n日期：{1}\n时间：{2}", point.YValues[0],
+                // 就是降雨了
+                prompt = string.Format("降雨：{0:0.00}\n日期：{1}\n时间：{2}", point.YValues[0],
                             dateTimeX.ToString("yyyy-MM-dd"),
                             dateTimeX.ToString("HH:mm:ss"));
             }
@@ -487,10 +487,10 @@ namespace Hydrology.CControls
             base.ClearAllDatas();
             m_maxDateTime = null;
             m_minDateTime = null;
-            m_dMaxConductivity = null;
-            m_dMinConductivity = null;
-            m_dMaxSanility = null;
-            m_dMinSanility = null;
+            m_dMaxRain = null;
+            m_dMinRain = null;
+            m_dMaxEva = null;
+            m_dMinEva = null;
         }
 
         #endregion 重载

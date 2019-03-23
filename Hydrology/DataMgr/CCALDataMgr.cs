@@ -7,9 +7,10 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Data.SqlClient;
+using Hydrology.Entity;
+using Hydrology.DBManager.Interface;
 
-
-namespace EvaCal
+namespace Hydrology.DataMgr
 {
     public class CCALDataMgr
     {
@@ -31,7 +32,7 @@ namespace EvaCal
         /// </summary>
         /// <param name="Dictionary<string, string>"></param> 
         /// <param name=""></param>
-        public Dictionary<string, string> EvaCal(Dictionary<string, string> myDic)
+        public Dictionary<string, string> EvaCal(CEntityEva eva)
         {
             //*************************判断数据是否合理****************************************************
             //if (rawDataStr[2].Length < 4 || rawDataStr[3].Length < 4 || rawDataStr[4].Length < 4 || rawDataStr[5].Length < 4)
@@ -43,13 +44,20 @@ namespace EvaCal
             Dictionary<string, string> evaDic = new Dictionary<string, string>();//输出的蒸发计算结果
             //int sumRawDataRows = rawDataList.Count;
             string strForInserts = string.Empty;
-            rawDataNew[0] = myDic["StationID"];
-            rawDataNew[1] = myDic["Time"];
-            rawDataNew[2] = myDic["Voltge"];
-            rawDataNew[3] = myDic["Evp"];
-            rawDataNew[4] = myDic["Rain"];
-            rawDataNew[5] = myDic["Temperature"];
-            rawDataNew[6] = myDic["EvpType"];
+            //rawDataNew[0] = myDic["StationID"];
+            rawDataNew[0] = eva.StationID;
+            //rawDataNew[1] = myDic["Time"];
+            rawDataNew[1] = eva.TimeCollect.ToString();
+            //rawDataNew[2] = myDic["Voltge"];
+            rawDataNew[2] = eva.Voltage.ToString();
+            //rawDataNew[3] = myDic["Evp"];
+            rawDataNew[3] =eva.Eva.ToString();
+            //rawDataNew[4] = myDic["Rain"];
+            rawDataNew[4] = eva.Rain.ToString();
+            //rawDataNew[5] = myDic["Temperature"];
+            rawDataNew[5] = eva.Rain.ToString();
+            //rawDataNew[6] = myDic["EvpType"];
+            rawDataNew[6] = eva.type;
             rawDataNew[7] = DateTime.Now.ToString();
 
             //判断是否为有效数字
@@ -95,6 +103,10 @@ namespace EvaCal
             //*******************************************数据入库************************************************
             //将原始表中的降雨量修改为PConvert，蒸发量修改为EConvert
             //第一次数据入库
+            eva.Eva = Decimal.Parse(EConvert);
+            eva.Rain = Decimal.Parse(PConvert);
+            IEvaProxy evaProxy = CDBDataMgr.Instance.GetEvaProxy();
+            evaProxy.AddNewRow(eva);
             //TODO sql语句
             //*******************************************需要修改*******************************************
             string strSqlForInquire = "SELECT top 1 * FROM dbo.[RawData]";

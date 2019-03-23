@@ -352,17 +352,17 @@
     <Compile Include="Forms\CSoilStationMgrForm2.designer.cs">
       <DependentUpon>CSoilStationMgrForm2.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\CStationDataAddForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\CStationDataAddForm.Designer.cs">
-      <DependentUpon>CStationDataAddForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\CStationDataMgrForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\CStationDataMgrForm.Designer.cs">
       <DependentUpon>CStationDataMgrForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CStationDataAddForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CStationDataAddForm.Designer.cs">
+      <DependentUpon>CStationDataAddForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\CStationMgrForm.cs">
       <SubType>Form</SubType>
@@ -556,11 +556,11 @@
     <EmbeddedResource Include="Forms\CSoilStationMgrForm2.resx">
       <DependentUpon>CSoilStationMgrForm2.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\CStationDataAddForm.resx">
-      <DependentUpon>CStationDataAddForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\CStationDataMgrForm.resx">
       <DependentUpon>CStationDataMgrForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CStationDataAddForm.resx">
+      <DependentUpon>CStationDataAddForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CStationMgrForm.resx">
       <DependentUpon>CStationMgrForm.cs</DependentUpon>

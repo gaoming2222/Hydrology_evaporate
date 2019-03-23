@@ -16,7 +16,7 @@ namespace Hydrology.Forms
         private static readonly string CS_CMB_Rain = "雨量";
         private static readonly string CS_CMB_Water = "水位";
         private static readonly string CS_CMB_Voltage = "电压";
-        private static readonly string CS_CMB_SoilData = "墒情数据";
+        private static readonly string CS_CMB_Eva = "蒸发";
 
         private static readonly string CS_CMB_ViewStyle_All = "图表";
         private static readonly string CS_CMB_ViewStyle_Table = "表格";
@@ -28,6 +28,7 @@ namespace Hydrology.Forms
 
         private static readonly string CS_CMB_AllData = "全部数据";
         private static readonly string CS_CMB_TimeData = "整点数据";
+        private static readonly string CS_CMB_DayData = "日数据";
 
         private readonly string CS_All_Station = "所有站点";
         #endregion ///<静态常量
@@ -36,17 +37,16 @@ namespace Hydrology.Forms
         private CDataGridViewRain m_dgvRain;        //自定义雨量数据表对象
         private CDataGridViewWater m_dgvWater;      //自定义水量数据表对象
         private CDataGridViewVoltage m_dgvVoltage;  //自定义电压数据表对象
-        private CDataGridViewSoilData m_dgvSoilData;//自定义墒情数据查询对象
+        private CDataGridViewEva m_dgvEva;    //自定义蒸发数据查询对象
 
         private Panel m_panelChart;                     // chart容量
         private CChartRain m_chartRain;                 //自定义雨量图
         private CChartVoltage m_chartVoltage;           //自定义电压过程线
         private CChartWaterStage m_chartWaterFlow;      //自定义水位流量图
-        private CChartSoilData m_charSoilData;          //墒情站图形
+        private CChartEva m_chartEva;          //自定义蒸发过程线
 
         private bool m_bIsEditable = false;         //默认是查询模式
         private List<CEntityStation> m_listStations; //所有水情站点的引用
-        private List<CEntitySoilStation> m_listSoilStations;//所有墒情站点的引用
         #endregion  ///<DATA_MENBER
 
         #region 属性
@@ -95,7 +95,7 @@ namespace Hydrology.Forms
                 m_dgvRain.Editable = true;
                 m_dgvWater.Editable = true;
                 m_dgvVoltage.Editable = true;
-                m_dgvSoilData.Editable = true;
+                m_dgvEva.Editable = true;
                 this.Text = "数据校正";
                 labelInfoSelect.Text = "配置检索信息";
 
@@ -108,7 +108,7 @@ namespace Hydrology.Forms
                 m_dgvRain.Editable = false;
                 m_dgvVoltage.Editable = false;
                 m_dgvWater.Editable = false;
-                m_dgvSoilData.Editable = false;
+                m_dgvEva.Editable = false;
                 if (btnNewRecord.Visible)
                 {
                     // 如果由编辑模式调整为非编辑模式，需要调整退出按钮的位置
@@ -137,11 +137,11 @@ namespace Hydrology.Forms
             // 初始化测站
             // 初始化查询信息类型
             this.SuspendLayout();
-            cmbQueryInfo.Items.AddRange(new string[] { CS_CMB_Water, CS_CMB_Rain,  CS_CMB_Voltage });
+            cmbQueryInfo.Items.AddRange(new string[] { CS_CMB_Rain, CS_CMB_Water, CS_CMB_Voltage, CS_CMB_Eva });
 
             cmb_RainShape.Items.AddRange(new string[] { CS_CMB_RainShape_Periodrain, CS_CMB_RainShape_Differencerain, CS_CMB_ViewStyle_Dayrain });
 
-            cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData });
+            cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData});
             // 设置日期
             this.dtpTimeStart.Format = DateTimePickerFormat.Custom;
             this.dptTimeEnd.Format = DateTimePickerFormat.Custom;
@@ -216,25 +216,22 @@ namespace Hydrology.Forms
             m_dgvVoltage.ColumnHeadersHeight = 25;
             m_dgvVoltage.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
 
-            m_dgvSoilData = new CDataGridViewSoilData();
-            m_dgvSoilData.AllowUserToAddRows = false;
-            m_dgvSoilData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.None;
-            //m_dgvVoltage.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            //m_dgvVoltage.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            m_dgvSoilData.Dock = DockStyle.Fill;
-            m_dgvSoilData.AutoSize = true;
-            //m_dgvVoltage.ReadOnly = true; //只读
-            m_dgvSoilData.AllowUserToResizeRows = false;
-            m_dgvSoilData.RowHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            m_dgvSoilData.RowHeadersWidth = 50;
-            m_dgvSoilData.ColumnHeadersHeight = 25;
-            m_dgvSoilData.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
+            m_dgvEva = new CDataGridViewEva();
+            m_dgvEva.AllowUserToAddRows = false;
+            m_dgvEva.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            m_dgvEva.Dock = DockStyle.Fill;
+            m_dgvEva.AutoSize = true;
+            m_dgvEva.AllowUserToResizeRows = false;
+            m_dgvEva.RowHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            m_dgvEva.RowHeadersWidth = 50;
+            m_dgvEva.ColumnHeadersHeight = 25;
+            m_dgvEva.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
 
             tLayoutRight.SuspendLayout();
             tLayoutRight.Controls.Add(m_dgvRain, 0, 0);
             tLayoutRight.Controls.Add(m_dgvWater, 0, 0);
             tLayoutRight.Controls.Add(m_dgvVoltage, 0, 0);
-            tLayoutRight.Controls.Add(m_dgvSoilData, 0, 0);
+            tLayoutRight.Controls.Add(m_dgvEva, 0, 0);
             tLayoutRight.ResumeLayout(false);
 
             #endregion 表
@@ -250,20 +247,20 @@ namespace Hydrology.Forms
 
             m_chartWaterFlow = new CChartWaterStage();
             m_chartWaterFlow.Dock = DockStyle.Fill;
-
-            m_charSoilData = new CChartSoilData();
-            m_charSoilData.Dock = DockStyle.Fill;
+           
+            m_chartEva = new CChartEva();
+            m_chartEva.Dock = DockStyle.Fill;
 
             m_panelChart.Controls.Add(m_chartRain);
             m_panelChart.Controls.Add(m_chartVoltage);
             m_panelChart.Controls.Add(m_chartWaterFlow);
-            m_panelChart.Controls.Add(m_charSoilData);
+            m_panelChart.Controls.Add(m_chartEva);
 
             panelRight.Controls.Add(m_panelChart);
 
             m_chartVoltage.Visible = false;
             m_chartWaterFlow.Visible = false;
-            m_charSoilData.Visible = false;
+            m_chartEva.Visible = false;
 
             m_panelChart.Height = panelRight.Height / 2;
 
@@ -278,9 +275,9 @@ namespace Hydrology.Forms
 
             m_dgvVoltage.PageNumberChanged += new EventHandler<CEventSingleArgs<int>>(this.EHPageNumberChanged);
             m_dgvVoltage.DataReady += new EventHandler<CEventDBUIDataReadyArgs>(this.EHTableDataReady);
-
-            m_dgvSoilData.PageNumberChanged += new EventHandler<CEventSingleArgs<int>>(this.EHPageNumberChanged);
-            m_dgvSoilData.DataReady += new EventHandler<CEventDBUIDataReadyArgs>(this.EHTableDataReady);
+            
+            m_dgvEva.PageNumberChanged += new EventHandler<CEventSingleArgs<int>>(this.EHPageNumberChanged);
+            m_dgvEva.DataReady += new EventHandler<CEventDBUIDataReadyArgs>(this.EHTableDataReady);
 
             // 初始化视图样式列表框
             cmb_ViewStyle.Items.Add(CS_CMB_ViewStyle_All);
@@ -310,15 +307,10 @@ namespace Hydrology.Forms
                 this.cmbStation.m_listBoxStation.Items.Clear();
                 // 根据分中心查找测站
                 m_listStations = CDBDataMgr.Instance.GetAllStation();
-                m_listSoilStations = CDBSoilDataMgr.Instance.GetAllSoilStation();
                 //   m_dgvStatioin.SetSubCenterName(null); //所有分中
                 for (int i = 0; i < m_listStations.Count; ++i)
                 {
                     this.cmbStation.m_listBoxStation.Items.Add(string.Format("({0,-4}|{1})", m_listStations[i].StationID, m_listStations[i].StationName));
-                }
-                for (int i = 0; i < m_listSoilStations.Count; ++i)
-                {
-                    this.cmbStation.m_listBoxStation.Items.Add(string.Format("({0,-4}|{1})", m_listSoilStations[i].StationID, m_listSoilStations[i].StationName));
                 }
                 //    this.cmbStation.Text = this.cmbStation.m_listBoxStation.Items[0].ToString();
             }
@@ -334,7 +326,6 @@ namespace Hydrology.Forms
                 // 根据分中心查找测站
                 //List<CEntityStation> listAllStation = CDBDataMgr.Instance.GetAllStation();
                 m_listStations = CDBDataMgr.Instance.GetAllStation();
-                m_listSoilStations = CDBSoilDataMgr.Instance.GetAllSoilStation();
                 CEntitySubCenter subcenter = CDBDataMgr.Instance.GetSubCenterByName(subcentername);
                 if (null != subcenter)
                 {
@@ -345,13 +336,6 @@ namespace Hydrology.Forms
                         {
 
                             this.cmbStation.m_listBoxStation.Items.Add(string.Format("({0,-4}|{1})", m_listStations[i].StationID, m_listStations[i].StationName));
-                        }
-                    }
-                    for (int i = 0; i < m_listSoilStations.Count; ++i)
-                    {
-                        if (m_listSoilStations[i].SubCenterID == subcenter.SubCenterID)
-                        {
-                            this.cmbStation.m_listBoxStation.Items.Add(string.Format("({0,-4}|{1})", m_listSoilStations[i].StationID, m_listSoilStations[i].StationName));
                         }
                     }
                     //      this.cmbStation.Text = this.cmbStation.m_listBoxStation.Items[0].ToString();
@@ -373,17 +357,16 @@ namespace Hydrology.Forms
             m_dgvRain.InitDataSource(CDBDataMgr.GetInstance().GetRainProxy());
             m_dgvWater.InitDataSource(CDBDataMgr.GetInstance().GetWaterProxy());
             m_dgvVoltage.InitDataSource(CDBDataMgr.GetInstance().GetVoltageProxy());
-            m_dgvSoilData.InitDataSource(CDBSoilDataMgr.Instance.GetSoilDataProxy());
+            m_dgvEva.InitDataSource(CDBDataMgr.GetInstance().GetHEvaProxy());
 
             m_chartRain.InitDataSource(CDBDataMgr.GetInstance().GetRainProxy());
             m_chartWaterFlow.InitDataSource(CDBDataMgr.GetInstance().GetWaterProxy());
             m_chartVoltage.InitDataSource(CDBDataMgr.GetInstance().GetVoltageProxy());
-            m_charSoilData.InitDataSource(CDBSoilDataMgr.Instance.GetSoilDataProxy());
+            m_chartEva.InitDataSource(CDBDataMgr.GetInstance().GetEvaProxy());
 
             List<CEntitySubCenter> listSubCenter = CDBDataMgr.Instance.GetAllSubCenter();
 
             m_listStations = CDBDataMgr.Instance.GetAllStation();
-            m_listSoilStations = CDBSoilDataMgr.Instance.GetAllSoilStation();
             cmb_SubCenter.Items.Add(CS_All_Station);
             for (int i = 0; i < listSubCenter.Count; ++i)
             {
@@ -416,7 +399,7 @@ namespace Hydrology.Forms
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-            if (m_dgvRain.IsModifiedUnSaved() || m_dgvWater.IsModifiedUnSaved() || m_dgvVoltage.IsModifiedUnSaved() || m_dgvSoilData.IsModifiedUnSaved())
+            if (m_dgvRain.IsModifiedUnSaved() || m_dgvWater.IsModifiedUnSaved() || m_dgvVoltage.IsModifiedUnSaved() || m_dgvEva.IsModifiedUnSaved())
             {
                 DoSave();
             }
@@ -428,8 +411,6 @@ namespace Hydrology.Forms
 
         private void btnNewRecord_Click(object sender, EventArgs e)
         {
-            if (!cmbQueryInfo.Text.Equals(CS_CMB_SoilData))
-            {
                 //添加新的记录
                 CStationDataAddForm form = new CStationDataAddForm();
 
@@ -465,11 +446,6 @@ namespace Hydrology.Forms
                     this.FormClosing -= this.CStationDataMgrForm_FormClosing;
                     this.Close(); //关闭窗口
                 }
-            }
-            else
-            {
-                MessageBox.Show("墒情站暂不支持添加墒情数据！");
-            }
         }
 
         private void cmbQueryInfo_SelectedIndexChanged(object sender, EventArgs e)
@@ -479,61 +455,68 @@ namespace Hydrology.Forms
             {
                 //查询雨量
                 //tLayoutRight.Controls.Add(m_dgvRain, 0, 0);
+                cmb_TimeSelect.Items.Clear();
+                cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData });
                 m_dgvRain.Show();
                 m_dgvWater.Hide();
                 m_dgvVoltage.Hide();
-                m_dgvSoilData.Hide();
+                m_dgvEva.Hide();
                 // 图形
                 m_chartRain.Show();
                 m_chartVoltage.Hide();
                 m_chartWaterFlow.Hide();
-                m_charSoilData.Hide();
                 this.label6.Show();
                 this.cmb_RainShape.Show();
             }
             else if (cmbQueryInfo.Text.Equals(CS_CMB_Water))
             {
                 //查询水量
+                cmb_TimeSelect.Items.Clear();
+                cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData });
                 m_dgvRain.Hide();
                 m_dgvWater.Show();
                 m_dgvVoltage.Hide();
-                m_dgvSoilData.Hide();
+                m_dgvEva.Hide();
                 //tLayoutRight.Controls.Add(m_dgvWater, 0, 0);
                 // 图形
                 m_chartRain.Hide();
                 m_chartVoltage.Hide();
                 m_chartWaterFlow.Show();
-                m_charSoilData.Hide();
+                m_chartEva.Hide();
                 this.label6.Hide();
                 this.cmb_RainShape.Hide();
             }
             else if (cmbQueryInfo.Text.Equals(CS_CMB_Voltage))
             {
                 //查询电压
+                cmb_TimeSelect.Items.Clear();
+                cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData });
                 m_dgvRain.Hide();
                 m_dgvWater.Hide();
                 m_dgvVoltage.Show();
-                m_dgvSoilData.Hide();
+                m_dgvEva.Hide();
                 // 图形
                 m_chartRain.Hide();
                 m_chartVoltage.Show();
                 m_chartWaterFlow.Hide();
-                m_charSoilData.Hide();
+                m_chartEva.Hide();
                 this.label6.Hide();
                 this.cmb_RainShape.Hide();
             }
-            else if (cmbQueryInfo.Text.Equals(CS_CMB_SoilData))
+            else if (cmbQueryInfo.Text.Equals(CS_CMB_Eva))
             {
-                //查询墒情数据
+                //查询蒸发数据
+                cmb_TimeSelect.Items.Clear();
+                cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_DayData });
                 m_dgvRain.Hide();
                 m_dgvWater.Hide();
                 m_dgvVoltage.Hide();
-                m_dgvSoilData.Show();
+                m_dgvEva.Show();
                 // 图形
                 m_chartRain.Hide();
                 m_chartVoltage.Hide();
                 m_chartWaterFlow.Hide();
-                m_charSoilData.Show();
+                m_chartEva.Show();
                 this.label6.Hide();
                 this.cmb_RainShape.Hide();
             }
@@ -767,19 +750,50 @@ namespace Hydrology.Forms
                 }
                 //if (updateData == true)
                 //{
-                    m_dgvVoltage.UpdateDataToUI();
+                m_dgvVoltage.UpdateDataToUI();
                 //}
                 #endregion 电压
             }
-            else if (cmbQueryInfo.Text.Equals(CS_CMB_SoilData))
+            else if (cmbQueryInfo.Text.Equals(CS_CMB_Eva))
             {
-                #region 墒情数据
-                if (m_dgvSoilData.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value))
+                #region 蒸发数据
+                // 查询蒸发
+                if (m_dgvEva.IsModifiedUnSaved())
                 {
-                    m_charSoilData.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value);
+                    DialogResult result = MessageBox.Show("当前所做修改尚未保存，强行查询会导致修改丢失,是否保存？", "提示", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                    if (DialogResult.Yes == result)
+                    {
+                        // 保存当前修改
+                        if (DoSave())
+                        {
+                            // 保存成功以后， 继续查询
+                        }
+                        else
+                        {
+                            // 保存失败，不查询
+                            return;
+                        }
+                    }
+                    else if (DialogResult.No == result)
+                    {
+                        //直接退出
+                    }
+                    else if (DialogResult.Cancel == result)
+                    {
+                        this.Close();
+                        return;// 退出查询
+                    }
                 }
-                m_dgvSoilData.UpdateDataToUI();
-                #endregion 墒情数据
+                bool updateData = false;
+                if (m_dgvEva.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value, TimeSelect))
+                {
+                    updateData = m_chartEva.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value, TimeSelect);
+                }
+                //if (updateData == true)
+                //{
+                m_dgvEva.UpdateDataToUI();
+                //}
+                #endregion 蒸发数据
             }
             this.Enabled = true;
             m_statusLable.Text = "查询已成功完成";
@@ -817,10 +831,10 @@ namespace Hydrology.Forms
                     m_dgvVoltage.DoSave();
                     m_dgvVoltage.UpdateDataToUI();
                 }
-                if (m_dgvSoilData.IsModifiedUnSaved())
+                if (m_dgvEva.IsModifiedUnSaved())
                 {
-                    m_dgvSoilData.DoSave();
-                    m_dgvSoilData.UpdateDataToUI();
+                    m_dgvEva.DoSave();
+                    m_dgvEva.UpdateDataToUI();
                 }
 
                 MessageBox.Show("保存成功！");

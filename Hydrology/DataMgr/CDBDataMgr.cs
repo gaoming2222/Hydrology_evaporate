@@ -41,9 +41,19 @@ namespace Hydrology.DataMgr
         public event EventHandler<CEventSingleArgs<CEntityRealTime>> RecvedRTD;
 
         /// <summary>
+        /// 收到单条实时蒸发数据消息
+        /// </summary>
+        public event EventHandler<CEventSingleArgs<CEntityRealEva>> RecvedRTD_Eva;
+
+        /// <summary>
         /// 实时数据表清空了事件，发生在切换数据库上面
         /// </summary>
         public event EventHandler RTDCleared;
+
+        /// <summary>
+        /// 实时蒸发数据表清空了事件，发生在切换数据库上面
+        /// </summary>
+        public event EventHandler RTDCleared_Eva;
 
         #endregion
 
@@ -75,6 +85,10 @@ namespace Hydrology.DataMgr
         private ISubCenterProxy m_proxySubCenter;
         private IWaterProxy m_proxyWater;
         private IRainProxy m_proxyRain;
+        private IEvaProxy m_proxyEva;
+        private IHEvaProxy m_proxyHEva;
+        private IDEvaProxy m_proxyDEva;
+        private ICurrentEva m_proxyRealEva;
         private ITSRainProxy m_proxyTSRain;
         private ITSWater m_proxyTSWater;
         private ITSVoltage m_proxyTSVoltage;
@@ -90,12 +104,14 @@ namespace Hydrology.DataMgr
         //1009gm
         private ISoilDataProxy m_proxySoilData;
 
+        private CCALDataMgr cal;
         private List<CEntityStation> m_listStations;    //所有站点内存副本
         private List<CEntitySubCenter> m_listSubCenter; //所有分中心内存副本
         private List<CEntitySerialPort> m_listSerialPort;   //所有串口的内存副本
         public Dictionary<string, CEntityStation> m_mapStation;    //站点ID和站点映射
         private Dictionary<string, List<CEntityWaterFlowMap>> m_mapStationWaterFlow; //站点的水位流量线条
         private Dictionary<string, CEntityRealTime> m_mapStationRTD;        //站点实时数据
+        private Dictionary<string, CEntityRealEva> m_mapStationRTS;        //站点实时数据
 
         public Dictionary<string, CEntityStation> m_mapGprsStation;    //站点gprs和站点映射
 
@@ -138,6 +154,10 @@ namespace Hydrology.DataMgr
             m_proxySubCenter = new CSQLSubCenter();
             m_proxyWater = new CSQLWater();
             m_proxyRain = new CSQLRain();
+            m_proxyEva = new CSQLEva();
+            m_proxyHEva = new CSQLHEva();
+            m_proxyDEva = new CSQLDEva();
+            m_proxyRealEva = new CSQLRealEva();
             m_proxyTSRain = new CDBSQLTSRain();
             m_proxyTSWater = new CDBSQLTSWater();
             m_proxyTSVoltage = new CDBSQLTSVoltage();
@@ -149,6 +169,8 @@ namespace Hydrology.DataMgr
             m_proxyWarningInfo = new CSQLWarningInfo();
             m_proxyWaterFlowMap = new CSQLWaterFlowMap();
             // m_proxyCommunicationRate = new CSQLCommunicationRate();
+
+            cal = new CCALDataMgr();
 
             //1009gm
             m_proxySoilData = new CSQLSoilData();
@@ -233,6 +255,28 @@ namespace Hydrology.DataMgr
                 }
             }
         }
+        /// <summary>
+        /// 初始化的时候，给实时蒸发界面发送蒸发数据初始化界面
+        /// </summary>
+        public void SentRTDEva()
+        {
+            // 将内存m_mapStationRTD中的上次记录通知界面
+            if (null != RecvedRTD_Eva && null != m_mapStationRTS)
+            {
+                foreach (KeyValuePair<string, CEntityRealEva> entity in m_mapStationRTS)
+                {
+                    // 该字段已经被废弃
+                    //if (entity.Value.BIsReceivedValid)
+                    //{
+                    // 只要数据库有值，就通知页面
+                    if ((entity.Value.Eva.HasValue))
+                    {
+                        RecvedRTD_Eva.Invoke(this, new CEventSingleArgs<CEntityRealEva>(entity.Value));
+                    }
+                    //}
+                }
+            }
+        }
         public IStationProxy GetStationProxy()
         {
             return m_proxyStation;
@@ -256,6 +300,22 @@ namespace Hydrology.DataMgr
         public ICurrentDataProxy GetRealTimeProxy()
         {
             return m_proxyRealtime;
+        }
+        public ICurrentEva GetRealEvaProxy()
+        {
+            return m_proxyRealEva;
+        }
+        public IEvaProxy GetEvaProxy()
+        {
+            return m_proxyEva;
+        }
+        public IHEvaProxy GetHEvaProxy()
+        {
+            return m_proxyHEva;
+        }
+        public IDEvaProxy GetDEvaProxy()
+        {
+            return m_proxyDEva;
         }
         public ISerialPortProxy GetSerialPortProxy()
         {
@@ -555,6 +615,10 @@ namespace Hydrology.DataMgr
             m_proxySubCenter = new CSQLSubCenter();
             m_proxyWater = new CSQLWater();
             m_proxyRain = new CSQLRain();
+            m_proxyEva = new CSQLEva();
+            m_proxyHEva = new CSQLHEva();
+            m_proxyDEva = new CSQLDEva();
+            m_proxyRealEva = new CSQLRealEva();
             m_proxyVoltage = new CSQLVoltage();
             m_proxyRealtime = new CSQLCurrenData();
             m_proxySerialPort = new CSQLSerialPort();
@@ -618,8 +682,14 @@ namespace Hydrology.DataMgr
             {
                 RTDCleared.Invoke(this, new EventArgs());
             }
+            // 清空实时数据
+            if (RTDCleared_Eva != null)
+            {
+                RTDCleared_Eva.Invoke(this, new EventArgs());
+            }
             // 最新数据
             SentRTDMsg();
+            SentRTDEva();
         }
 
         /// <summary>
@@ -687,6 +757,10 @@ namespace Hydrology.DataMgr
                 m_proxyWater.Close();
                 m_proxyVoltage.Close();
                 m_proxyRealtime.Close();
+                m_proxyEva.Close();
+                m_proxyHEva.Close();
+                m_proxyDEva.Close();
+                m_proxyRealEva.Close();
 
                 // 告警信息
                 m_proxyWarningInfo.Close();
@@ -737,6 +811,16 @@ namespace Hydrology.DataMgr
             NewTask(() => { DealRTDData(args); });
         }
 
+        // 180904 xcj
+        /// <summary>
+        /// 收到蒸发数据
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        public void EHRecvEvaDatas(object sender, CEventRecvStationDatasArgs args)
+        {
+            NewTask(() => { DealEvaDatas(args); });
+        }
         /// <summary>
         /// 收到多条数据记录，包括多条雨量，水量以及电压记录
         /// </summary>
@@ -980,6 +1064,31 @@ namespace Hydrology.DataMgr
             //修改到关闭的时候再删除，以免意外关闭导致xml为空
             //修改为删除，以免非正常退出时，再次启动为前一次数据
             CXmlRealTimeDataSerializer.Instance.DeleteFile();
+        }
+
+        private void ReadRTS()
+        {
+            m_mapStationRTS = new Dictionary<string, CEntityRealEva>();
+            // 读取数据库,初始化实时蒸发数据表
+            List<CEntityRealEva> listRTS = m_proxyRealEva.QueryAll();
+            if (null == listRTS)
+            {
+                return;
+            }
+            for (int i = 0; i < listRTS.Count; ++i)
+            {
+                if (m_mapStation.ContainsKey(listRTS[i].StrStationID))
+                {
+                    // 通知界面
+                    m_mapStationRTS.Add(listRTS[i].StrStationID, listRTS[i]);
+                }
+                else
+                {
+                    // 位置站点，读取实时蒸发数据文件不匹配
+                    CSystemInfoMgr.Instance.AddInfo(string.Format("实时蒸发数据中站点\"{0}\"在数据库中匹配失败", listRTS[i].StrStationID));
+                }
+            }
+
         }
 
         /// <summary>
@@ -2326,6 +2435,119 @@ namespace Hydrology.DataMgr
             m_proxyTSVoltage.AddNewRows(listVoltages);
             #endregion 电压表
         }
+
+        private void DealEvaDatas(CEventRecvStationDatasArgs args)
+        {
+            try
+            {
+                Dictionary<string, string> cDic = new Dictionary<string, string>();
+                int tmpDataCount = args.Datas.Count;
+                if (tmpDataCount <= 0)
+                {
+                    // 数据为空
+                    CSystemInfoMgr.Instance.AddInfo("收到空的数据记录项目");
+                    return;
+                }
+                // 生成实时数据CEntityRTD
+                CEntityStation station = GetStationById(args.StrStationID);
+                //station
+                if (null == station)
+                {
+                    Debug.WriteLine("站点配置不正确，数据库没有站点{0}的配置", args.StrStationID);
+                    return;
+                }
+
+                #region 蒸发表
+                List<CEntityEva> HEvas = new List<CEntityEva>();
+                List<CEntityEva> DEvas = new List<CEntityEva>();
+                foreach (CSingleStationData data in args.Datas)
+                {
+                    // 是否和上一条时间一致, 就丢失当条数据
+                    if (m_mapStationRTD[station.StationID].TimeDeviceGained == data.DataTime)
+                    {
+                        Debug.WriteLine("drop");
+                        continue;
+                    }
+
+                    if (data.Eva == null || data.Temp == null)
+                    {
+                        continue;
+                    }
+
+                    CEntityEva Eva = new CEntityEva();
+                    Eva.StationID = args.StrStationID;
+                    Eva.Eva = data.Eva;
+                    Eva.TimeCollect = data.DataTime;
+                    Eva.Temperature = data.Temp;
+                    Eva.Rain = data.TotalRain;
+                    Eva.Voltage = data.Voltage;
+                    Eva.type = data.EvpType;
+
+                    cDic = cal.EvaCal(Eva);
+                    if (cDic.Count == 0)
+                    {
+                        continue;
+                    }
+                    if (cDic.ContainsKey("hourE"))
+                    {
+                        Eva.Eva = Decimal.Parse(cDic["hourE"]);
+                        Eva.Rain = Decimal.Parse(cDic["hourP"]);
+                        Eva.Temperature = Decimal.Parse(cDic["hourT"]);
+                        Eva.Voltage = Decimal.Parse(cDic["hourU"]);
+                        HEvas.Add(Eva);
+                    }
+                    if (cDic.ContainsKey("dayE"))
+                    {
+                        Eva.Eva = Decimal.Parse(cDic["dayE"]);
+                        Eva.Rain = Decimal.Parse(cDic["dayP"]);
+                        Eva.Temperature = Decimal.Parse(cDic["dayT"]);
+                        DEvas.Add(Eva);
+                    }
+                }
+                if (HEvas.Count > 0)
+                {
+                    m_proxyHEva.AddNewRows(HEvas);
+                }
+                if (DEvas.Count > 0)
+                {
+                    m_proxyDEva.AddNewRows(DEvas);
+                }
+                #endregion
+
+                #region 实时蒸发表
+                if (!cDic.ContainsKey("hourE"))
+                {
+                    return;
+                }
+                CEntityRealEva realtime = new CEntityRealEva();
+                realtime.StrStationID = station.StationID;
+                realtime.StationType = station.StationType;
+                realtime.StrStationName = station.StationName;
+                //realtime.EIChannelType = args.EChannelType;
+                realtime.Eva = Decimal.Parse(cDic["hourE"]);
+                realtime.Rain = Decimal.Parse(cDic["hourP"]);
+                realtime.Temperature = Decimal.Parse(cDic["hourT"]);
+                realtime.Voltage = Decimal.Parse(cDic["hourU"]);
+                //realtime.TimeReceived = args.RecvDataTime;
+                realtime.TimeDeviceGained = args.Datas[tmpDataCount - 1].DataTime; //采集时间
+
+                // 发消息，通知界面更新
+                if (RecvedRTD_Eva != null)
+                {
+                    Task.Factory.StartNew(() => { RecvedRTD_Eva.Invoke(this, new CEventSingleArgs<CEntityRealEva>(realtime)); });
+                }
+
+                m_mapStationRTS[station.StationID] = realtime;
+
+                m_proxyRealEva.AddNewRow(realtime);
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
         private void DealRTDDatas(CEventRecvStationDatasArgs args)
         {
             try

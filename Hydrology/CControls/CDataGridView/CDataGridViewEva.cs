@@ -38,7 +38,8 @@ namespace Hydrology.CControls
         private List<CEntityEva> m_listAddedEva;   //新增的蒸发记录
 
         // 查询相关信息
-        private IEvaProxy m_proxyEva;   //蒸发表的操作接口
+        private IHEvaProxy m_proxyHEva;   //蒸发表的操作接口
+        private IDEvaProxy m_proxyDEva;   //蒸发表的操作接口
         private string m_strStaionId;            //查询的测站ID
         private DateTime m_dateTimeStart;   //查询的起点日期
         private DateTime m_dateTimeEnd;     //查询的起点日期
@@ -62,7 +63,7 @@ namespace Hydrology.CControls
             // 设定标题栏,默认有个隐藏列,默认非编辑模式
             this.Header = new string[]
             {
-                CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain ,CS_Temp
+                CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain ,CS_Temp, CS_Voltage
             };
 
             this.HideColomns = new int[] { 5 };
@@ -84,9 +85,9 @@ namespace Hydrology.CControls
         /// 初始化数据来源，绑定与数据库的数据
         /// </summary>
         /// <param name="proxy"></param>
-        public void InitDataSource(IEvaProxy proxy)
+        public void InitDataSource(IHEvaProxy proxy)
         {
-            m_proxyEva = proxy;
+            m_proxyHEva = proxy;
         }
 
         // 设置显示的雨量记录
@@ -172,22 +173,45 @@ namespace Hydrology.CControls
             m_strStaionId = strStationId;
             m_dateTimeStart = timeStart;
             m_dateTimeEnd = timeEnd;
-            m_proxyEva.SetFilter(strStationId, timeStart, timeEnd, TimeSelect);
-            if (-1 == m_proxyEva.GetPageCount())
+            if (TimeSelect)
             {
-                // 查询失败
-                MessageBox.Show("数据库忙，查询失败，请稍后再试！");
-                return false;
+                m_proxyHEva.SetFilter(strStationId, timeStart, timeEnd);
+                if (-1 == m_proxyHEva.GetPageCount())
+                {
+                    // 查询失败
+                    MessageBox.Show("数据库忙，查询失败，请稍后再试！");
+                    return false;
+                }
+                else
+                {
+                    // 并查询数据，显示第一页
+                    this.OnMenuFirstPage(this, null);
+                    base.TotalPageCount = m_proxyHEva.GetPageCount();
+                    base.TotalRowCount = m_proxyHEva.GetRowCount();
+                    SetEva(m_proxyHEva.GetPageData(1, false));
+                    return true;
+                }
             }
             else
             {
-                // 并查询数据，显示第一页
-                this.OnMenuFirstPage(this, null);
-                base.TotalPageCount = m_proxyEva.GetPageCount();
-                base.TotalRowCount = m_proxyEva.GetRowCount();
-                SetEva(m_proxyEva.GetPageData(1, false));
-                return true;
+                m_proxyDEva.SetFilter(strStationId, timeStart, timeEnd);
+                if (-1 == m_proxyDEva.GetPageCount())
+                {
+                    // 查询失败
+                    MessageBox.Show("数据库忙，查询失败，请稍后再试！");
+                    return false;
+                }
+                else
+                {
+                    // 并查询数据，显示第一页
+                    this.OnMenuFirstPage(this, null);
+                    base.TotalPageCount = m_proxyDEva.GetPageCount();
+                    base.TotalRowCount = m_proxyDEva.GetRowCount();
+                    SetEva(m_proxyDEva.GetPageData(1, false));
+                    return true;
+                }
             }
+            
 
         }
 
@@ -216,19 +240,19 @@ namespace Hydrology.CControls
                 if (m_listAddedEva.Count > 0)
                 {
                     //直接添加，不需要等待1分钟
-                    m_proxyEva.AddNewRows_DataModify(m_listAddedEva);
+                    m_proxyHEva.AddNewRows_DataModify(m_listAddedEva);
                     m_listAddedEva.Clear();
                 }
                 // 修改
                 if (m_listUpdated.Count > 0)
                 {
-                    m_proxyEva.AddNewRows_DataModify(m_listUpdated);
+                    m_proxyHEva.AddNewRows_DataModify(m_listUpdated);
                     m_listUpdated.Clear();
                 }
                 // 删除
                 if (m_listDeleteSanilities_StationId.Count > 0)
                 {
-                    result = result && m_proxyEva.DeleteRows(m_listDeleteSanilities_StationId, m_listDeleteSanilities_StationDate);
+                    result = result && m_proxyHEva.DeleteRows(m_listDeleteSanilities_StationId, m_listDeleteSanilities_StationDate);
                     m_listDeleteSanilities.Clear();
                 }
                 if (result)
@@ -241,7 +265,7 @@ namespace Hydrology.CControls
                     //MessageBox.Show("保存失败");
                     return false;
                 }
-                SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage, true));
+                SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
             }
             else
             {
@@ -360,7 +384,7 @@ namespace Hydrology.CControls
                 // 逐页读取数据
                 for (int i = 0; i < m_iTotalPage; ++i)
                 {
-                    List<CEntityEva> tmpSanilities = m_proxyEva.GetPageData(i + 1, false);
+                    List<CEntityEva> tmpSanilities = m_proxyHEva.GetPageData(i + 1, false);
                     foreach (CEntityEva Eva in tmpSanilities)
                     {
                         // 赋值到dataTable中去
@@ -447,7 +471,7 @@ namespace Hydrology.CControls
                     }
                     MessageBox.Show("保存成功");
                     // 保存成功，换页
-                    SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage - 1, true));
+                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage - 1, true));
                     base.OnMenuPreviousPage(sender, e);
                 }
                 else if (DialogResult.No == result)
@@ -455,14 +479,14 @@ namespace Hydrology.CControls
                     //不保存，直接换页，直接退出
                     //清楚所有状态位
                     base.ClearAllState();
-                    SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage - 1, false));
+                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage - 1, false));
                     base.OnMenuPreviousPage(sender, e);
                 }
             }
             else
             {
                 // 没有修改，直接换页
-                SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage - 1, false));
+                SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage - 1, false));
                 base.OnMenuPreviousPage(sender, e);
             }
 
@@ -490,7 +514,7 @@ namespace Hydrology.CControls
                     }
                     MessageBox.Show("保存成功");
                     // 保存成功，换页
-                    SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage + 1, true));
+                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage + 1, true));
                     base.OnMenuNextPage(sender, e);
                 }
                 else if (DialogResult.No == result)
@@ -498,14 +522,14 @@ namespace Hydrology.CControls
                     //不保存，直接换页，直接退出
                     //清楚所有状态位
                     base.ClearAllState();
-                    SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage + 1, false));
+                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage + 1, false));
                     base.OnMenuNextPage(sender, e);
                 }
             }
             else
             {
                 // 没有修改，直接换页
-                SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage + 1, false));
+                SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage + 1, false));
                 base.OnMenuNextPage(sender, e);
             }
         }
@@ -536,7 +560,7 @@ namespace Hydrology.CControls
                     MessageBox.Show("保存成功");
                     // 保存成功，换页
                     base.OnMenuFirstPage(sender, e);
-                    SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage, true));
+                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
                     this.UpdateDataToUI();
                 }
                 else if (DialogResult.No == result)
@@ -545,7 +569,7 @@ namespace Hydrology.CControls
                     //清楚所有状态位
                     base.ClearAllState();
                     base.OnMenuFirstPage(sender, e);
-                    SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage, false));
+                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, false));
                     this.UpdateDataToUI();
                 }
             }
@@ -553,7 +577,7 @@ namespace Hydrology.CControls
             {
                 // 没有修改，直接换页
                 base.OnMenuFirstPage(sender, e);
-                SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage, false));
+                SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, false));
                 this.UpdateDataToUI();
             }
 
@@ -587,7 +611,7 @@ namespace Hydrology.CControls
                         MessageBox.Show("保存成功");
                         // 保存成功，换页
                         base.OnMenuFirstPage(sender, e);
-                        SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage, true));
+                        SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
                         this.UpdateDataToUI();
                     }
                 }
@@ -597,7 +621,7 @@ namespace Hydrology.CControls
                     //清楚所有状态位
                     base.ClearAllState();
                     base.OnMenuLastPage(sender, e);
-                    SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage, false));
+                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, false));
                     this.UpdateDataToUI();
                 }
             }
@@ -605,7 +629,7 @@ namespace Hydrology.CControls
             {
                 // 没有修改，直接换页
                 base.OnMenuLastPage(sender, e);
-                SetEva(m_proxyEva.GetPageData(base.m_iCurrentPage, false));
+                SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, false));
                 this.UpdateDataToUI();
             }
         }
@@ -746,6 +770,7 @@ namespace Hydrology.CControls
                 Eva.Eva = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Eva].Value.ToString());
                 Eva.Voltage = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Rain].Value.ToString());
                 Eva.Temperature = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Temp].Value.ToString());
+                Eva.Voltage = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Voltage].Value.ToString());
 
                 m_listUpdated.Add(Eva);
             }

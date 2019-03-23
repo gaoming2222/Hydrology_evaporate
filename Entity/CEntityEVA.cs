@@ -35,7 +35,7 @@ namespace Hydrology.Entity
         public Nullable<Decimal> Eva { get; set; }
 
         /// <summary>
-        /// 系统接收数据的时间
+        /// 雨量
         /// </summary>
         public Nullable<Decimal> Rain { get; set; }
 

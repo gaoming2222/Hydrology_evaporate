@@ -32,7 +32,7 @@ namespace Hydrology
         public int num1 = 0;
         public int num2 = 0;
         private CRTDForm m_formRTD;  //最新实时数据
-        //private CRTDSoilForm m_formSoilRTD; //  最新墒情实时数据
+        private CRTDEvaForm m_formEvaRTD; //  最新蒸发实时数据
         private CStationStateForm m_formStationState;   //站点最新状态
         private CExTabControl m_tabControlUp;           //右上Tab控件
         private CExTabControl m_tabControlBottom;       //右下Tab控件
@@ -51,11 +51,6 @@ namespace Hydrology
         {
             Enabled = false,
             Interval = 1 * 60// 30分钟
-        };
-        private System.Windows.Forms.Timer m_timer_beidou = new System.Windows.Forms.Timer()
-        {
-            Enabled = false,
-            Interval = 55 * 60 * 1000// 55分钟
         };
         private System.Windows.Forms.Timer m_sysTimer;  //用于刷新系统时间
 
@@ -87,11 +82,6 @@ namespace Hydrology
             m_timer_gsm.Interval = 1 * 60 * 1000;
             m_timer_gsm.Enabled = true;
             m_timer_gsm.Start();
-
-            m_timer_beidou.Tick += new EventHandler(EH_Timer_beidou);
-            m_timer_beidou.Interval = 55 * 60 * 1000;
-            m_timer_beidou.Enabled = true;
-            m_timer_beidou.Start();
             //取得当前时间
             DateTime timeBegin = DateTime.Now;
             //进入载入界面
@@ -147,7 +137,7 @@ namespace Hydrology
                 m_timer.Tick += new EventHandler(EH_Timer);
                 // m_timer_gsm.Tick += new EventHandler(EH_Timer_gsm);
 
-                this.CopyRightLabel.Text = "版权所有:湖北一方科技发展有限责任公司 V1.0 - ZY    GSM数据接收：" + num1 + "    BeiDou数据接收：" + num2;
+                this.CopyRightLabel.Text = "版权所有:湖北一方科技发展有限责任公司 V1.0 - YD    GSM数据接收：" + num1 + "    BeiDou数据接收：" + num2;
                 // this.CopyRightLabel.Text = Thread.CurrentThread.ManagedThreadId.ToString();
                 this.lblSysTimer.Alignment = ToolStripItemAlignment.Right;
                 //  初始化系统时间定时器
@@ -172,36 +162,15 @@ namespace Hydrology
                 CPortDataMgr.Instance.StartGprs();
                 CPortDataMgr.Instance.StartHDGprs();
                 CPortDataMgr.Instance.InitBeidou500();
-                CPortDataMgr.Instance.InitCable();
 
-                string comPort = "COM";
-                //端口号
-                List<CPortProtocolConfig> m_listPortConfig = XmlDocManager.Instance.GetComOrPortConfig(true);
-                if (m_listPortConfig != null)
-                {
-                    for (int i = 0; i < m_listPortConfig.Count; i++)
-                    {
-                        CPortProtocolConfig cPortProtocolConfig = m_listPortConfig[i];
-                        if (cPortProtocolConfig.ProtocolChannelName == "Beidou-Normal")
-                        {
-                            comPort = comPort + cPortProtocolConfig.PortNumber.ToString();
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    CSystemInfoMgr.Instance.AddInfo(string.Format("系统未配置北斗通信"));
-                }
-                CPortDataMgr.Instance.SendBeidouQSTA(comPort);
                 // 计算启动时间，写入日志文件
                 TimeSpan span = DateTime.Now - timeBegin;
                 CSystemInfoMgr.Instance.AddInfo(string.Format("系统启动正常, 用时 {0} s", span.TotalSeconds.ToString("0.00")), DateTime.Now);
 
                 //  显示实时数据表
                 CDBDataMgr.Instance.SentRTDMsg();
-                //  显示实时墒情表
-                CDBSoilDataMgr.Instance.SendSoilDataMsg();
+                //  显示实时蒸发表
+                CDBDataMgr.Instance.SentRTDEva();
 
 
                 // 生成测试数据
@@ -404,20 +373,20 @@ namespace Hydrology
                 m_listFormComState.Hide();
             }
         }
-        private void EHMI_Soil_Click(object sender, EventArgs e)
+        private void EHMI_Eva_Click(object sender, EventArgs e)
         {
-            MI_Soil.Checked = !MI_Soil.Checked;
-            if (MI_Soil.Checked)
+            MI_Eva.Checked = !MI_Eva.Checked;
+            if (MI_Eva.Checked)
             {
                 // 显示
-                //m_tabControlUp.AddPage(m_formSoilRTD);
+                m_tabControlUp.AddPage(m_formEvaRTD);
                 m_tabControlUp.SelectedIndex = m_tabControlUp.TabCount - 1;
                 m_formStationState.Show();
             }
             else
             {
                 // 隐藏
-                //m_tabControlUp.RemovePage(m_formSoilRTD);
+                m_tabControlUp.RemovePage(m_formEvaRTD);
                 m_formStationState.Hide();
             }
         }
@@ -460,9 +429,9 @@ namespace Hydrology
             this.MI_ComPortState.Checked = false;
         }
 
-        private void EH_Soil_Page_Closed(object sender, EventArgs e)
+        private void EH_Eva_Page_Closed(object sender, EventArgs e)
         {
-            this.MI_Soil.Checked = false;
+            this.MI_Eva.Checked = false;
         }
         private void EH_StationState_Page_Closed(object sender, EventArgs e)
         {
@@ -497,15 +466,6 @@ namespace Hydrology
             m_timer.Stop();
             Logout();
             CSystemInfoMgr.Instance.AddInfo("用户超时，自动退出登录");
-        }
-
-        private void EH_Timer_beidou(object sender, EventArgs e)
-        {
-            if (DateTime.Now.Hour == 1)
-            {
-                CPortDataMgr.Instance.sendBeidouTTCATimer();
-            }
-            //CPortDataMgr.Instance.sendBeidouTTCATimer();
         }
         private void EH_Timer_gsm(object sender, EventArgs e)
         {
@@ -546,7 +506,7 @@ namespace Hydrology
             sr.Close();
             sr2.Close();
 
-            this.CopyRightLabel.Text = "版权所有:湖北一方科技发展有限责任公司 V1.0    GSM数据接收：" + gsmnum + "    BeiDou数据接收：" + bdnum;
+            this.CopyRightLabel.Text = "版权所有:湖北一方科技发展有限责任公司 V1.0 - YD   GSM数据接收：" + gsmnum + "    BeiDou数据接收：" + bdnum;
         }
         #endregion
 
@@ -560,8 +520,8 @@ namespace Hydrology
             m_formRTD = new CRTDForm() { Title = "实时水情数据", BTabRectClosable = false, MdiParent = this };
             m_formRTD.Dock = DockStyle.Fill;
 
-            //m_formSoilRTD = new CRTDSoilForm() { Title = "实时墒情数据", BTabRectClosable = false, MdiParent = this };
-            //m_formSoilRTD.Dock = DockStyle.Fill;
+            m_formEvaRTD = new CRTDEvaForm() { Title = "实时蒸发数据", BTabRectClosable = false, MdiParent = this };
+            m_formEvaRTD.Dock = DockStyle.Fill;
 
             m_listFormSystemInfo = new CListFormTabPage() { Title = "运行日志", BTabRectClosable = false, BCloseButton = false, MdiParent = this, Text = "实时信息" };
             m_listFormSystemInfo.Dock = DockStyle.Fill;
@@ -582,7 +542,7 @@ namespace Hydrology
 
 
             m_formRTD.MouseEnter += MainForm_MouseEnter;
-            //m_formSoilRTD.MouseEnter += MainForm_MouseEnter;
+            m_formEvaRTD.MouseEnter += MainForm_MouseEnter;
             m_listFormSystemInfo.MouseEnter += MainForm_MouseEnter;
             m_listFormComState.MouseEnter += MainForm_MouseEnter;
             m_listFormWarningInfo.MouseEnter += MainForm_MouseEnter;
@@ -594,7 +554,7 @@ namespace Hydrology
             m_tabControlUp = new CExTabControl();
             m_tabControlUp.SuspendLayout();
             m_tabControlUp.AddPage(m_formRTD);
-            //m_tabControlUp.AddPage(m_formSoilRTD);
+            m_tabControlUp.AddPage(m_formEvaRTD);
             m_tabControlUp.AddPage(m_formStationState);
             //m_tabControlUp.AddPage(m_formSoilRTD);
             splitContainer2.Panel1.Controls.Add(m_tabControlUp);
@@ -626,7 +586,7 @@ namespace Hydrology
             //    this.MI_Soil.Enabled = false;
             //    this.MI_Soil.Checked = true;
             //    this.MI_Soil.Enabled = true;
-            //m_formSoilRTD.Show();
+            m_formEvaRTD.Show();
             //}
             m_listFormWarningInfo.Show();
 
@@ -648,6 +608,7 @@ namespace Hydrology
             this.MI_Beidou.Click += new EventHandler(FormHelper.ShowForm);
             this.MI_Beidou500.Click += new EventHandler(FormHelper.ShowForm);
             this.MI_DatabaseConfig.Click += new EventHandler(FormHelper.ShowForm);
+            this.MI_EvaSet.Click += new EventHandler(FormHelper.ShowForm);
             this.MI_VoiceConfig.Click += new EventHandler(FormHelper.ShowForm);
             this.MI_SystemExit.Click += new EventHandler(FormHelper.SysExit);
             this.MI_LogIn.Click += new EventHandler(FormHelper.ShowForm);          // 用户登录  
@@ -660,7 +621,7 @@ namespace Hydrology
             this.MI_ToolBar.Click += new EventHandler(this.EHMI_ToolBar_Click);
             this.MI_StatusBar.Click += new EventHandler(this.EHMI_StatusBar_Click);
             this.MI_StationStatus.Click += new EventHandler(this.EHMI_StationRTState_Click);
-            this.MI_Soil.Click += new EventHandler(this.EHMI_Soil_Click);
+            this.MI_Eva.Click += new EventHandler(this.EHMI_Eva_Click);
             this.MI_ComPortState.Click += new EventHandler(this.EHMI_CommPortState_Click);
             this.MI_WarningInfo.Click += new EventHandler(this.EHMI_WarningInfo_Click);
 
@@ -708,8 +669,6 @@ namespace Hydrology
 
             this.OneStationYear.Click += new EventHandler(FormHelper.ShowForm);
 
-            this.DataText.Click += new EventHandler(FormHelper.ShowForm);
-
 
             /**********   帮助栏   **********/
 
@@ -751,7 +710,7 @@ namespace Hydrology
             this.UserModeChanged += FormHelper.EHUserModeChanged;
 
             // 绑定消息
-            //m_formSoilRTD.TabClosed += new EventHandler(this.EH_Soil_Page_Closed);
+            m_formEvaRTD.TabClosed += new EventHandler(this.EH_Eva_Page_Closed);
             m_listFormComState.TabClosed += new EventHandler(this.EH_CommPort_Page_Closed);
             m_formStationState.TabClosed += new EventHandler(this.EH_StationState_Page_Closed);
             m_listFormWarningInfo.TabClosed += new EventHandler(this.EH_WarningInfo_Page_Closed);
@@ -827,11 +786,11 @@ namespace Hydrology
                 if (!hasSoilStation)
                 {
                     //    this.MI_Soil.Checked = false;
-                    this.MI_Soil.Enabled = false;
+                    this.MI_Eva.Enabled = false;
                 }
                 else
                 {
-                    this.MI_Soil.Enabled = true;
+                    this.MI_Eva.Enabled = true;
                 }
             }
 #pragma warning disable CS0168 // 声明了变量“exp”，但从未使用过
@@ -857,6 +816,7 @@ namespace Hydrology
             this.MI_CommunicationPort.Enabled = m_bIsInAdministrator;
             this.MI_SerialPortConfig.Enabled = m_bIsInAdministrator;
             this.MI_DatabaseConfig.Enabled = m_bIsInAdministrator;
+            this.MI_EvaSet.Enabled = m_bIsInAdministrator;
             this.MI_GPRS.Enabled = m_bIsInAdministrator;
             this.ReadAndSetting.Enabled = m_bIsInAdministrator;
             this.BatchTransmit.Enabled = m_bIsInAdministrator;
@@ -1180,6 +1140,8 @@ namespace Hydrology
             m_timer.Stop();
             m_timer.Start();
         }
+
+
     } // end of class
 
 }//end of namespace MDIParent
