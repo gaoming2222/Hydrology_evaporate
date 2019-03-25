@@ -849,6 +849,372 @@ namespace Hydrology.Forms
             }
         }
 
+        //private void btn_Set_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        ResetAllControlsBackColor();
+        //        //  站点id
+        //        var station = (this.cmbStation as CStationComboBox).GetStation();
+        //        m_CurrentStation = station;
+        //        if (station == null)
+        //        {
+        //            MessageBox.Show("请选择站点！");
+        //            return;
+        //        }
+        //        string sid = station.StationID;
+
+        //        var cmds = new List<EDownParam>();
+        //        CDownConf down = new CDownConf();
+        //        //  配置参数
+        //        #region 配置参数
+        //        if (tabControl1.SelectedIndex == 0)
+        //        {
+        //            if (this.chkClock.Checked)
+        //            {
+        //                cmds.Add(EDownParam.Clock);
+        //                down.Clock = this.chkLocalTime.Checked ? DateTime.Now : this.vClock.Value;
+        //            }
+        //            if (this.chkVoltage.Checked)
+        //            {
+        //                MessageBox.Show("电压不允许设置");
+        //                this.chkVoltage.Checked = false;
+        //                return;
+        //            }
+        //            if (this.chkStationCmdID.Checked)
+        //            {
+        //                MessageBox.Show("站号不允许设置");
+        //                this.chkStationCmdID.Checked = false;
+        //                return;
+        //            }
+        //            if (this.chkNormalState.Checked)
+        //            {
+        //                cmds.Add(EDownParam.NormalState);
+        //                var normalState = this.vNormalState.Text.Trim();
+        //                if (this.m_vNormalStateLists.Contains(normalState))
+        //                {
+        //                    down.NormalState = ProtocolMaps.NormalState4UI.FindKey(normalState);
+        //                }
+        //                else
+        //                {
+        //                    MessageBox.Show("常规状态 参数不是合法的!");
+        //                    return;
+        //                }
+        //            }
+        //            if (this.chkVersionNum.Checked)
+        //            {
+        //                MessageBox.Show("版本号不允许设置");
+        //                this.chkVersionNum.Checked = false;
+        //                return;
+        //            }
+        //            if (this.chkFlashClear.Checked)
+        //            {
+        //                MessageBox.Show("清除Flash不允许设置");
+        //                this.chkFlashClear.Checked = false;
+        //                return;
+        //            }
+        //            if (this.chkWorkStatus.Checked)
+        //            {
+        //                cmds.Add(EDownParam.WorkStatus);
+        //                string workStatus = this.vWorkStatus.Text.Trim();
+        //                if (this.m_vWorkStatusLists.Contains(workStatus))
+        //                {
+        //                    down.WorkStatus = ProtocolMaps.WorkStatus4UI.FindKey(workStatus);
+        //                }
+        //                else
+        //                {
+        //                    MessageBox.Show("工作状态 参数不是合法的!");
+        //                    return;
+        //                }
+        //            }
+        //            if (this.chkTimePeriod.Checked)
+        //            {
+        //                cmds.Add(EDownParam.TimePeriod);
+        //                string temp = String.Format("{0:D2}", Int16.Parse(this.vTimePeriod.Text));
+        //                if (this.m_vTimePeriodLists.Contains(Int16.Parse(this.vTimePeriod.Text.Trim())))
+        //                {
+        //                    down.TimePeriod = ProtocolMaps.TimePeriodMap.FindKey(temp);
+        //                }
+        //                else
+        //                {
+        //                    MessageBox.Show("定时段次 参数不是合法的!");
+        //                    return;
+        //                }
+        //            }
+        //            if (this.chkTimeChoice.Checked)
+        //            {
+        //                cmds.Add(EDownParam.TimeChoice);
+        //                string temp = this.vTimeChoice.Text.Trim();
+        //                if (this.m_vTimeChoiceLists.Contains(temp))
+        //                {
+        //                    down.TimeChoice = ProtocolMaps.TimeChoice4UI.FindKey(temp);
+        //                }
+        //                else
+        //                {
+        //                    MessageBox.Show("对时选择 参数不是合法的!");
+        //                    return;
+        //                }
+        //            }
+        //        }
+        //        else if (tabControl1.SelectedIndex == 1)
+        //        {
+        //            if (this.chkMainChannel.Checked)
+        //            {
+        //                cmds.Add(EDownParam.StandbyChannel);
+
+        //                string mainChannel = this.vMainChannel.Text.Trim();
+        //                string viceChannel = this.vViceChannel.Text.Trim();
+        //                if (!this.m_vMainChannelLists.Contains(mainChannel))
+        //                {
+        //                    MessageBox.Show("主用信道 参数不是合法的!");
+        //                    return;
+        //                }
+        //                if (!this.m_vViceChannelLists.Contains(viceChannel))
+        //                {
+        //                    MessageBox.Show("备用信道 参数不是合法的!");
+        //                    return;
+        //                }
+        //                if (mainChannel == viceChannel)
+        //                {
+        //                    MessageBox.Show("主用信道和备用信道不能同时设为" + vMainChannel.Text);
+        //                    return;
+        //                }
+        //                down.MainChannel = ProtocolMaps.ChannelType4UIMap.FindKey(mainChannel);
+        //                down.ViceChannel = ProtocolMaps.ChannelType4UIMap.FindKey(viceChannel);
+        //            }
+        //            if (this.chkDestPhoneNum.Checked)
+        //            {
+        //                cmds.Add(EDownParam.DestPhoneNum);
+        //                string temp = this.vDestPhoneNum.Text.Trim();
+        //                if (!CStringUtil.IsDigitStrWithSpecifyLength(temp, 11))
+        //                {
+        //                    MessageBox.Show("目的地手机号码 长度必须为11位，而且是数字!");
+        //                    return;
+        //                }
+        //                down.DestPhoneNum = temp;
+        //            }
+        //            if (this.chkTeleNum.Checked)
+        //            {
+        //                cmds.Add(EDownParam.TeleNum);
+        //                string temp = this.vTeleNum.Text.Trim();
+        //                if (!CStringUtil.IsDigit(temp))
+        //                {
+        //                    MessageBox.Show("SIM卡号 所有位必须全部为数字!");
+        //                    return;
+        //                }
+        //                down.TeleNum = temp;
+        //            }
+        //            if (this.chkTerminalNum.Checked)
+        //            {
+        //                cmds.Add(EDownParam.TerminalNum);
+        //                string temp = this.vTerminalNum.Text.Trim();
+        //                if (!CStringUtil.IsDigit(temp))
+        //                {
+        //                    MessageBox.Show("终端机号 所有位必须全部为数字!");
+        //                    return;
+        //                }
+        //                down.TerminalNum = temp;
+        //            }
+        //            if (this.chkRespBeam.Checked)
+        //            {
+        //                cmds.Add(EDownParam.RespBeam);
+        //                string temp = this.vRespBeam.Text.Trim();
+        //                if (!CStringUtil.IsDigit(temp))
+        //                {
+        //                    MessageBox.Show("响应波束 所有位必须全部为数字!");
+        //                    return;
+        //                }
+        //                down.RespBeam = temp;
+        //            }
+        //            if (this.chkRingsNum.Checked)
+        //            {
+        //                cmds.Add(EDownParam.RingsNum);
+        //                decimal temp = this.vRingsNum.Value;
+        //                if (temp <= 0)
+        //                {
+        //                    MessageBox.Show("振铃次数 必须大于0!");
+        //                    return;
+        //                }
+        //                down.RingsNum = temp;
+        //            }
+        //        }
+        //        else if (tabControl1.SelectedIndex == 2)
+        //        {
+        //            if (this.chkAvegTime.Checked)
+        //            {
+        //                cmds.Add(EDownParam.AvegTime);
+        //                down.AvegTime = Decimal.Parse(this.vAvegTime.Text);
+        //            }
+        //            if (this.chkStationType.Checked)
+        //            {
+        //                // MessageBox.Show("测站类型不允许设置");
+        //                cmds.Add(EDownParam.StationType);
+        //                if (this.vStationType.Text == "雨量站")
+        //                    down.StationType = EStationTypeProto.ERainFall;
+        //                if (this.vStationType.Text == "并行水位站")
+        //                    down.StationType = EStationTypeProto.EParallelRiverWater;
+        //                if (this.vStationType.Text == "并行水文站")
+        //                    down.StationType = EStationTypeProto.EParallelEHydrology;
+        //                if (this.vStationType.Text == "串行水位站")
+        //                    down.StationType = EStationTypeProto.ESerialRiverWater;
+        //                if (this.vStationType.Text == "串行水文站")
+        //                    down.StationType = EStationTypeProto.ESerialEHydrology;
+        //                //this.chkStationType.Checked = false;
+        //                //return;
+
+        //            }
+        //            if (this.chkWater.Checked)
+        //            {
+        //                if(this.cmbWater.Text == "存储水位")
+        //                {
+        //                    MessageBox.Show("存储水位不允许设置");
+        //                    this.chkWater.Checked = false;
+        //                    return;
+        //                }
+        //                cmds.Add(EDownParam.realWater);
+        //                down.realWater = this.vWater.Value * (decimal)100;
+        //            }
+        //            if (this.chkWaterPlusReportedValue.Checked)
+        //            {
+        //                cmds.Add(EDownParam.WaterPlusReportedValue);
+        //                down.WaterPlusReportedValue = Decimal.Parse(this.vWaterPlusReportedValue.Text);
+        //            }
+        //            if (this.chkRain.Checked)
+        //            {
+        //                cmds.Add(EDownParam.Rain);
+        //                decimal rainAcc = (decimal)m_CurrentStation.DRainAccuracy;
+        //                if (rainAcc == 0)
+        //                {
+        //                    MessageBox.Show("站点的雨量精度不能为0!");
+        //                    return;
+        //                }
+        //                down.Rain = this.vRain.Value / rainAcc;
+        //            }
+        //            if (this.chkRainPlusReportedValue.Checked)
+        //            {
+        //                cmds.Add(EDownParam.RainPlusReportedValue);
+        //                decimal rainAcc = (decimal)m_CurrentStation.DRainAccuracy;
+        //                if (rainAcc == 0)
+        //                {
+        //                    MessageBox.Show("站点的雨量精度不能为0!");
+        //                    return;
+        //                }
+        //                down.RainPlusReportedValue = this.vRainPlusReportedValue.Value / rainAcc;
+        //            }
+        //            if (this.chkK.Checked)
+        //            {
+        //                string k = this.vK.Text.Trim();
+        //                string c = this.vC.Text.Trim();
+        //                if (!CStringUtil.IsDigitStrWithSpecifyLength(k, 10))
+        //                {
+        //                    MessageBox.Show("K值长度必须为10位数字!");
+        //                    return;
+        //                }
+        //                if (!CStringUtil.IsDigitStrWithSpecifyLength(c, 10))
+        //                {
+        //                    MessageBox.Show("C值长度必须为10位数字!");
+        //                    return;
+        //                }
+        //                cmds.Add(EDownParam.KC);
+        //                down.KC = this.vK.Text + this.vC.Text;
+        //            }
+        //            if (this.chkSelectCollectionParagraphs.Checked)
+        //            {
+        //                string temp = this.vSelectCollectionParagraphs.Text;
+        //                if (!this.m_vSelectCollectionParagraphsLists.Contains(temp))
+        //                {
+        //                    MessageBox.Show("采集段次 参数不是合法的!");
+        //                    return;
+        //                }
+        //                cmds.Add(EDownParam.SelectCollectionParagraphs);
+        //                down.SelectCollectionParagraphs = ProtocolMaps.SelectCollectionParagraphs4UIMap.FindKey(temp);
+        //            }
+        //            if (this.chkSensor.Checked)
+        //            {
+        //                cmds.Add(EDownParam.SensorType);
+        //                string temp = this.vSensorType.Text;
+        //                if (this.m_vSensorLists.Contains(temp))
+        //                {
+        //                    down.SensorType = ProtocolMaps.SensorType4UIMap.FindKey(temp);
+        //                }
+        //                else
+        //                {
+        //                    MessageBox.Show("传感器配置 参数不是合法的!");
+        //                    return;
+        //                }
+        //            }
+        //        }
+        //        //if (this.chkUserName.Checked)
+        //        //{
+        //        //    string temp = this.vUserName.Text;
+        //        //    if (!CStringUtil.IsDigitOrAlpha(temp))
+        //        //    {
+        //        //        MessageBox.Show("用户名只能为字母或者数字！");
+        //        //        return;
+        //        //    }
+        //        //    cmds.Add(EDownParam.UserName);
+        //        //    down.UserName = temp;
+        //        //}
+        //        //if (this.chkStationName.Checked)
+        //        //{
+        //        //    string temp = this.vStationName.Text;
+        //        //    if (!CStringUtil.IsDigitOrAlpha(temp))
+        //        //    {
+        //        //        MessageBox.Show("测站名只能为字母或者数字！");
+        //        //        return;
+        //        //    }
+        //        //    cmds.Add(EDownParam.StationName);
+        //        //    down.StationName = temp;
+        //        //}
+        //        if (cmds.Count == 0)
+        //        {
+        //            MessageBox.Show("请选择参数!");
+        //            return;
+        //        }
+        //        #endregion
+        //        string gprsNum = this.txtGprs.Text;
+        //        if (String.IsNullOrEmpty(gprsNum))
+        //        {
+        //            MessageBox.Show(this.panel_Station.Text + "号码不能为空!");
+        //            return;
+        //        }
+        //        if (this.m_channelType == EChannelType.GPRS)
+        //        {
+        //            if (!HasUserOnLine())
+        //            {
+        //                return;
+        //            }
+        //        }
+        //        string query = null;
+        //        if (gprsNum.Length == 8)
+        //        {
+        //            query = CPortDataMgr.Instance.SendSetMsg(gprsNum, sid, cmds, down, this.m_channelType);
+        //        }
+        //        if(gprsNum.Length == 11)
+        //        {
+        //            query = CPortDataMgr.Instance.SendSetHDMsg(gprsNum, sid, cmds, down, this.m_channelType);
+        //        }
+
+
+        //        m_RSStatus = EReadOrSetStatus.Set;
+        //        m_CmdStr = "设置";
+        //        m_StatusIDStr = sid;
+        //        SetWarningInfo(string.Format("{0}{1}命令发出", m_CmdStr, m_StatusIDStr), Color.Blue);
+        //        // 写入系统日志
+        //        string logMsg = String.Format("--------设置参数    目标站点（{0:D4}）--------- ", int.Parse(sid));
+        //        CSystemInfoMgr.Instance.AddInfo(logMsg);
+        //        this.listView1.Items.Add(logMsg);
+        //        AddLog(String.Format("[{0}] Send: {1,-10}  {2}", m_channelType, "", query));
+        //        m_RSStatus = EReadOrSetStatus.Set;
+
+        //    }
+        //    catch (Exception exp)
+        //    {
+        //        Debug.WriteLine("参数设置模块:设置参数失败！" + exp.Message);
+        //    }
+        //}
+
+
         private void btn_Set_Click(object sender, EventArgs e)
         {
             try
@@ -866,6 +1232,9 @@ namespace Hydrology.Forms
 
                 var cmds = new List<EDownParam>();
                 CDownConf down = new CDownConf();
+
+                var cmdsEV = new List<EDownParamEV>();
+                CDownConfEV downEV = new CDownConfEV(); 
                 //  配置参数
                 #region 配置参数
                 if (tabControl1.SelectedIndex == 0)
@@ -874,6 +1243,9 @@ namespace Hydrology.Forms
                     {
                         cmds.Add(EDownParam.Clock);
                         down.Clock = this.chkLocalTime.Checked ? DateTime.Now : this.vClock.Value;
+
+                        cmdsEV.Add(EDownParamEV.Clock);
+                        downEV.Date = this.chkLocalTime.Checked ? DateTime.Now.ToString("yy/MM/dd,HH:mm:ss") : this.vClock.Value.ToString("yy/MM/dd,HH:mm:ss");
                     }
                     if (this.chkVoltage.Checked)
                     {
@@ -992,6 +1364,10 @@ namespace Hydrology.Forms
                             return;
                         }
                         down.DestPhoneNum = temp;
+
+                        cmdsEV.Add(EDownParamEV.TelephoneNum);
+                        downEV.TelephoneNumD = this.vDestPhoneNum.Text.Trim();
+
                     }
                     if (this.chkTeleNum.Checked)
                     {
@@ -999,10 +1375,13 @@ namespace Hydrology.Forms
                         string temp = this.vTeleNum.Text.Trim();
                         if (!CStringUtil.IsDigit(temp))
                         {
-                            MessageBox.Show("SIM卡号 所有位必须全部为数字!");
+                            MessageBox.Show("ID 所有位必须全部为数字!");
                             return;
                         }
                         down.TeleNum = temp;
+
+                        cmdsEV.Add(EDownParamEV.ID);
+                        downEV.ID = this.vTeleNum.Text.Trim();
                     }
                     if (this.chkTerminalNum.Checked)
                     {
@@ -1014,6 +1393,9 @@ namespace Hydrology.Forms
                             return;
                         }
                         down.TerminalNum = temp;
+
+                        cmdsEV.Add(EDownParamEV.HeightLimit);
+                        downEV.HeightLimit = this.vTerminalNum.Text.Trim();
                     }
                     if (this.chkRespBeam.Checked)
                     {
@@ -1065,7 +1447,7 @@ namespace Hydrology.Forms
                     }
                     if (this.chkWater.Checked)
                     {
-                        if(this.cmbWater.Text == "存储水位")
+                        if (this.cmbWater.Text == "存储水位")
                         {
                             MessageBox.Show("存储水位不允许设置");
                             this.chkWater.Checked = false;
@@ -1144,28 +1526,7 @@ namespace Hydrology.Forms
                         }
                     }
                 }
-                //if (this.chkUserName.Checked)
-                //{
-                //    string temp = this.vUserName.Text;
-                //    if (!CStringUtil.IsDigitOrAlpha(temp))
-                //    {
-                //        MessageBox.Show("用户名只能为字母或者数字！");
-                //        return;
-                //    }
-                //    cmds.Add(EDownParam.UserName);
-                //    down.UserName = temp;
-                //}
-                //if (this.chkStationName.Checked)
-                //{
-                //    string temp = this.vStationName.Text;
-                //    if (!CStringUtil.IsDigitOrAlpha(temp))
-                //    {
-                //        MessageBox.Show("测站名只能为字母或者数字！");
-                //        return;
-                //    }
-                //    cmds.Add(EDownParam.StationName);
-                //    down.StationName = temp;
-                //}
+                
                 if (cmds.Count == 0)
                 {
                     MessageBox.Show("请选择参数!");
@@ -1188,13 +1549,13 @@ namespace Hydrology.Forms
                 string query = null;
                 if (gprsNum.Length == 8)
                 {
-                    query = CPortDataMgr.Instance.SendSetMsg(gprsNum, sid, cmds, down, this.m_channelType);
+                    query = CPortDataMgr.Instance.SendSetMsgEV(gprsNum, sid, cmdsEV, downEV, this.m_channelType);
                 }
-                if(gprsNum.Length == 11)
+                if (gprsNum.Length == 11)
                 {
-                    query = CPortDataMgr.Instance.SendSetHDMsg(gprsNum, sid, cmds, down, this.m_channelType);
+                    query = CPortDataMgr.Instance.SendSetHDMsgEV(gprsNum, sid, cmdsEV, downEV, this.m_channelType);
                 }
-                
+
 
                 m_RSStatus = EReadOrSetStatus.Set;
                 m_CmdStr = "设置";
@@ -1213,6 +1574,8 @@ namespace Hydrology.Forms
                 Debug.WriteLine("参数设置模块:设置参数失败！" + exp.Message);
             }
         }
+
+
 
         private void btn_Exit_Click(object sender, EventArgs e)
         {

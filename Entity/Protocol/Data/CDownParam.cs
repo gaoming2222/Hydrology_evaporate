@@ -3,6 +3,26 @@ using System.Collections.Generic;
 
 namespace Hydrology.Entity
 {
+    public enum EDownParamEV
+    {
+        /// <summary>
+        /// 03 时钟命令
+        /// </summary>
+        Clock,
+        /// <summary>
+        /// 04 目的手机卡号命令
+        /// </summary>
+        TelephoneNum,
+        /// <summary>
+        /// 05 ID号命令
+        /// </summary>
+        ID,
+        /// <summary>
+        /// 06 液位限制命令
+        /// </summary>
+        HeightLimit
+    }
+
     public enum EDownParam
     {
         /// <summary>
