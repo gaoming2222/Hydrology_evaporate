@@ -358,11 +358,13 @@ namespace Hydrology.Forms
             m_dgvWater.InitDataSource(CDBDataMgr.GetInstance().GetWaterProxy());
             m_dgvVoltage.InitDataSource(CDBDataMgr.GetInstance().GetVoltageProxy());
             m_dgvEva.InitDataSource(CDBDataMgr.GetInstance().GetHEvaProxy());
+            m_dgvEva.InitDataSource(CDBDataMgr.GetInstance().GetDEvaProxy());
 
             m_chartRain.InitDataSource(CDBDataMgr.GetInstance().GetRainProxy());
             m_chartWaterFlow.InitDataSource(CDBDataMgr.GetInstance().GetWaterProxy());
             m_chartVoltage.InitDataSource(CDBDataMgr.GetInstance().GetVoltageProxy());
-            m_chartEva.InitDataSource(CDBDataMgr.GetInstance().GetEvaProxy());
+            m_chartEva.InitDataSource(CDBDataMgr.GetInstance().GetHEvaProxy());
+            m_chartEva.InitDataSource(CDBDataMgr.GetInstance().GetDEvaProxy());
 
             List<CEntitySubCenter> listSubCenter = CDBDataMgr.Instance.GetAllSubCenter();
 
@@ -457,6 +459,7 @@ namespace Hydrology.Forms
                 //tLayoutRight.Controls.Add(m_dgvRain, 0, 0);
                 cmb_TimeSelect.Items.Clear();
                 cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData });
+                cmb_TimeSelect.SelectedIndex = 0;
                 m_dgvRain.Show();
                 m_dgvWater.Hide();
                 m_dgvVoltage.Hide();
@@ -473,6 +476,7 @@ namespace Hydrology.Forms
                 //查询水量
                 cmb_TimeSelect.Items.Clear();
                 cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData });
+                cmb_TimeSelect.SelectedIndex = 0;
                 m_dgvRain.Hide();
                 m_dgvWater.Show();
                 m_dgvVoltage.Hide();
@@ -491,6 +495,7 @@ namespace Hydrology.Forms
                 //查询电压
                 cmb_TimeSelect.Items.Clear();
                 cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData });
+                cmb_TimeSelect.SelectedIndex = 0;
                 m_dgvRain.Hide();
                 m_dgvWater.Hide();
                 m_dgvVoltage.Show();
@@ -508,6 +513,7 @@ namespace Hydrology.Forms
                 //查询蒸发数据
                 cmb_TimeSelect.Items.Clear();
                 cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_DayData });
+                cmb_TimeSelect.SelectedIndex = 0;
                 m_dgvRain.Hide();
                 m_dgvWater.Hide();
                 m_dgvVoltage.Hide();

@@ -13,7 +13,7 @@ namespace Hydrology.DBManager.DB.SQLServer
     {
         #region 静态常量
         private const string CT_EntityName = "CEntityEva";   //  数据库表Eva实体类
-        public static readonly string CT_TableName = "Data";      //数据库中蒸发初始表的名字
+        public static readonly string CT_TableName = "Data";      //数据库中蒸发时段表的名字
         public static readonly string CN_StationId = "STCD";   //站点ID
         public static readonly string CN_DataTime = "DT";    //数据的采集时间
         public static readonly string CN_Temp = "T";  //温度
@@ -118,7 +118,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     // 蒸发表有插入触发器，如果遇到重复记录，则更新为当前的最新记录
                     //bulkCopy.BatchSize = 1;
                     bulkCopy.BulkCopyTimeout = 1800;
-                    bulkCopy.DestinationTableName = CSQLDEva.CT_TableName;
+                    bulkCopy.DestinationTableName = CSQLHEva.CT_TableName;
                     bulkCopy.ColumnMappings.Add(CN_StationId, CN_StationId);
                     bulkCopy.ColumnMappings.Add(CN_DataTime, CN_DataTime);
                     bulkCopy.ColumnMappings.Add(CN_Eva, CN_Eva);
@@ -129,7 +129,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     try
                     {
                         bulkCopy.WriteToServer(tmp);
-                        Debug.WriteLine("###{0} :add {1} lines to Eva db", DateTime.Now, tmp.Rows.Count);
+                        Debug.WriteLine("###{0} :add {1} lines to HEva db", DateTime.Now, tmp.Rows.Count);
                         CDBLog.Instance.AddInfo(string.Format("添加{0}行到蒸发时表", tmp.Rows.Count));
                     }
                     catch (Exception e)
@@ -420,7 +420,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.BatchSize = 1;
                     bulkCopy.BulkCopyTimeout = 1800;
 
-                    bulkCopy.DestinationTableName = CSQLDEva.CT_TableName;
+                    bulkCopy.DestinationTableName = CSQLHEva.CT_TableName;
                     bulkCopy.ColumnMappings.Add(CN_StationId, CN_StationId);
                     bulkCopy.ColumnMappings.Add(CN_DataTime, CN_DataTime);
                     bulkCopy.ColumnMappings.Add(CN_Eva, CN_Eva);
@@ -446,7 +446,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 m_mutexWriteToDB.ReleaseMutex();
                 return false;
             }
-            Debug.WriteLine("###{0} :add {1} lines to Eva db", DateTime.Now, tmp.Rows.Count);
+            Debug.WriteLine("###{0} :add {1} lines to HEva db", DateTime.Now, tmp.Rows.Count);
             CDBLog.Instance.AddInfo(string.Format("添加{0}行到蒸发时表", tmp.Rows.Count));
             m_mutexWriteToDB.ReleaseMutex();
             return true;

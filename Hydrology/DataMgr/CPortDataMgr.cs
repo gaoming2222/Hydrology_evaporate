@@ -1594,23 +1594,23 @@ namespace Hydrology.DataMgr
 
         public void EHSerialPortUpdated(object sender, EventArgs args)
         {
-            //try
-            //{
-            //    if (m_gsmLists != null && m_gsmLists.Count > 0)
-            //    {
-            //        foreach (var item in m_gsmLists)
-            //        {
-            //            item.ClosePort();
-            //        }
-            //        m_gsmLists.Clear();
-            //        m_CurrentGsmIndex = 0;
-            //    }
-            //    InitGsms();
-            //}
-            //catch (Exception exp)
-            //{
-            //    Debug.WriteLine(exp.Message);
-            //}
+            try
+            {
+                if (m_gsmLists != null && m_gsmLists.Count > 0)
+                {
+                    foreach (var item in m_gsmLists)
+                    {
+                        item.ClosePort();
+                    }
+                    m_gsmLists.Clear();
+                    m_CurrentGsmIndex = 0;
+                }
+                InitGsms();
+            }
+            catch (Exception exp)
+            {
+                Debug.WriteLine(exp.Message);
+            }
 
             try
             {

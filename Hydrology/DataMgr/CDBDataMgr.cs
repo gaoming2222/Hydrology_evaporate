@@ -211,6 +211,7 @@ namespace Hydrology.DataMgr
             resetTxt();
             //CreateTable();
             ReadRTDXml();
+            ReadRTS();
             // 初始化上次雨量记录
             InitStationRainRecord();
             // 初始化水位
@@ -2490,18 +2491,24 @@ namespace Hydrology.DataMgr
                     }
                     if (cDic.ContainsKey("hourE"))
                     {
-                        Eva.Eva = Decimal.Parse(cDic["hourE"]);
-                        Eva.Rain = Decimal.Parse(cDic["hourP"]);
-                        Eva.Temperature = Decimal.Parse(cDic["hourT"]);
-                        Eva.Voltage = Decimal.Parse(cDic["hourU"]);
-                        HEvas.Add(Eva);
+                        if (cDic["hourE"] != "")
+                        {
+                            Eva.Eva = Decimal.Parse(cDic["hourE"]);
+                            Eva.Rain = Decimal.Parse(cDic["hourP"]);
+                            Eva.Temperature = Decimal.Parse(cDic["hourT"]);
+                            Eva.Voltage = Decimal.Parse(cDic["hourU"]);
+                            HEvas.Add(Eva);
+                        }
                     }
                     if (cDic.ContainsKey("dayE"))
                     {
-                        Eva.Eva = Decimal.Parse(cDic["dayE"]);
-                        Eva.Rain = Decimal.Parse(cDic["dayP"]);
-                        Eva.Temperature = Decimal.Parse(cDic["dayT"]);
-                        DEvas.Add(Eva);
+                        if (cDic["dayE"] != "")
+                        {
+                            Eva.Eva = Decimal.Parse(cDic["dayE"]);
+                            Eva.Rain = Decimal.Parse(cDic["dayP"]);
+                            Eva.Temperature = Decimal.Parse(cDic["dayT"]);
+                            DEvas.Add(Eva);
+                        }
                     }
                 }
                 if (HEvas.Count > 0)

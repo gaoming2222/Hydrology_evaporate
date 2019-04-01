@@ -90,6 +90,15 @@ namespace Hydrology.CControls
             m_proxyHEva = proxy;
         }
 
+        /// <summary>
+        /// 初始化数据来源，绑定与数据库的数据
+        /// </summary>
+        /// <param name="proxy"></param>
+        public void InitDataSource(IDEvaProxy proxy)
+        {
+            m_proxyDEva = proxy;
+        }
+
         // 设置显示的雨量记录
         public void SetEva(List<CEntityEva> listEva)
         {

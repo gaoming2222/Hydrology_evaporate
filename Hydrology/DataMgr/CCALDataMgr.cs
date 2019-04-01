@@ -9,6 +9,8 @@ using System.IO;
 using System.Data.SqlClient;
 using Hydrology.Entity;
 using Hydrology.DBManager.Interface;
+using Hydrology.DBManager;
+using System.Threading;
 
 namespace Hydrology.DataMgr
 {
@@ -55,10 +57,11 @@ namespace Hydrology.DataMgr
             //rawDataNew[4] = myDic["Rain"];
             rawDataNew[4] = eva.Rain.ToString();
             //rawDataNew[5] = myDic["Temperature"];
-            rawDataNew[5] = eva.Rain.ToString();
+            rawDataNew[5] = eva.Temperature.ToString();
             //rawDataNew[6] = myDic["EvpType"];
             rawDataNew[6] = eva.type;
             rawDataNew[7] = DateTime.Now.ToString();
+            stcdForCal = eva.StationID;
 
             //判断是否为有效数字
             double d1;
@@ -107,10 +110,11 @@ namespace Hydrology.DataMgr
             eva.Rain = Decimal.Parse(PConvert);
             IEvaProxy evaProxy = CDBDataMgr.Instance.GetEvaProxy();
             evaProxy.AddNewRow(eva);
+            Thread.Sleep(5000);
             //TODO sql语句
             //*******************************************需要修改*******************************************
-            string strSqlForInquire = "SELECT top 1 * FROM dbo.[RawData]";
-            DataTable dtReadSql = ExecuteDatatable(sqlConStr, strSqlForInquire);
+            //string strSqlForInquire = "SELECT top 1 * FROM dbo.[RawData]";
+            //DataTable dtReadSql = ExecuteDatatable(sqlConStr, strSqlForInquire);
             //*******************************************需要修改*******************************************
 
 
@@ -125,7 +129,8 @@ namespace Hydrology.DataMgr
 
 
             //=======首先判断是否是整点，整点处理（读取该整点至上个整点的数据，分段计算），否则看上个数据是不是"RE"数据，不处理========
-            if (rawDataNew[1].Substring(10, 2) == "00" && rawDataNew[1].Substring(12, 2) == "00")
+            DateTime time = DateTime.Parse(rawDataNew[1]);
+            if (time.Minute == 0 && time.Second == 0)
             {
                 //=========按时间顺序读取这个整点至上个整点的数据==========
                 //*******************************************需要修改*******************************************
@@ -368,7 +373,7 @@ namespace Hydrology.DataMgr
                         if (countP == 0)
                         {
                             //*******************************************需要修改*******************************************
-                            string strForSum2 = "SELECT a.E-b.E as E, b.P-a.P as P FROM [Evaporation_Web].[dbo].[RawData] as a, [Evaporation_Web].[dbo].[RawData] as b where a.DT='" + theBegDT.AddHours(-1).ToString() + " ' AND b.DT = '" + theEndDT.AddHours(-1).ToString() + " ' and a.stcd='" + stcdForCal + "'";
+                            string strForSum2 = "SELECT a.E-b.E as E, b.P-a.P as P FROM dbo.[RawData] as a, dbo.[RawData] as b where a.DT='" + theBegDT.AddHours(-1).ToString() + " ' AND b.DT = '" + theEndDT.AddHours(-1).ToString() + " ' and a.stcd='" + stcdForCal + "'";
                             //TODO
                             DataTable dtForDaySum2 = ExecuteDatatable(sqlConStr, strForSum2);
                             //*******************************************需要修改*******************************************
@@ -428,8 +433,8 @@ namespace Hydrology.DataMgr
 
         private DataTable ExecuteDatatable(string[] myConnection, string sql, params SqlParameter[] parameters)
         {
-            string connStr = string.Empty;
-            connStr = "Server=" + myConnection[0] + ";DataBase=" + myConnection[1] + ";Uid=" + myConnection[2] + ";Pwd=" + myConnection[3];
+            //string connStr = string.Empty;
+            //connStr = "Server=" + myConnection[0] + ";DataBase=" + myConnection[1] + ";Uid=" + myConnection[2] + ";Pwd=" + myConnection[3];
             //SqlConnection conn = new SqlConnection(connStr);
             //conn.Open();
             //SqlCommand cmd = new SqlCommand(sql);
@@ -437,7 +442,8 @@ namespace Hydrology.DataMgr
             //DataSet dataSet = new DataSet();
             //adapter.Fill(dataSet);
             //return dataSet.Tables[0];
-            using (SqlConnection conn = new SqlConnection(connStr))
+
+            using (SqlConnection conn = CDBManager.Instance.GetConnection())
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())

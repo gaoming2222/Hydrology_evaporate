@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Hydrology.DBManager.Interface;
 using Hydrology.Entity;
-using System.Windows.Forms.DataVisualization.Charting;
-using System.Drawing;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Windows.Forms;
-using Hydrology.DBManager.Interface;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Hydrology.CControls
 {
@@ -54,7 +52,8 @@ namespace Hydrology.CControls
         private MenuItem m_MIEvaSerial; //蒸发
         private MenuItem m_MIRainSerial;  //降雨
 
-        private IEvaProxy m_proxyEva;
+        private IHEvaProxy m_proxyHEva;
+        private IDEvaProxy m_proxyDEva;
 
         public CChartEva()
             : base()
@@ -72,41 +71,41 @@ namespace Hydrology.CControls
             foreach (CEntityEva entity in Evas)
             {
                 //    if (Eva.Eva > 0 && Eva.Rain > 0)
-                
-                    // 判断蒸发最大值和最小值
-                    if (m_dMinEva.HasValue)
-                    {
-                        m_dMinEva = m_dMinEva > entity.Eva ? entity.Eva : m_dMinEva;
-                    }
-                    else
-                    {
-                        m_dMinEva = entity.Eva;
-                    }
-                    if (m_dMaxEva.HasValue)
-                    {
-                        m_dMaxEva = m_dMaxEva < entity.Eva ? entity.Eva : m_dMaxEva;
-                    }
-                    else
-                    {
-                        m_dMaxEva = entity.Eva;
-                    }
-                    // 判断降雨的最大值和最小值
-                    if (m_dMinRain.HasValue)
-                    {
-                        m_dMinRain = m_dMinRain > entity.Rain ? entity.Rain : m_dMinRain;
-                    }
-                    else
-                    {
-                        m_dMinRain = entity.Rain;
-                    }
-                    if (m_dMaxRain.HasValue)
-                    {
-                        m_dMaxRain = m_dMaxRain < entity.Rain ? entity.Rain : m_dMaxRain;
-                    }
-                    else
-                    {
-                        m_dMaxRain = entity.Rain;
-                    }
+
+                // 判断蒸发最大值和最小值
+                if (m_dMinEva.HasValue)
+                {
+                    m_dMinEva = m_dMinEva > entity.Eva ? entity.Eva : m_dMinEva;
+                }
+                else
+                {
+                    m_dMinEva = entity.Eva;
+                }
+                if (m_dMaxEva.HasValue)
+                {
+                    m_dMaxEva = m_dMaxEva < entity.Eva ? entity.Eva : m_dMaxEva;
+                }
+                else
+                {
+                    m_dMaxEva = entity.Eva;
+                }
+                // 判断降雨的最大值和最小值
+                if (m_dMinRain.HasValue)
+                {
+                    m_dMinRain = m_dMinRain > entity.Rain ? entity.Rain : m_dMinRain;
+                }
+                else
+                {
+                    m_dMinRain = entity.Rain;
+                }
+                if (m_dMaxRain.HasValue)
+                {
+                    m_dMaxRain = m_dMaxRain < entity.Rain ? entity.Rain : m_dMaxRain;
+                }
+                else
+                {
+                    m_dMaxRain = entity.Rain;
+                }
 
                 // 判断日期, 更新日期最大值和最小值
                 if (m_maxDateTime.HasValue)
@@ -203,40 +202,80 @@ namespace Hydrology.CControls
         {
             m_annotation.Visible = false;
             ClearAllDatas();
-            m_proxyEva.SetFilter(iStationId, timeStart, timeEnd, TimeSelect);
-            if (-1 == m_proxyEva.GetPageCount())
+            if (TimeSelect)
             {
-                // 查询失败
-                // MessageBox.Show("数据库忙，查询失败，请稍后再试！");
-                return false;
+                m_proxyHEva.SetFilter(iStationId, timeStart, timeEnd);
+                if (-1 == m_proxyHEva.GetPageCount())
+                {
+                    // 查询失败
+                    // MessageBox.Show("数据库忙，查询失败，请稍后再试！");
+                    return false;
+                }
+                else
+                {
+                    // 并查询数据，显示第一页
+                    m_dMaxRain = null;
+                    m_dMaxEva = null;
+                    m_dMinRain = null;
+                    m_dMinEva = null;
+                    int iTotalPage = m_proxyHEva.GetPageCount();
+                    int rowcount = m_proxyHEva.GetRowCount();
+                    if (rowcount > CI_Chart_Max_Count)
+                    {
+                        // 数据量太大，退出绘图
+                        MessageBox.Show("查询结果集太大，自动退出绘图");
+                        return false;
+                    }
+                    for (int i = 0; i < iTotalPage; ++i)
+                    {
+                        // 查询所有的数据
+                        this.AddEvas(m_proxyHEva.GetPageData(i + 1, false));
+                    }
+                    return true;
+                }
             }
             else
             {
-                // 并查询数据，显示第一页
-                m_dMaxRain = null;
-                m_dMaxEva = null;
-                m_dMinRain = null;
-                m_dMinEva = null;
-                int iTotalPage = m_proxyEva.GetPageCount();
-                int rowcount = m_proxyEva.GetRowCount();
-                if (rowcount > CI_Chart_Max_Count)
+                m_proxyDEva.SetFilter(iStationId, timeStart, timeEnd);
+                if (-1 == m_proxyDEva.GetPageCount())
                 {
-                    // 数据量太大，退出绘图
-                    MessageBox.Show("查询结果集太大，自动退出绘图");
+                    // 查询失败
+                    // MessageBox.Show("数据库忙，查询失败，请稍后再试！");
                     return false;
                 }
-                for (int i = 0; i < iTotalPage; ++i)
+                else
                 {
-                    // 查询所有的数据
-                    this.AddEvas(m_proxyEva.GetPageData(i + 1, false));
+                    // 并查询数据，显示第一页
+                    m_dMaxRain = null;
+                    m_dMaxEva = null;
+                    m_dMinRain = null;
+                    m_dMinEva = null;
+                    int iTotalPage = m_proxyDEva.GetPageCount();
+                    int rowcount = m_proxyDEva.GetRowCount();
+                    if (rowcount > CI_Chart_Max_Count)
+                    {
+                        // 数据量太大，退出绘图
+                        MessageBox.Show("查询结果集太大，自动退出绘图");
+                        return false;
+                    }
+                    for (int i = 0; i < iTotalPage; ++i)
+                    {
+                        // 查询所有的数据
+                        this.AddEvas(m_proxyDEva.GetPageData(i + 1, false));
+                    }
+                    return true;
                 }
-                return true;
             }
         }
 
-        public void InitDataSource(IEvaProxy proxy)
+        public void InitDataSource(IDEvaProxy proxy)
         {
-            m_proxyEva = proxy;
+            m_proxyDEva = proxy;
+        }
+
+        public void InitDataSource(IHEvaProxy proxy)
+        {
+            m_proxyHEva = proxy;
         }
 
         //降雨

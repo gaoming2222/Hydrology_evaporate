@@ -281,7 +281,7 @@ namespace Hydrology.CControls
             {
                 result = result && (entity.Value.DataGrid as CDataGridViewEvaRTD).RefreshRTDTimeOutStatus();
             }
-            CSystemInfoMgr.Instance.AddInfo("刷新盐度实时数据状态");
+            CSystemInfoMgr.Instance.AddInfo("刷新蒸发实时数据状态");
         }
 
         private void EHFormClosing(object sender, FormClosingEventArgs e)

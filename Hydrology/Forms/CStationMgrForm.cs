@@ -200,7 +200,7 @@ namespace Hydrology.Forms
             string[] arrayStr = str.Split(',');
             if (arrayStr.Length == 21)
             {
-                if (arrayStr[0].Length == 4)
+                if (arrayStr[0].Length <= 8)
                     try
                     {
                         string stationId = arrayStr[0].Trim();
@@ -793,7 +793,7 @@ namespace Hydrology.Forms
 
         private string GetDisplayStationName(CEntityStation station)
         {
-            return string.Format("({0,-4}|{1})", station.StationID, station.StationName);
+            return string.Format("({0,-8}|{1})", station.StationID, station.StationName);
         }
 
         private void tsButImport_Click(object sender, EventArgs e)

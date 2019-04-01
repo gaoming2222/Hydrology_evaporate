@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -214,7 +215,7 @@ namespace Hydrology.Forms
                     textBox_WaterBase.Text = "0.0";
                 }
 
-                textBox_StationID.Text = "0001";
+                textBox_StationID.Text = "00000001";
                 textBox_StationName.Text = "测站1";
                 cmb_StationType.SelectedIndex = 0;
                 //comb_DataProtocol.Items.Add("辽宁");
@@ -309,13 +310,7 @@ namespace Hydrology.Forms
                     MessageBox.Show("测站编号不能为空");
                     return false;
                 }
-                // 判断测站编号是否为4位数字
-                if (stationId.Length != 4)
-                {
-                    MessageBox.Show("请输入正确的4位测站编号");
-                    return false;
-                }
-
+                
                 // 判断编号是否为负数
                 try
                 {
@@ -390,7 +385,7 @@ namespace Hydrology.Forms
                     }
                 }
 
-                if (System.Text.Encoding.Default.GetByteCount(stationId) > 4)
+                if (System.Text.Encoding.Default.GetByteCount(stationId) > 8)
                 {
                     MessageBox.Show("测站ID字符数不能超过4个");
                     return false;
@@ -740,7 +735,9 @@ namespace Hydrology.Forms
                 //btn_Revert.Enabled = false;
             }
 #pragma warning disable CS0168 // 声明了变量“ex”，但从未使用过
-            catch (Exception ex) { }
+            catch (Exception ex) {
+                Debug.WriteLine("添加站点失败" + ex);
+            }
 #pragma warning restore CS0168 // 声明了变量“ex”，但从未使用过
         }
 

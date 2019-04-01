@@ -126,7 +126,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     try
                     {
                         bulkCopy.WriteToServer(tmp);
-                        Debug.WriteLine("###{0} :add {1} lines to Eva db", DateTime.Now, tmp.Rows.Count);
+                        Debug.WriteLine("###{0} :add {1} lines to DEva db", DateTime.Now, tmp.Rows.Count);
                         CDBLog.Instance.AddInfo(string.Format("添加{0}行到蒸发日表", tmp.Rows.Count));
                     }
                     catch (Exception e)
@@ -436,7 +436,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 m_mutexWriteToDB.ReleaseMutex();
                 return false;
             }
-            Debug.WriteLine("###{0} :add {1} lines to Eva db", DateTime.Now, tmp.Rows.Count);
+            Debug.WriteLine("###{0} :add {1} lines to DEva db", DateTime.Now, tmp.Rows.Count);
             CDBLog.Instance.AddInfo(string.Format("添加{0}行到蒸发日表", tmp.Rows.Count));
             m_mutexWriteToDB.ReleaseMutex();
             return true;

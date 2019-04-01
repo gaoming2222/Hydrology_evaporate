@@ -19,10 +19,9 @@ namespace Hydrology.CControls
         public static readonly string CS_StationType = "站点类型";
         public static readonly string CS_TimeCollected = "采集时间";
         //public static readonly string CS_ChannelType = "通讯方式";
-        public static readonly string CS_Eva = "盐度";
-        public static readonly string CS_Rain = "电导率";
+        public static readonly string CS_Eva = "蒸发";
+        public static readonly string CS_Rain = "雨量";
         public static readonly string CS_Temp = "温度";
-        public static readonly string CS_Voltage = "电压";
         public static readonly string CS_NullUIStr = "---";
         #endregion ///<STATIC_STRING
 
@@ -43,7 +42,7 @@ namespace Hydrology.CControls
             {
                 CS_StationID, CS_StationName, CS_StationType, CS_TimeCollected,
                 //CS_ChannelType,
-                CS_Eva, CS_Rain, CS_Temp, CS_Voltage
+                CS_Eva, CS_Rain, CS_Temp
             };
             // 隐藏延迟列，串口列
             //base.HideColomns = new int[] { 4, 10, 11, 14, 15 };
@@ -262,7 +261,7 @@ namespace Hydrology.CControls
                         };
                         if (form != null)
                         {
-                            form.cmbStation.Text = string.Format("({0,-4}|{1})", stationid, stationname);
+                            form.cmbStation.Text = string.Format("({0,-8}|{1})", stationid, stationname);
                             form.cmbQueryInfo.SelectedIndex = 3;
                             form.ShowDialog();
                         }
@@ -438,7 +437,6 @@ namespace Hydrology.CControls
             result.Add(entity.Eva >= 0 ? entity.Eva.Value.ToString() : CS_NullUIStr);
             result.Add(entity.Rain.HasValue ? entity.Rain.ToString() : CS_NullUIStr);
             result.Add(entity.Temperature.HasValue ? entity.Temperature.ToString() : CS_NullUIStr);
-            result.Add(entity.Voltage.HasValue ? entity.Voltage.ToString() : CS_NullUIStr);
             return result;
         }
         #endregion ///<HELP_METHOD
