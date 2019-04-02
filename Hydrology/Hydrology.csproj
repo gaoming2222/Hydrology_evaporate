@@ -420,11 +420,17 @@
     <Compile Include="Forms\CWelcomePage.Designer.cs">
       <DependentUpon>CWelcomePage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\DataText.cs">
+    <Compile Include="Forms\CEvaSetForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\DataText.Designer.cs">
-      <DependentUpon>DataText.cs</DependentUpon>
+    <Compile Include="Forms\CEvaSetForm.Designer.cs">
+      <DependentUpon>CEvaSetForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ShowForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ShowForm.Designer.cs">
+      <DependentUpon>ShowForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\DebugInfoSearch.cs">
       <SubType>Form</SubType>
@@ -591,8 +597,11 @@
     <EmbeddedResource Include="Forms\CWelcomePage.resx">
       <DependentUpon>CWelcomePage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\DataText.resx">
-      <DependentUpon>DataText.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\CEvaSetForm.resx">
+      <DependentUpon>CEvaSetForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ShowForm.resx">
+      <DependentUpon>ShowForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DebugInfoSearch.resx">
       <DependentUpon>DebugInfoSearch.cs</DependentUpon>

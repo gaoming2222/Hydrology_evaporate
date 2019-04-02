@@ -14,6 +14,7 @@ using Hydrology.Forms;
 using System.IO;
 using System.Xml;
 using Entity;
+using Hydrology.Entity.Utils;
 
 namespace Hydrology.DataMgr
 {
@@ -846,6 +847,19 @@ namespace Hydrology.DataMgr
         #endregion ///<公共方法
 
         #region 帮助方法
+
+        public void SetEvaConf()
+        {
+            try
+            {
+                EvaConf evaConf = Protocol.Manager.XMLEvaInfo.Instance.DeSerialize();
+            }
+            catch (Exception e)
+            {
+                //SanilityConf.StdConduct = 1.000m;
+                MessageBox.Show("未配置盐度参数！");
+            }
+        }
 
         private void InitStationRainRecord()
         {

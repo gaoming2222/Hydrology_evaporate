@@ -25,7 +25,7 @@ namespace Hydrology.CControls
         public static readonly string CS_Rain = "雨量";
         public static readonly string CS_Voltage = "电压";
         public static readonly string CS_Temp = "温度值";
-        
+
         public static readonly string CS_TimeFormat = "yyy-MM-dd HH:mm:ss";
         #endregion  ///<STATIC_STRING
 
@@ -66,7 +66,6 @@ namespace Hydrology.CControls
                 CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain ,CS_Temp, CS_Voltage
             };
 
-            this.HideColomns = new int[] { 5 };
 
             // 设置一页的数量
             this.PageRowCount = CDBParams.GetInstance().UIPageRowCount;
@@ -220,7 +219,7 @@ namespace Hydrology.CControls
                     return true;
                 }
             }
-            
+
 
         }
 
@@ -309,7 +308,7 @@ namespace Hydrology.CControls
                 {
                     CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage
                 };
-                
+
                 //开启编辑模式,设置可编辑列
 
                 DataGridViewCheckBoxColumn deleteCol = new DataGridViewCheckBoxColumn();
@@ -388,7 +387,7 @@ namespace Hydrology.CControls
                 dataTable.Columns.Add(CS_Eva, typeof(string));
                 dataTable.Columns.Add(CS_Rain, typeof(string));
                 dataTable.Columns.Add(CS_Temp, typeof(string));
-                dataTable.Columns.Add(CS_Voltage, typeof(string)); 
+                dataTable.Columns.Add(CS_Voltage, typeof(string));
                 dataTable.Columns.Add(CS_TimeCollected, typeof(DateTime));
                 // 逐页读取数据
                 for (int i = 0; i < m_iTotalPage; ++i)
@@ -777,7 +776,6 @@ namespace Hydrology.CControls
                 Eva.TimeCollect = DateTime.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_TimeCollected].Value.ToString());
                 Eva.Rain = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Rain].Value.ToString());
                 Eva.Eva = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Eva].Value.ToString());
-                Eva.Voltage = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Rain].Value.ToString());
                 Eva.Temperature = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Temp].Value.ToString());
                 Eva.Voltage = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Voltage].Value.ToString());
 

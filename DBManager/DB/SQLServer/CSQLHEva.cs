@@ -329,7 +329,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 }
                 if (!table.Rows[startRow][CN_Voltage].ToString().Equals(""))
                 {
-                    Eva.Rain = Decimal.Parse(table.Rows[startRow][CN_Voltage].ToString());
+                    Eva.Voltage = Decimal.Parse(table.Rows[startRow][CN_Voltage].ToString());
                 }
                 result.Add(Eva);
             }
