@@ -89,10 +89,17 @@ namespace Hydrology.Forms
                 case "数据库配置":
                     form = new CDatabaseConfigForm();
                     break;
+                case "蒸发参数设置":
+                    form = new CEvaSetForm();
+                    break;
+                case "界面显示设置":
+                    form = new ShowForm();
+                    (form as ShowForm).FormShowChanged += new EventHandler<CEventSingleArgs<bool>>(MainFormRef.EHFormShowChanged);
+                    break;
                 case "用户登陆":
                     {
                         form = new CLoginForm();
-                        (form as CLoginForm).UserModeChanged += new EventHandler<CEventSingleArgs<bool>>(MainFormRef.EHUserModeChanged);
+                        (form as CLoginForm).UserModeChanged += new EventHandler<CEventSingleArgs<int>>(MainFormRef.EHUserModeChanged);
                     }
                     break;
                 case "用户管理":
@@ -291,9 +298,9 @@ namespace Hydrology.Forms
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        public static void EHUserModeChanged(object sender, CEventSingleArgs<bool> args)
+        public static void EHUserModeChanged(object sender, CEventSingleArgs<int> args)
         {
-            if (args.Value)
+            if (args.Value == 0)
             {
                 // 只处理由管理员退出为普通用户的情况
                 return;

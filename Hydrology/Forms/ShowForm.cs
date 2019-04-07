@@ -6,11 +6,14 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Hydrology.Entity;
 
 namespace Hydrology.Forms
 {
     public partial class ShowForm : Form
     {
+        public EventHandler<CEventSingleArgs<bool>> FormShowChanged;
+
         public ShowForm()
         {
             InitializeComponent();
@@ -24,26 +27,24 @@ namespace Hydrology.Forms
 
         private void SaveBtn_Click(object sender, EventArgs e)
         {
-            if (Rain_ckb.Checked == false && Eva_ckb.Checked == false)
+            //if (Rain_ckb.Checked == false && Eva_ckb.Checked == false)
+            //{
+            //    MessageBox.Show("请至少选择一项需要显示的界面！");
+            //    return;
+            //}
+            if(FormShowChanged != null)
             {
-                MessageBox.Show("请至少选择一项需要显示的界面！");
-                return;
+                FormShowChanged.Invoke(this, new CEventSingleArgs<bool>(Eva_ckb.Checked));
             }
-            if (Rain_ckb.Checked == true)
-            {
-
-            }
-
-            if (Eva_ckb.Checked == true)
-            {
-
-            }
+            Protocol.Manager.XMLEvaInfo.Instance.Serialize_ShowForm(Eva_ckb.Checked);
+            this.Close();
         }
 
         private void Init()
         {
-            this.Rain_ckb.Checked = true;
-            this.Eva_ckb.Checked = true;
+            //this.Rain_ckb.Checked = true;
+            this.Eva_ckb.Checked = Protocol.Manager.XMLEvaInfo.Instance.DeSerialize_FormShow();
+
         }
 
         private void Cancel_btn_Click(object sender, EventArgs e)

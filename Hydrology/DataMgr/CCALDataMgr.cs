@@ -10,14 +10,14 @@ using System.Data.SqlClient;
 using Hydrology.Entity;
 using Hydrology.DBManager.Interface;
 using Hydrology.DBManager;
-using System.Threading;
+using Hydrology.Entity.Utils;
 
 namespace Hydrology.DataMgr
 {
     public class CCALDataMgr
     {
         string[] sqlConStr = new string[4];
-        string[] rawDataNew = new string[8];
+        string[] rawDataNew = new string[12];
         string[] hourData = new string[6];
         string[] dayData = new string[6];
         //List<string> rawDataList = new List<string>();
@@ -36,13 +36,6 @@ namespace Hydrology.DataMgr
         /// <param name=""></param>
         public Dictionary<string, string> EvaCal(CEntityEva eva)
         {
-            //*************************判断数据是否合理****************************************************
-            //if (rawDataStr[2].Length < 4 || rawDataStr[3].Length < 4 || rawDataStr[4].Length < 4 || rawDataStr[5].Length < 4)
-            //{
-            //    return;
-            //}
-
-
             Dictionary<string, string> evaDic = new Dictionary<string, string>();//输出的蒸发计算结果
             //int sumRawDataRows = rawDataList.Count;
             string strForInserts = string.Empty;
@@ -53,7 +46,7 @@ namespace Hydrology.DataMgr
             //rawDataNew[2] = myDic["Voltge"];
             rawDataNew[2] = eva.Voltage.ToString();
             //rawDataNew[3] = myDic["Evp"];
-            rawDataNew[3] =eva.Eva.ToString();
+            rawDataNew[3] = eva.Eva.ToString();
             //rawDataNew[4] = myDic["Rain"];
             rawDataNew[4] = eva.Rain.ToString();
             //rawDataNew[5] = myDic["Temperature"];
@@ -62,6 +55,14 @@ namespace Hydrology.DataMgr
             rawDataNew[6] = eva.type;
             rawDataNew[7] = DateTime.Now.ToString();
             stcdForCal = eva.StationID;
+
+
+
+            rawDataNew[8] = EvaConf.kp.ToString();//降雨转换系数
+            rawDataNew[9] = EvaConf.ke.ToString();//蒸发转换系数
+            rawDataNew[10] = EvaConf.dh.ToString();//人工数据比测初始高度差
+            rawDataNew[11] = EvaConf.comP.ToString();//是否降雨补偿
+
 
             //判断是否为有效数字
             double d1;
@@ -84,6 +85,19 @@ namespace Hydrology.DataMgr
             string EConvert;
             string PConvert;
 
+
+            //判断是否有降雨、蒸发转换系数输入，如果有则替换初始转换系数
+            if (rawDataNew[8] != "")
+            {
+                Kp = double.Parse(rawDataNew[8]);
+            }
+
+            if (rawDataNew[9] != "")
+            {
+                Ke = double.Parse(rawDataNew[9]);
+            }
+
+
             if (double.TryParse(rawDataNew[3], out ConDouE))//蒸发
             {
                 EConvert = (ConDouE * Ke).ToString("F2");
@@ -103,6 +117,13 @@ namespace Hydrology.DataMgr
                 return evaDic;
             }
 
+
+            //蒸发桶里面的水位需要减去一个高度差dh，结果作为人工数据比对用
+            //*******************************需要写进原始表中**********************************
+            double compareH = Convert.ToDouble(rawDataNew[3]) - Convert.ToDouble(rawDataNew[10]);
+
+
+
             //*******************************************数据入库************************************************
             //将原始表中的降雨量修改为PConvert，蒸发量修改为EConvert
             //第一次数据入库
@@ -110,7 +131,7 @@ namespace Hydrology.DataMgr
             eva.Rain = Decimal.Parse(PConvert);
             IEvaProxy evaProxy = CDBDataMgr.Instance.GetEvaProxy();
             evaProxy.AddNewRow(eva);
-            Thread.Sleep(5000);
+            System.Threading.Thread.Sleep(5000);
             //TODO sql语句
             //*******************************************需要修改*******************************************
             //string strSqlForInquire = "SELECT top 1 * FROM dbo.[RawData]";
@@ -337,17 +358,18 @@ namespace Hydrology.DataMgr
                     evaDic.Add("hourU", hourData[5]);
                     //***************************每天的8点，整理过去一天的日累积降雨量和蒸发量*********************************
                     #region
+                    int hourPNums = 0;//记录降雨小时数
                     DateTime theNewDT = Convert.ToDateTime(rawDataNew[1]);
                     DateTime theKeyDT1 = Convert.ToDateTime(Convert.ToDateTime(rawDataNew[1]).ToString("yyyy-MM-dd ") + "08:00:00");
                     DateTime theKeyDT2 = Convert.ToDateTime(Convert.ToDateTime(rawDataNew[1]).ToString("yyyy-MM-dd ") + "09:00:00");
                     #region
-                    if (theNewDT >= theKeyDT1 && theNewDT < theKeyDT2 && rawDataNew[6] == string.Empty)
+                    if (theNewDT >= theKeyDT1 && theNewDT < theKeyDT2 && rawDataNew[6] == null)
                     {
                         //确定统计的起止时间，读取数据库数据
                         DateTime theBegDT = Convert.ToDateTime((Convert.ToDateTime(rawDataNew[1]).AddDays(-1)).ToString("yyyy-MM-dd ") + "09:00:00");
                         DateTime theEndDT = Convert.ToDateTime(Convert.ToDateTime(rawDataNew[1]).ToString("yyyy-MM-dd ") + "09:00:00");
                         //*******************************************需要修改*******************************************
-                        string strSqlForDayData = "select stcd, sum(E) as E, sum(P) as P, avg(T) as T from data where dt>='" + theBegDT.ToString() + "' and dt<'" + theEndDT.ToString() + "' and stcd='" + stcdForCal + "' group by stcd";
+                        string strSqlForDayData = "select stcd,sum(E) as E, sum(P) as P, avg(T) as T from data where dt>='" + theBegDT.ToString() + "' and dt<'" + theEndDT.ToString() + "' and stcd='" + stcdForCal + "' group by stcd";
                         //TODO
                         DataTable dayDT = ExecuteDatatable(sqlConStr, strSqlForDayData);
                         //*******************************************需要修改*******************************************
@@ -363,6 +385,10 @@ namespace Hydrology.DataMgr
                         int sumdtForDaySumTempRows = dayDT.Rows.Count;
                         for (int j = 0; j < sumdtForDaySumTempRows; j++)
                         {
+                            if (Math.Abs(Decimal.Parse(dtForDaySumTemp.Rows[j + 1]["P"].ToString()) - Decimal.Parse(dtForDaySumTemp.Rows[j]["P"].ToString())) > 0.05m)
+                            {
+                                hourPNums += 1;
+                            }
                             if (dtForDaySumTemp.Rows[j]["ACT"].ToString().Trim() == "PP" || dtForDaySumTemp.Rows[j]["ACT"].ToString().Trim() == "PE" || dtForDaySumTemp.Rows[j]["ACT"].ToString().Trim() == "ZE" || dtForDaySumTemp.Rows[j]["ACT"].ToString().Trim() == "RE")
                             {
                                 countP = countP + 1;
@@ -373,7 +399,7 @@ namespace Hydrology.DataMgr
                         if (countP == 0)
                         {
                             //*******************************************需要修改*******************************************
-                            string strForSum2 = "SELECT a.E-b.E as E, b.P-a.P as P FROM dbo.[RawData] as a, dbo.[RawData] as b where a.DT='" + theBegDT.AddHours(-1).ToString() + " ' AND b.DT = '" + theEndDT.AddHours(-1).ToString() + " ' and a.stcd='" + stcdForCal + "'";
+                            string strForSum2 = "SELECT a.E-b.E as E, b.P-a.P as P FROM [dbo].[RawData] as a,[dbo].[RawData] as b where a.DT='" + theBegDT.AddHours(-1).ToString() + " ' AND b.DT = '" + theEndDT.AddHours(-1).ToString() + " ' and a.stcd='" + stcdForCal + "'";
                             //TODO
                             DataTable dtForDaySum2 = ExecuteDatatable(sqlConStr, strForSum2);
                             //*******************************************需要修改*******************************************
@@ -402,14 +428,25 @@ namespace Hydrology.DataMgr
                             }
                         }
 
+                        decimal tempP = Decimal.Parse(dayDT.Rows[0]["P"].ToString());
+
+                        //*****************日降雨补偿********************************
+                        //判断日降雨的小时数，小于3不补偿，最大为13
+                        if (hourPNums > 3 && hourPNums <= 13)
+                        {
+                            tempP = Decimal.Parse(dayDT.Rows[0]["P"].ToString()) + Convert.ToDecimal(rawDataNew[11]) * 0.05m * (hourPNums - 3);
+                        }
+
+
                         //==================写入日累积值，并触发网页程序=====================
-                        //构造hourData数组
+                        //构造dayData数组
                         dayData[0] = dayDT.Rows[0]["STCD"].ToString();
                         dayData[1] = theKeyDT1.AddDays(-1).ToShortDateString();
                         dayData[2] = dayDT.Rows[0]["E"].ToString();  //真实蒸发，考虑容器的换算？
-                        dayData[3] = dayDT.Rows[0]["P"].ToString();
+                        dayData[3] = tempP.ToString();
                         dayData[4] = dayDT.Rows[0]["T"].ToString();
                         dayData[5] = "";
+
 
 
                         evaDic.Add("dayE", dayData[2]);
@@ -480,5 +517,6 @@ namespace Hydrology.DataMgr
                 }
             }
         }
+
     }
 }

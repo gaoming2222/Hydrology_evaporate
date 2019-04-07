@@ -43,6 +43,7 @@
             this.MI_DatabaseConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_VoiceConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_EvaSet = new System.Windows.Forms.ToolStripMenuItem();
+            this.MI_FormShowSet = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.MI_SystemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.editMenu = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,7 +76,7 @@
             this.MI_StatusBar = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.toolBarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.MI_Eva = new System.Windows.Forms.ToolStripMenuItem();
+            this.MI_RealEva = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_StationStatus = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.MI_ComPortState = new System.Windows.Forms.ToolStripMenuItem();
@@ -157,6 +158,7 @@
             this.MI_DatabaseConfig,
             this.MI_VoiceConfig,
             this.MI_EvaSet,
+            this.MI_FormShowSet,
             this.toolStripSeparator4,
             this.MI_SystemExit});
             this.fileMenu.ImageTransparentColor = System.Drawing.SystemColors.ActiveBorder;
@@ -240,8 +242,17 @@
             // 
             this.MI_EvaSet.Name = "MI_EvaSet";
             this.MI_EvaSet.Size = new System.Drawing.Size(180, 22);
-            this.MI_EvaSet.Tag = "界面显示设置";
-            this.MI_EvaSet.Text = "界面显示设置";
+            this.MI_EvaSet.Tag = "蒸发参数设置";
+            this.MI_EvaSet.Text = "蒸发参数设置";
+            this.MI_EvaSet.Visible = false;
+            // 
+            // MI_FormShowSet
+            // 
+            this.MI_FormShowSet.Name = "MI_FormShowSet";
+            this.MI_FormShowSet.Size = new System.Drawing.Size(180, 22);
+            this.MI_FormShowSet.Tag = "界面显示设置";
+            this.MI_FormShowSet.Text = "界面显示设置";
+            this.MI_FormShowSet.Visible = false;
             // 
             // toolStripSeparator4
             // 
@@ -463,7 +474,7 @@
             this.MI_StatusBar,
             this.toolStripSeparator7,
             this.toolBarToolStripMenuItem,
-            this.MI_Eva,
+            this.MI_RealEva,
             this.MI_StationStatus,
             this.toolStripSeparator3,
             this.MI_ComPortState,
@@ -508,15 +519,15 @@
             this.toolBarToolStripMenuItem.Tag = "最新实时数据";
             this.toolBarToolStripMenuItem.Text = "实时水情数据";
             // 
-            // MI_Eva
+            // MI_RealEva
             // 
-            this.MI_Eva.Checked = true;
-            this.MI_Eva.CheckOnClick = true;
-            this.MI_Eva.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.MI_Eva.Enabled = false;
-            this.MI_Eva.Name = "MI_Eva";
-            this.MI_Eva.Size = new System.Drawing.Size(148, 22);
-            this.MI_Eva.Text = "实时数据";
+            this.MI_RealEva.Checked = true;
+            this.MI_RealEva.CheckOnClick = true;
+            this.MI_RealEva.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.MI_RealEva.Enabled = false;
+            this.MI_RealEva.Name = "MI_RealEva";
+            this.MI_RealEva.Size = new System.Drawing.Size(148, 22);
+            this.MI_RealEva.Text = "实时数据";
             // 
             // MI_StationStatus
             // 
@@ -1030,7 +1041,8 @@
         private System.Windows.Forms.ToolStripMenuItem OneStationYear;
         private System.Windows.Forms.ToolStripButton MITool_Remote;
         private System.Windows.Forms.ToolStripMenuItem I_searchDebug;
-        private System.Windows.Forms.ToolStripMenuItem MI_Eva;
+        private System.Windows.Forms.ToolStripMenuItem MI_RealEva;
+        private System.Windows.Forms.ToolStripMenuItem MI_FormShowSet;
         private System.Windows.Forms.ToolStripMenuItem MI_EvaSet;
     }
 }

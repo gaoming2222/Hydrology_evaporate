@@ -24,7 +24,7 @@ namespace Hydrology
         /// <summary>
         /// 更改当前用户模式消息
         /// </summary>
-        public event EventHandler<CEventSingleArgs<bool>> UserModeChanged;
+        public event EventHandler<CEventSingleArgs<int>> UserModeChanged;
         //public event EventHandler GSMNumChanged;
         #endregion 事件定义
 
@@ -40,6 +40,7 @@ namespace Hydrology
         private CListFormTabPage m_listFormWarningInfo; //告警信息
         private CListFormTabPage m_listFormComState;    //串口状态
         private bool m_bIsInAdministrator;              //当前用户模式
+        private bool m_bIsSuperInAdministrator;              //超级用户模式
 
         private List<Thread> m_listSimulators;
         private System.Windows.Forms.Timer m_timer = new System.Windows.Forms.Timer()
@@ -155,7 +156,7 @@ namespace Hydrology
                 InitMainFormMenu();
                 CreateMsgBinding();
 
-                ChangeUserMode(false);
+                ChangeUserMode(0);
 
                 CPortDataMgr.Instance.InitGsms();
                 CPortDataMgr.Instance.InitBeidouNormal();
@@ -332,7 +333,7 @@ namespace Hydrology
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void EHUserModeChanged(object sender, CEventSingleArgs<bool> e)
+        public void EHUserModeChanged(object sender, CEventSingleArgs<int> e)
         {
             this.ChangeUserMode(e.Value);
             this.MI_UserLogout.Enabled = true;
@@ -340,8 +341,13 @@ namespace Hydrology
             m_timer.Start();
             if (UserModeChanged != null)
             {
-                UserModeChanged(this, new CEventSingleArgs<bool>(e.Value));
+                UserModeChanged(this, new CEventSingleArgs<int>(e.Value));
             }
+        }
+
+        public void EHFormShowChanged(object sender, CEventSingleArgs<bool> e)
+        {
+            this.ChangeFormShow(e.Value);
         }
 
         private void EHMI_ToolBar_Click(object sender, EventArgs e)
@@ -373,10 +379,10 @@ namespace Hydrology
                 m_listFormComState.Hide();
             }
         }
-        private void EHMI_Eva_Click(object sender, EventArgs e)
+        private void EHMI_RealEva_Click(object sender, EventArgs e)
         {
-            MI_Eva.Checked = !MI_Eva.Checked;
-            if (MI_Eva.Checked)
+            MI_RealEva.Checked = !MI_RealEva.Checked;
+            if (MI_RealEva.Checked)
             {
                 // 显示
                 m_tabControlUp.AddPage(m_formEvaRTD);
@@ -431,7 +437,7 @@ namespace Hydrology
 
         private void EH_Eva_Page_Closed(object sender, EventArgs e)
         {
-            this.MI_Eva.Checked = false;
+            this.MI_RealEva.Checked = false;
         }
         private void EH_StationState_Page_Closed(object sender, EventArgs e)
         {
@@ -554,7 +560,10 @@ namespace Hydrology
             m_tabControlUp = new CExTabControl();
             m_tabControlUp.SuspendLayout();
             m_tabControlUp.AddPage(m_formRTD);
-            m_tabControlUp.AddPage(m_formEvaRTD);
+            if (XMLEvaInfo.Instance.DeSerialize_FormShow())
+            {
+                m_tabControlUp.AddPage(m_formEvaRTD);
+            }
             m_tabControlUp.AddPage(m_formStationState);
             //m_tabControlUp.AddPage(m_formSoilRTD);
             splitContainer2.Panel1.Controls.Add(m_tabControlUp);
@@ -608,6 +617,7 @@ namespace Hydrology
             this.MI_Beidou.Click += new EventHandler(FormHelper.ShowForm);
             this.MI_Beidou500.Click += new EventHandler(FormHelper.ShowForm);
             this.MI_DatabaseConfig.Click += new EventHandler(FormHelper.ShowForm);
+            this.MI_FormShowSet.Click += new EventHandler(FormHelper.ShowForm);
             this.MI_EvaSet.Click += new EventHandler(FormHelper.ShowForm);
             this.MI_VoiceConfig.Click += new EventHandler(FormHelper.ShowForm);
             this.MI_SystemExit.Click += new EventHandler(FormHelper.SysExit);
@@ -621,7 +631,7 @@ namespace Hydrology
             this.MI_ToolBar.Click += new EventHandler(this.EHMI_ToolBar_Click);
             this.MI_StatusBar.Click += new EventHandler(this.EHMI_StatusBar_Click);
             this.MI_StationStatus.Click += new EventHandler(this.EHMI_StationRTState_Click);
-            this.MI_Eva.Click += new EventHandler(this.EHMI_Eva_Click);
+            this.MI_RealEva.Click += new EventHandler(this.EHMI_RealEva_Click);
             this.MI_ComPortState.Click += new EventHandler(this.EHMI_CommPortState_Click);
             this.MI_WarningInfo.Click += new EventHandler(this.EHMI_WarningInfo_Click);
 
@@ -786,11 +796,11 @@ namespace Hydrology
                 if (!hasSoilStation)
                 {
                     //    this.MI_Soil.Checked = false;
-                    this.MI_Eva.Enabled = false;
+                    this.MI_RealEva.Enabled = false;
                 }
                 else
                 {
-                    this.MI_Eva.Enabled = true;
+                    this.MI_RealEva.Enabled = true;
                 }
             }
 #pragma warning disable CS0168 // 声明了变量“exp”，但从未使用过
@@ -803,11 +813,31 @@ namespace Hydrology
             CTree.Instance.LoadTree();
         }
 
-        private void ChangeUserMode(bool bAdministrator)
+        private void ChangeUserMode(int flag)
         {
-            m_bIsInAdministrator = bAdministrator;
+            if (flag == 0)
+            {
+                m_bIsInAdministrator = false;
+                m_bIsSuperInAdministrator = false;
+            }
+            else if (flag == 1)
+            {
+                m_bIsInAdministrator = true;
+                m_bIsSuperInAdministrator = false;
+            }
+            else if (flag == 2)
+            {
+                m_bIsInAdministrator = true;
+                m_bIsSuperInAdministrator = true;
+            }
+            else
+            {
+                m_bIsInAdministrator = false;
+                m_bIsSuperInAdministrator = false;
+            }
+            //m_bIsInAdministrator = bAdministrator;
             // 设置一些菜单项的启用
-            this.MI_LogIn.Enabled = !bAdministrator;
+            this.MI_LogIn.Enabled = !m_bIsInAdministrator;
             // 协议配置
             this.MI_ChannelProtocolCfg.Enabled = m_bIsInAdministrator;
             this.MI_DataProtocolCfg.Enabled = m_bIsInAdministrator;
@@ -816,7 +846,8 @@ namespace Hydrology
             this.MI_CommunicationPort.Enabled = m_bIsInAdministrator;
             this.MI_SerialPortConfig.Enabled = m_bIsInAdministrator;
             this.MI_DatabaseConfig.Enabled = m_bIsInAdministrator;
-            this.MI_EvaSet.Enabled = m_bIsInAdministrator;
+            this.MI_FormShowSet.Visible = m_bIsSuperInAdministrator;
+            this.MI_EvaSet.Visible = m_bIsSuperInAdministrator;
             this.MI_GPRS.Enabled = m_bIsInAdministrator;
             this.ReadAndSetting.Enabled = m_bIsInAdministrator;
             this.BatchTransmit.Enabled = m_bIsInAdministrator;
@@ -869,17 +900,29 @@ namespace Hydrology
             UpdateMenuState();
         }
 
+        private void ChangeFormShow(bool bShowEva)
+        {
+            if (bShowEva)
+            {
+                m_tabControlUp.AddPage(m_formEvaRTD);
+            }
+            else
+            {
+                m_tabControlUp.RemovePage(m_formEvaRTD);
+            }
+        }
+
         public void Logout()
         {
             // 退出当前登陆
-            ChangeUserMode(false);
+            ChangeUserMode(0);
             this.MI_UserLogout.Enabled = false;
             // 停止定时器
             m_timer.Stop();
 
             if (UserModeChanged != null)
             {
-                UserModeChanged(this, new CEventSingleArgs<bool>(false));
+                UserModeChanged(this, new CEventSingleArgs<int>(0));
             }
 
             CCurrentLoginUser.Instance.LogOut();

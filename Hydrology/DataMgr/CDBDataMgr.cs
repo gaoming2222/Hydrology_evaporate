@@ -225,6 +225,9 @@ namespace Hydrology.DataMgr
             FillRTDStationNotInMap();
             ReadFromXML();
 
+            // 初始化蒸发参数
+            SetEvaConf();
+
             Protocol.Manager.XmlStationDataSerializer.Instance.DeleteFile();
             Protocol.Manager.XmlStationDataSerializer.Instance.Serialize(m_listStations);
 
@@ -852,12 +855,19 @@ namespace Hydrology.DataMgr
         {
             try
             {
-                EvaConf evaConf = Protocol.Manager.XMLEvaInfo.Instance.DeSerialize();
+                Dictionary<string,string> evaConf = Protocol.Manager.XMLEvaInfo.Instance.DeSerialize();
+                EvaConf.kp = decimal.Parse(evaConf["kp"]);
+                EvaConf.ke = decimal.Parse(evaConf["ke"]);
+                EvaConf.dh = decimal.Parse(evaConf["dh"]);
+                EvaConf.comP = bool.Parse(evaConf["comP"]);
             }
             catch (Exception e)
             {
-                //SanilityConf.StdConduct = 1.000m;
-                MessageBox.Show("未配置盐度参数！");
+                EvaConf.kp = 1.000m;
+                EvaConf.ke = 1.000m;
+                EvaConf.dh = 0.000m;
+                EvaConf.comP = false;
+                MessageBox.Show("未配置蒸发参数！");
             }
         }
 

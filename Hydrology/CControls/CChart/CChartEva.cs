@@ -417,6 +417,26 @@ namespace Hydrology.CControls
             m_chartAreaDefault.AxisX.LabelStyle.Format = "MM-dd HH";
             m_chartAreaDefault.AxisX.LabelStyle.Angle = 90;
 
+
+            #region 降雨
+            m_serialRain = this.Series.Add(CS_Serial_Name_Rain);
+            m_serialRain.Name = "降雨"; //用来显示图例的
+            m_serialRain.ChartArea = CS_ChartAreaName_Default;
+            m_serialRain.ChartType = SeriesChartType.Column; //如果点数过多， 画图很慢，初步测试不能超过2000个
+            m_serialRain.BorderWidth = 1;
+            //m_serialRain.BorderColor = Color.FromArgb(120, 147, 190);
+            m_serialRain.Color = Color.Blue;
+            //m_serialRain.ShadowOffset = 2;
+            //  设置时间类型,对于serial来说
+            m_serialRain.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            m_serialRain.IsXValueIndexed = false; // 自己计算X值，以及边界值,否则翻译不出正确的值
+
+            //  绑定数据
+            m_serialRain.XValueMember = CS_CN_DateTime;
+            m_serialRain.YValueMembers = CS_CN_Rain;
+            m_serialRain.YAxisType = AxisType.Secondary;
+            #endregion 降雨
+
             #region 蒸发
             m_serialEva = this.Series.Add(CS_Serial_Name_Eva);
             m_serialEva.Name = "蒸发"; //用来显示图例的
@@ -438,25 +458,6 @@ namespace Hydrology.CControls
 
             m_serialEva.YAxisType = AxisType.Primary;
             #endregion 蒸发
-
-            #region 降雨
-            m_serialRain = this.Series.Add(CS_Serial_Name_Rain);
-            m_serialRain.Name = "降雨"; //用来显示图例的
-            m_serialRain.ChartArea = CS_ChartAreaName_Default;
-            m_serialRain.ChartType = SeriesChartType.Line; //如果点数过多， 画图很慢，初步测试不能超过2000个
-            m_serialRain.BorderWidth = 1;
-            //m_serialRain.BorderColor = Color.FromArgb(120, 147, 190);
-            m_serialRain.Color = Color.Blue;
-            //m_serialRain.ShadowOffset = 2;
-            //  设置时间类型,对于serial来说
-            m_serialRain.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-            m_serialRain.IsXValueIndexed = false; // 自己计算X值，以及边界值,否则翻译不出正确的值
-
-            //  绑定数据
-            m_serialRain.XValueMember = CS_CN_DateTime;
-            m_serialRain.YValueMembers = CS_CN_Rain;
-            m_serialRain.YAxisType = AxisType.Secondary;
-            #endregion 降雨
 
             #region 图例
             m_legend = new System.Windows.Forms.DataVisualization.Charting.Legend();

@@ -2724,14 +2724,14 @@ namespace Hydrology.DataMgr
 
             CReportStruct report = e.Value;
 
-            string flagId = CDBDataMgr.Instance.GetComFlagById(report.Stationid, report.ChannelType);
-            if (flagId != report.flagId)
-            {
-                if (report.ChannelType == EChannelType.GPRS || report.ChannelType == EChannelType.GSM)
-                {
-                    return;
-                }
-            }
+            //string flagId = CDBDataMgr.Instance.GetComFlagById(report.Stationid, report.ChannelType);
+            //if (flagId != report.flagId)
+            //{
+            //    if (report.ChannelType == EChannelType.GPRS || report.ChannelType == EChannelType.GSM)
+            //    {
+            //        return;
+            //    }
+            //}
 
             //gm 0331
             string str = e.RawData;

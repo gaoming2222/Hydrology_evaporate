@@ -28,28 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ShowForm));
-            this.Rain_ckb = new System.Windows.Forms.CheckBox();
             this.Eva_ckb = new System.Windows.Forms.CheckBox();
             this.Save_btn = new System.Windows.Forms.Button();
             this.Cancel_btn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // Rain_ckb
-            // 
-            this.Rain_ckb.AutoSize = true;
-            this.Rain_ckb.Location = new System.Drawing.Point(171, 44);
-            this.Rain_ckb.Name = "Rain_ckb";
-            this.Rain_ckb.Size = new System.Drawing.Size(84, 16);
-            this.Rain_ckb.TabIndex = 0;
-            this.Rain_ckb.Text = "雨水情界面";
-            this.Rain_ckb.UseVisualStyleBackColor = true;
-            // 
             // Eva_ckb
             // 
             this.Eva_ckb.AutoSize = true;
-            this.Eva_ckb.Location = new System.Drawing.Point(367, 44);
+            this.Eva_ckb.Location = new System.Drawing.Point(198, 43);
             this.Eva_ckb.Name = "Eva_ckb";
             this.Eva_ckb.Size = new System.Drawing.Size(72, 16);
             this.Eva_ckb.TabIndex = 1;
@@ -81,9 +69,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(29, 13);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(137, 12);
+            this.label1.Size = new System.Drawing.Size(149, 12);
             this.label1.TabIndex = 4;
-            this.label1.Text = "请选择需要显示的界面：";
+            this.label1.Text = "请选择是否需要显示界面：";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // ShowForm
@@ -95,8 +83,6 @@
             this.Controls.Add(this.Cancel_btn);
             this.Controls.Add(this.Save_btn);
             this.Controls.Add(this.Eva_ckb);
-            this.Controls.Add(this.Rain_ckb);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ShowForm";
             this.Text = "界面显示设置";
             this.ResumeLayout(false);
@@ -105,8 +91,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.CheckBox Rain_ckb;
         private System.Windows.Forms.CheckBox Eva_ckb;
         private System.Windows.Forms.Button Save_btn;
         private System.Windows.Forms.Button Cancel_btn;
