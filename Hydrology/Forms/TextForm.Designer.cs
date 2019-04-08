@@ -39,13 +39,17 @@
             this.SubCenter = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.TableType = new System.Windows.Forms.GroupBox();
-            this.water = new System.Windows.Forms.RadioButton();
-            this.rain = new System.Windows.Forms.RadioButton();
+            this.year = new System.Windows.Forms.RadioButton();
+            this.day = new System.Windows.Forms.RadioButton();
+            this.month = new System.Windows.Forms.RadioButton();
             this.TablePanel = new System.Windows.Forms.Panel();
             this.StationSelect = new System.Windows.Forms.CheckedListBox();
             this.label3 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.zhongao = new System.Windows.Forms.RadioButton();
+            this.label5 = new System.Windows.Forms.Label();
+            this.models = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.ExldateTime = new System.Windows.Forms.DateTimePicker();
             this.MessagePanel.SuspendLayout();
             this.TableType.SuspendLayout();
             this.TablePanel.SuspendLayout();
@@ -53,6 +57,10 @@
             // 
             // MessagePanel
             // 
+            this.MessagePanel.Controls.Add(this.ExldateTime);
+            this.MessagePanel.Controls.Add(this.label6);
+            this.MessagePanel.Controls.Add(this.models);
+            this.MessagePanel.Controls.Add(this.label5);
             this.MessagePanel.Controls.Add(this.endDateTime);
             this.MessagePanel.Controls.Add(this.label4);
             this.MessagePanel.Controls.Add(this.checkBox1);
@@ -100,11 +108,11 @@
             // 
             // Export
             // 
-            this.Export.Location = new System.Drawing.Point(347, 156);
+            this.Export.Location = new System.Drawing.Point(413, 156);
             this.Export.Name = "Export";
             this.Export.Size = new System.Drawing.Size(80, 54);
             this.Export.TabIndex = 8;
-            this.Export.Text = "导出文本";
+            this.Export.Text = "导出Excel";
             this.Export.UseVisualStyleBackColor = true;
             this.Export.Click += new System.EventHandler(this.export_Click);
             // 
@@ -133,7 +141,7 @@
             this.SubCenter.FormattingEnabled = true;
             this.SubCenter.Location = new System.Drawing.Point(201, 153);
             this.SubCenter.Name = "SubCenter";
-            this.SubCenter.Size = new System.Drawing.Size(85, 20);
+            this.SubCenter.Size = new System.Drawing.Size(169, 20);
             this.SubCenter.TabIndex = 3;
             this.SubCenter.SelectedIndexChanged += new System.EventHandler(this.center_SelectedIndexChanged);
             // 
@@ -148,9 +156,9 @@
             // 
             // TableType
             // 
-            this.TableType.Controls.Add(this.zhongao);
-            this.TableType.Controls.Add(this.water);
-            this.TableType.Controls.Add(this.rain);
+            this.TableType.Controls.Add(this.year);
+            this.TableType.Controls.Add(this.day);
+            this.TableType.Controls.Add(this.month);
             this.TableType.Location = new System.Drawing.Point(3, 3);
             this.TableType.Name = "TableType";
             this.TableType.Size = new System.Drawing.Size(130, 89);
@@ -158,30 +166,41 @@
             this.TableType.TabStop = false;
             this.TableType.Text = "报表类型";
             // 
-            // water
+            // year
             // 
-            this.water.AutoSize = true;
-            this.water.Checked = true;
-            this.water.Location = new System.Drawing.Point(0, 20);
-            this.water.Name = "water";
-            this.water.Size = new System.Drawing.Size(59, 16);
-            this.water.TabIndex = 1;
-            this.water.TabStop = true;
-            this.water.Text = "水  位";
-            this.water.UseVisualStyleBackColor = true;
-            this.water.CheckedChanged += new System.EventHandler(this.TableTypeChanged);
+            this.year.AutoSize = true;
+            this.year.Location = new System.Drawing.Point(0, 67);
+            this.year.Name = "year";
+            this.year.Size = new System.Drawing.Size(47, 16);
+            this.year.TabIndex = 2;
+            this.year.TabStop = true;
+            this.year.Text = "年表";
+            this.year.UseVisualStyleBackColor = true;
             // 
-            // rain
+            // day
             // 
-            this.rain.AutoSize = true;
-            this.rain.Location = new System.Drawing.Point(0, 42);
-            this.rain.Name = "rain";
-            this.rain.Size = new System.Drawing.Size(59, 16);
-            this.rain.TabIndex = 1;
-            this.rain.TabStop = true;
-            this.rain.Text = "雨  量";
-            this.rain.UseVisualStyleBackColor = true;
-            this.rain.CheckedChanged += new System.EventHandler(this.TableTypeChanged);
+            this.day.AutoSize = true;
+            this.day.Checked = true;
+            this.day.Location = new System.Drawing.Point(0, 20);
+            this.day.Name = "day";
+            this.day.Size = new System.Drawing.Size(53, 16);
+            this.day.TabIndex = 1;
+            this.day.TabStop = true;
+            this.day.Text = "日 表";
+            this.day.UseVisualStyleBackColor = true;
+            this.day.CheckedChanged += new System.EventHandler(this.TableTypeChanged);
+            // 
+            // month
+            // 
+            this.month.AutoSize = true;
+            this.month.Location = new System.Drawing.Point(0, 42);
+            this.month.Name = "month";
+            this.month.Size = new System.Drawing.Size(53, 16);
+            this.month.TabIndex = 1;
+            this.month.TabStop = true;
+            this.month.Text = "月 表";
+            this.month.UseVisualStyleBackColor = true;
+            this.month.CheckedChanged += new System.EventHandler(this.TableTypeChanged);
             // 
             // TablePanel
             // 
@@ -219,16 +238,42 @@
             this.panel1.Size = new System.Drawing.Size(124, 254);
             this.panel1.TabIndex = 0;
             // 
-            // zhongao
+            // label5
             // 
-            this.zhongao.AutoSize = true;
-            this.zhongao.Location = new System.Drawing.Point(0, 67);
-            this.zhongao.Name = "zhongao";
-            this.zhongao.Size = new System.Drawing.Size(71, 16);
-            this.zhongao.TabIndex = 2;
-            this.zhongao.TabStop = true;
-            this.zhongao.Text = "中澳格式";
-            this.zhongao.UseVisualStyleBackColor = true;
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(131, 111);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(65, 12);
+            this.label5.TabIndex = 12;
+            this.label5.Text = "模板类型：";
+            // 
+            // models
+            // 
+            this.models.FormattingEnabled = true;
+            this.models.Location = new System.Drawing.Point(201, 103);
+            this.models.Name = "models";
+            this.models.Size = new System.Drawing.Size(169, 20);
+            this.models.TabIndex = 13;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(199, 42);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(65, 12);
+            this.label6.TabIndex = 14;
+            this.label6.Text = "统计日期：";
+            // 
+            // ExldateTime
+            // 
+            this.ExldateTime.CustomFormat = "yyyy年MM月";
+            this.ExldateTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.ExldateTime.Location = new System.Drawing.Point(297, 36);
+            this.ExldateTime.Name = "ExldateTime";
+            this.ExldateTime.ShowUpDown = true;
+            this.ExldateTime.Size = new System.Drawing.Size(117, 21);
+            this.ExldateTime.TabIndex = 15;
+            this.ExldateTime.Value = new System.DateTime(2010, 1, 1, 0, 0, 0, 0);
             // 
             // TextForm
             // 
@@ -259,8 +304,8 @@
         private System.Windows.Forms.Panel TablePanel;
         private System.Windows.Forms.GroupBox TableType;
         //private System.Windows.Forms.RadioButton soil;
-        private System.Windows.Forms.RadioButton water;
-        private System.Windows.Forms.RadioButton rain;
+        private System.Windows.Forms.RadioButton day;
+        private System.Windows.Forms.RadioButton month;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox SubCenter;
         private System.Windows.Forms.Label label2;
@@ -272,6 +317,10 @@
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.DateTimePicker endDateTime;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.RadioButton zhongao;
+        private System.Windows.Forms.RadioButton year;
+        private System.Windows.Forms.ComboBox models;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.DateTimePicker ExldateTime;
+        private System.Windows.Forms.Label label6;
     }
 }

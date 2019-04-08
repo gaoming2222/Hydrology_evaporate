@@ -197,9 +197,9 @@ namespace Hydrology.CControls
             // 绑定消息，分中心变更消息
             CDBDataMgr.Instance.SubCenterUpdated += new EventHandler(this.EHSubCenterChanged);
             // 收到RTD消息
-            CDBDataMgr.Instance.RecvedRTD_Sanility += new EventHandler<CEventSingleArgs<CEntityRealEva>>(EHRecvRTD);
+            //CDBDataMgr.Instance.RecvedRTD_Sanility += new EventHandler<CEventSingleArgs<CEntityRealEva>>(EHRecvRTD);
             // 收到清空RTD消息
-            CDBDataMgr.Instance.RTDCleared_Sanility += new EventHandler(EHClearRTD);
+            //CDBDataMgr.Instance.RTDCleared_Sanility += new EventHandler(EHClearRTD);
 
             m_tabControl.ResumeLayout(false);
 

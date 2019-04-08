@@ -417,44 +417,44 @@
             // OneStationMonth
             // 
             this.OneStationMonth.Name = "OneStationMonth";
-            this.OneStationMonth.Size = new System.Drawing.Size(208, 22);
+            this.OneStationMonth.Size = new System.Drawing.Size(152, 22);
             this.OneStationMonth.Tag = "单站月";
             this.OneStationMonth.Text = "单站月报表...";
             // 
             // MoreStationMonth
             // 
             this.MoreStationMonth.Name = "MoreStationMonth";
-            this.MoreStationMonth.Size = new System.Drawing.Size(208, 22);
+            this.MoreStationMonth.Size = new System.Drawing.Size(152, 22);
             this.MoreStationMonth.Tag = "多站月";
             this.MoreStationMonth.Text = "多站月报表...";
             // 
             // MoreStationDay
             // 
             this.MoreStationDay.Name = "MoreStationDay";
-            this.MoreStationDay.Size = new System.Drawing.Size(208, 22);
+            this.MoreStationDay.Size = new System.Drawing.Size(152, 22);
             this.MoreStationDay.Tag = "多站日";
             this.MoreStationDay.Text = "多站日报表...";
             // 
             // Communicate
             // 
             this.Communicate.Name = "Communicate";
-            this.Communicate.Size = new System.Drawing.Size(208, 22);
+            this.Communicate.Size = new System.Drawing.Size(152, 22);
             this.Communicate.Tag = "畅通率";
             this.Communicate.Text = "畅通率报表...";
             // 
             // OneStationYear
             // 
             this.OneStationYear.Name = "OneStationYear";
-            this.OneStationYear.Size = new System.Drawing.Size(208, 22);
+            this.OneStationYear.Size = new System.Drawing.Size(152, 22);
             this.OneStationYear.Tag = "单站年";
             this.OneStationYear.Text = "单站年报表...";
             // 
             // DataText
             // 
             this.DataText.Name = "DataText";
-            this.DataText.Size = new System.Drawing.Size(208, 22);
+            this.DataText.Size = new System.Drawing.Size(152, 22);
             this.DataText.Tag = "文本导出";
-            this.DataText.Text = "文本导出";
+            this.DataText.Text = "统计数据导出";
             // 
             // viewMenu
             // 
