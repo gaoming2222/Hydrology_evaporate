@@ -90,6 +90,7 @@
     <Compile Include="Protocol\Data\ModemDataEventArgs.cs" />
     <Compile Include="Protocol\Data\ProtocolStrMaps.cs" />
     <Compile Include="Utils\CStringFromatHelper.cs" />
+    <Compile Include="Utils\EvaConf.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

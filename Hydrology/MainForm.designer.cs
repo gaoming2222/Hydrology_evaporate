@@ -42,6 +42,8 @@
             this.MI_Beidou500 = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_DatabaseConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_VoiceConfig = new System.Windows.Forms.ToolStripMenuItem();
+            this.MI_EvaSet = new System.Windows.Forms.ToolStripMenuItem();
+            this.MI_FormShowSet = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.MI_SystemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.editMenu = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,13 +71,12 @@
             this.MoreStationDay = new System.Windows.Forms.ToolStripMenuItem();
             this.Communicate = new System.Windows.Forms.ToolStripMenuItem();
             this.OneStationYear = new System.Windows.Forms.ToolStripMenuItem();
-            this.DataText = new System.Windows.Forms.ToolStripMenuItem();
             this.viewMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_ToolBar = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_StatusBar = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.toolBarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.MI_Soil = new System.Windows.Forms.ToolStripMenuItem();
+            this.MI_RealEva = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_StationStatus = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.MI_ComPortState = new System.Windows.Forms.ToolStripMenuItem();
@@ -156,6 +157,8 @@
             this.MI_CommunicationPort,
             this.MI_DatabaseConfig,
             this.MI_VoiceConfig,
+            this.MI_EvaSet,
+            this.MI_FormShowSet,
             this.toolStripSeparator4,
             this.MI_SystemExit});
             this.fileMenu.ImageTransparentColor = System.Drawing.SystemColors.ActiveBorder;
@@ -166,21 +169,21 @@
             // MI_ChannelProtocolCfg
             // 
             this.MI_ChannelProtocolCfg.Name = "MI_ChannelProtocolCfg";
-            this.MI_ChannelProtocolCfg.Size = new System.Drawing.Size(161, 22);
+            this.MI_ChannelProtocolCfg.Size = new System.Drawing.Size(180, 22);
             this.MI_ChannelProtocolCfg.Tag = "通讯方式配置";
             this.MI_ChannelProtocolCfg.Text = "通讯方式配置";
             // 
             // MI_DataProtocolCfg
             // 
             this.MI_DataProtocolCfg.Name = "MI_DataProtocolCfg";
-            this.MI_DataProtocolCfg.Size = new System.Drawing.Size(161, 22);
+            this.MI_DataProtocolCfg.Size = new System.Drawing.Size(180, 22);
             this.MI_DataProtocolCfg.Tag = "数据协议配置";
             this.MI_DataProtocolCfg.Text = "数据协议配置";
             // 
             // toolStripSeparator13
             // 
             this.toolStripSeparator13.Name = "toolStripSeparator13";
-            this.toolStripSeparator13.Size = new System.Drawing.Size(158, 6);
+            this.toolStripSeparator13.Size = new System.Drawing.Size(177, 6);
             // 
             // MI_CommunicationPort
             // 
@@ -190,7 +193,7 @@
             this.MI_Beidou,
             this.MI_Beidou500});
             this.MI_CommunicationPort.Name = "MI_CommunicationPort";
-            this.MI_CommunicationPort.Size = new System.Drawing.Size(161, 22);
+            this.MI_CommunicationPort.Size = new System.Drawing.Size(180, 22);
             this.MI_CommunicationPort.Text = "通讯口配置";
             // 
             // MI_SerialPortConfig
@@ -224,26 +227,42 @@
             // MI_DatabaseConfig
             // 
             this.MI_DatabaseConfig.Name = "MI_DatabaseConfig";
-            this.MI_DatabaseConfig.Size = new System.Drawing.Size(161, 22);
+            this.MI_DatabaseConfig.Size = new System.Drawing.Size(180, 22);
             this.MI_DatabaseConfig.Tag = "数据库配置";
             this.MI_DatabaseConfig.Text = "数据库配置(&C)...";
             // 
             // MI_VoiceConfig
             // 
             this.MI_VoiceConfig.Name = "MI_VoiceConfig";
-            this.MI_VoiceConfig.Size = new System.Drawing.Size(161, 22);
+            this.MI_VoiceConfig.Size = new System.Drawing.Size(180, 22);
             this.MI_VoiceConfig.Tag = "声音配置";
             this.MI_VoiceConfig.Text = "声音配置...";
+            // 
+            // MI_EvaSet
+            // 
+            this.MI_EvaSet.Name = "MI_EvaSet";
+            this.MI_EvaSet.Size = new System.Drawing.Size(180, 22);
+            this.MI_EvaSet.Tag = "蒸发参数设置";
+            this.MI_EvaSet.Text = "蒸发参数设置";
+            this.MI_EvaSet.Visible = false;
+            // 
+            // MI_FormShowSet
+            // 
+            this.MI_FormShowSet.Name = "MI_FormShowSet";
+            this.MI_FormShowSet.Size = new System.Drawing.Size(180, 22);
+            this.MI_FormShowSet.Tag = "界面显示设置";
+            this.MI_FormShowSet.Text = "界面显示设置";
+            this.MI_FormShowSet.Visible = false;
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(158, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
             // 
             // MI_SystemExit
             // 
             this.MI_SystemExit.Name = "MI_SystemExit";
-            this.MI_SystemExit.Size = new System.Drawing.Size(161, 22);
+            this.MI_SystemExit.Size = new System.Drawing.Size(180, 22);
             this.MI_SystemExit.Tag = "退出";
             this.MI_SystemExit.Text = "退出(&X)";
             // 
@@ -408,8 +427,7 @@
             this.MoreStationMonth,
             this.MoreStationDay,
             this.Communicate,
-            this.OneStationYear,
-            this.DataText});
+            this.OneStationYear});
             this.帮助ToolStripMenuItem.Name = "帮助ToolStripMenuItem";
             this.帮助ToolStripMenuItem.Size = new System.Drawing.Size(59, 21);
             this.帮助ToolStripMenuItem.Text = "报表(&T)";
@@ -417,44 +435,37 @@
             // OneStationMonth
             // 
             this.OneStationMonth.Name = "OneStationMonth";
-            this.OneStationMonth.Size = new System.Drawing.Size(152, 22);
+            this.OneStationMonth.Size = new System.Drawing.Size(145, 22);
             this.OneStationMonth.Tag = "单站月";
             this.OneStationMonth.Text = "单站月报表...";
             // 
             // MoreStationMonth
             // 
             this.MoreStationMonth.Name = "MoreStationMonth";
-            this.MoreStationMonth.Size = new System.Drawing.Size(152, 22);
+            this.MoreStationMonth.Size = new System.Drawing.Size(145, 22);
             this.MoreStationMonth.Tag = "多站月";
             this.MoreStationMonth.Text = "多站月报表...";
             // 
             // MoreStationDay
             // 
             this.MoreStationDay.Name = "MoreStationDay";
-            this.MoreStationDay.Size = new System.Drawing.Size(152, 22);
+            this.MoreStationDay.Size = new System.Drawing.Size(145, 22);
             this.MoreStationDay.Tag = "多站日";
             this.MoreStationDay.Text = "多站日报表...";
             // 
             // Communicate
             // 
             this.Communicate.Name = "Communicate";
-            this.Communicate.Size = new System.Drawing.Size(152, 22);
+            this.Communicate.Size = new System.Drawing.Size(145, 22);
             this.Communicate.Tag = "畅通率";
             this.Communicate.Text = "畅通率报表...";
             // 
             // OneStationYear
             // 
             this.OneStationYear.Name = "OneStationYear";
-            this.OneStationYear.Size = new System.Drawing.Size(152, 22);
+            this.OneStationYear.Size = new System.Drawing.Size(145, 22);
             this.OneStationYear.Tag = "单站年";
             this.OneStationYear.Text = "单站年报表...";
-            // 
-            // DataText
-            // 
-            this.DataText.Name = "DataText";
-            this.DataText.Size = new System.Drawing.Size(152, 22);
-            this.DataText.Tag = "文本导出";
-            this.DataText.Text = "统计数据导出";
             // 
             // viewMenu
             // 
@@ -463,7 +474,7 @@
             this.MI_StatusBar,
             this.toolStripSeparator7,
             this.toolBarToolStripMenuItem,
-            this.MI_Soil,
+            this.MI_RealEva,
             this.MI_StationStatus,
             this.toolStripSeparator3,
             this.MI_ComPortState,
@@ -508,15 +519,15 @@
             this.toolBarToolStripMenuItem.Tag = "最新实时数据";
             this.toolBarToolStripMenuItem.Text = "实时水情数据";
             // 
-            // MI_Soil
+            // MI_RealEva
             // 
-            this.MI_Soil.Checked = true;
-            this.MI_Soil.CheckOnClick = true;
-            this.MI_Soil.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.MI_Soil.Enabled = false;
-            this.MI_Soil.Name = "MI_Soil";
-            this.MI_Soil.Size = new System.Drawing.Size(148, 22);
-            this.MI_Soil.Text = "实时数据";
+            this.MI_RealEva.Checked = true;
+            this.MI_RealEva.CheckOnClick = true;
+            this.MI_RealEva.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.MI_RealEva.Enabled = false;
+            this.MI_RealEva.Name = "MI_RealEva";
+            this.MI_RealEva.Size = new System.Drawing.Size(148, 22);
+            this.MI_RealEva.Text = "实时数据";
             // 
             // MI_StationStatus
             // 
@@ -925,7 +936,7 @@
             this.IsMdiContainer = true;
             this.MainMenuStrip = this.menuStrip;
             this.Name = "MainForm";
-            this.Text = "水文蒸发自动监测系统——湖北一方科技发展有限责任公司 V1.0";
+            this.Text = "水文多要素自动监测管理系统——湖北一方科技发展有限责任公司 V1.0 - YD";
             this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.MainForm_MouseClick);
             this.MouseEnter += new System.EventHandler(this.MainForm_MouseEnter);
             this.menuStrip.ResumeLayout(false);
@@ -1030,8 +1041,9 @@
         private System.Windows.Forms.ToolStripMenuItem OneStationYear;
         private System.Windows.Forms.ToolStripButton MITool_Remote;
         private System.Windows.Forms.ToolStripMenuItem I_searchDebug;
-        private System.Windows.Forms.ToolStripMenuItem MI_Soil;
-        private System.Windows.Forms.ToolStripMenuItem DataText;
+        private System.Windows.Forms.ToolStripMenuItem MI_RealEva;
+        private System.Windows.Forms.ToolStripMenuItem MI_FormShowSet;
+        private System.Windows.Forms.ToolStripMenuItem MI_EvaSet;
     }
 }
 

@@ -7,16 +7,19 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Data.SqlClient;
+using Hydrology.Entity;
+using Hydrology.DBManager.Interface;
+using Hydrology.DBManager;
+using Hydrology.Entity.Utils;
 
-
-namespace EvaCal
+namespace Hydrology.DataMgr
 {
     public class CCALDataMgr
     {
         string[] sqlConStr = new string[4];
-        string[] rawDataNew = new string[8];
+        string[] rawDataNew = new string[12];
         string[] hourData = new string[6];
-        string[] dayData = new string[6];
+        string[] dayData = new string[8];
         //List<string> rawDataList = new List<string>();
         string stcdForCal;  //用于监测计算的站码
         double Kp = 0.356d;
@@ -31,26 +34,35 @@ namespace EvaCal
         /// </summary>
         /// <param name="Dictionary<string, string>"></param> 
         /// <param name=""></param>
-        public Dictionary<string, string> EvaCal(Dictionary<string, string> myDic)
+        public Dictionary<string, string> EvaCal(CEntityEva eva)
         {
-            //*************************判断数据是否合理****************************************************
-            //if (rawDataStr[2].Length < 4 || rawDataStr[3].Length < 4 || rawDataStr[4].Length < 4 || rawDataStr[5].Length < 4)
-            //{
-            //    return;
-            //}
-
-
             Dictionary<string, string> evaDic = new Dictionary<string, string>();//输出的蒸发计算结果
             //int sumRawDataRows = rawDataList.Count;
             string strForInserts = string.Empty;
-            rawDataNew[0] = myDic["StationID"];
-            rawDataNew[1] = myDic["Time"];
-            rawDataNew[2] = myDic["Voltge"];
-            rawDataNew[3] = myDic["Evp"];
-            rawDataNew[4] = myDic["Rain"];
-            rawDataNew[5] = myDic["Temperature"];
-            rawDataNew[6] = myDic["EvpType"];
+            //rawDataNew[0] = myDic["StationID"];
+            rawDataNew[0] = eva.StationID;
+            //rawDataNew[1] = myDic["Time"];
+            rawDataNew[1] = eva.TimeCollect.ToString();
+            //rawDataNew[2] = myDic["Voltge"];
+            rawDataNew[2] = eva.Voltage.ToString();
+            //rawDataNew[3] = myDic["Evp"];
+            rawDataNew[3] = eva.Eva.ToString();
+            //rawDataNew[4] = myDic["Rain"];
+            rawDataNew[4] = eva.Rain.ToString();
+            //rawDataNew[5] = myDic["Temperature"];
+            rawDataNew[5] = eva.Temperature.ToString();
+            //rawDataNew[6] = myDic["EvpType"];
+            rawDataNew[6] = eva.type;
             rawDataNew[7] = DateTime.Now.ToString();
+            stcdForCal = eva.StationID;
+
+
+
+            rawDataNew[8] = EvaConf.kp.ToString();//降雨转换系数
+            rawDataNew[9] = EvaConf.ke.ToString();//蒸发转换系数
+            rawDataNew[10] = EvaConf.dh.ToString();//人工数据比测初始高度差
+            rawDataNew[11] = EvaConf.comP.ToString();//是否降雨补偿
+
 
             //判断是否为有效数字
             double d1;
@@ -73,6 +85,19 @@ namespace EvaCal
             string EConvert;
             string PConvert;
 
+
+            //判断是否有降雨、蒸发转换系数输入，如果有则替换初始转换系数
+            if (rawDataNew[8] != "")
+            {
+                Kp = double.Parse(rawDataNew[8]);
+            }
+
+            if (rawDataNew[9] != "")
+            {
+                Ke = double.Parse(rawDataNew[9]);
+            }
+
+
             if (double.TryParse(rawDataNew[3], out ConDouE))//蒸发
             {
                 EConvert = (ConDouE * Ke).ToString("F2");
@@ -92,13 +117,26 @@ namespace EvaCal
                 return evaDic;
             }
 
+
+            //蒸发桶里面的水位需要减去一个高度差dh，结果作为人工数据比对用
+            //*******************************需要写进小时表中**********************************
+            double compareH = Convert.ToDouble(rawDataNew[3]) - Convert.ToDouble(rawDataNew[10]);
+            evaDic.Add("dH", compareH.ToString("F2"));
+
+
+
             //*******************************************数据入库************************************************
             //将原始表中的降雨量修改为PConvert，蒸发量修改为EConvert
             //第一次数据入库
+            eva.Eva = Decimal.Parse(EConvert);
+            eva.Rain = Decimal.Parse(PConvert);
+            IEvaProxy evaProxy = CDBDataMgr.Instance.GetEvaProxy();
+            evaProxy.AddNewRow(eva);
+            System.Threading.Thread.Sleep(5000);
             //TODO sql语句
             //*******************************************需要修改*******************************************
-            string strSqlForInquire = "SELECT top 1 * FROM dbo.[RawData]";
-            DataTable dtReadSql = ExecuteDatatable(sqlConStr, strSqlForInquire);
+            //string strSqlForInquire = "SELECT top 1 * FROM dbo.[RawData]";
+            //DataTable dtReadSql = ExecuteDatatable(sqlConStr, strSqlForInquire);
             //*******************************************需要修改*******************************************
 
 
@@ -113,7 +151,8 @@ namespace EvaCal
 
 
             //=======首先判断是否是整点，整点处理（读取该整点至上个整点的数据，分段计算），否则看上个数据是不是"RE"数据，不处理========
-            if (rawDataNew[1].Substring(10, 2) == "00" && rawDataNew[1].Substring(12, 2) == "00")
+            DateTime time = DateTime.Parse(rawDataNew[1]);
+            if (time.Minute == 0 && time.Second == 0)
             {
                 //=========按时间顺序读取这个整点至上个整点的数据==========
                 //*******************************************需要修改*******************************************
@@ -318,86 +357,158 @@ namespace EvaCal
                     evaDic.Add("hourP", hourData[3]);
                     evaDic.Add("hourT", hourData[4]);
                     evaDic.Add("hourU", hourData[5]);
+
                     //***************************每天的8点，整理过去一天的日累积降雨量和蒸发量*********************************
                     #region
+
                     DateTime theNewDT = Convert.ToDateTime(rawDataNew[1]);
                     DateTime theKeyDT1 = Convert.ToDateTime(Convert.ToDateTime(rawDataNew[1]).ToString("yyyy-MM-dd ") + "08:00:00");
                     DateTime theKeyDT2 = Convert.ToDateTime(Convert.ToDateTime(rawDataNew[1]).ToString("yyyy-MM-dd ") + "09:00:00");
                     #region
-                    if (theNewDT >= theKeyDT1 && theNewDT < theKeyDT2 && rawDataNew[6] == string.Empty)
+                    if (theNewDT >= theKeyDT1 && theNewDT < theKeyDT2 && rawDataNew[6] == null)
                     {
                         //确定统计的起止时间，读取数据库数据
-                        DateTime theBegDT = Convert.ToDateTime((Convert.ToDateTime(rawDataNew[1]).AddDays(-1)).ToString("yyyy-MM-dd ") + "09:00:00");
-                        DateTime theEndDT = Convert.ToDateTime(Convert.ToDateTime(rawDataNew[1]).ToString("yyyy-MM-dd ") + "09:00:00");
+                        DateTime theBegDT = Convert.ToDateTime((Convert.ToDateTime(rawDataNew[1]).AddDays(-1)).ToString("yyyy-MM-dd ") + "09:00:00");//前一天8点
+                        DateTime theMidDT = Convert.ToDateTime((Convert.ToDateTime(rawDataNew[1]).AddDays(-1)).ToString("yyyy-MM-dd ") + "21:00:00");//前一天20点
+                        DateTime theEndDT = Convert.ToDateTime(Convert.ToDateTime(rawDataNew[1]).ToString("yyyy-MM-dd ") + "09:00:00");//今天8点
                         //*******************************************需要修改*******************************************
-                        string strSqlForDayData = "select stcd, sum(E) as E, sum(P) as P, avg(T) as T from data where dt>='" + theBegDT.ToString() + "' and dt<'" + theEndDT.ToString() + "' and stcd='" + stcdForCal + "' group by stcd";
+                        string strSqlForDayData = "select stcd,sum(E) as E, sum(P) as P, avg(T) as T from data where dt>='" + theBegDT.ToString() + "' and dt<'" + theEndDT.ToString() + "' and stcd='" + stcdForCal + "' group by stcd";
+                        string strSqlForDayData1 = "select sum(P) as P8 from data where dt>='" + theMidDT.ToString() + "' and dt<'" + theEndDT.ToString() + "' and stcd='" + stcdForCal + "' group by stcd";
                         //TODO
-                        DataTable dayDT = ExecuteDatatable(sqlConStr, strSqlForDayData);
-                        //*******************************************需要修改*******************************************
+                        DataTable dayDT = ExecuteDatatable(sqlConStr, strSqlForDayData);//今天8点到昨天8点日累积降雨和蒸发
+                        DataTable dayDT1 = ExecuteDatatable(sqlConStr, strSqlForDayData1);//今天8点到昨天20点累积降雨
+
+                        decimal tempE = Decimal.Parse(dayDT.Rows[0]["E"].ToString()) + decimal.Parse(hourE.ToString());//日蒸发
+                        decimal tempP = Decimal.Parse(dayDT.Rows[0]["P"].ToString()) + decimal.Parse(hourP.ToString());//日降雨+8点钟的降雨
+                        decimal p8 = Decimal.Parse(dayDT1.Rows[0]["P8"].ToString()) + decimal.Parse(hourP.ToString());//后12小时降雨+8点钟的降雨
+
+
+
+                        //判断降雨小时数
+                        #region
+                        int hourPNums = 0;//记录降雨小时数
+                        int hourP8Nums = 0;//记录p8的12个小时内的降雨小时数
+                        string strSqlPNums = "select P from data where dt>='" + theBegDT.ToString() + "' and dt<'" + theEndDT.ToString() + "' and stcd='" + stcdForCal + "'";
+                        string strSqlP8Nums = "select P from data where dt>='" + theMidDT.ToString() + "' and dt<'" + theEndDT.ToString() + "' and stcd='" + stcdForCal + "'";
+                        //TODO
+                        DataTable hourPDT = ExecuteDatatable(sqlConStr, strSqlPNums);
+                        DataTable hourP8DT = ExecuteDatatable(sqlConStr, strSqlP8Nums);
+                        //8小时的数据还未入库
+                        if (hourP > 0)
+                        {
+                            hourPNums += 1;
+                            hourP8Nums += 1;
+                        }
+                        for (int i = 0; i < hourPDT.Rows.Count; i++)
+                        {
+                            if (decimal.Parse(hourPDT.Rows[i]["P"].ToString()) != 0m)
+                            {
+                                hourPNums += 1;
+                            }
+                        }
+
+                        for (int i = 0; i < hourP8DT.Rows.Count; i++)
+                        {
+                            if (decimal.Parse(hourP8DT.Rows[i]["P"].ToString()) != 0m)
+                            {
+                                hourP8Nums += 1;
+                            }
+                        }
+                        #endregion
+
 
                         //判断当天有无排水或者注水操作，如果有则用小时累加值，如果无则取小时累加值和两个8点差值中的最小值
                         //*******************************************需要修改*******************************************
                         string strForSumTemp = "select * from RawData where DT>='" + theBegDT.AddHours(-1).ToString() + " ' AND DT<'" + theEndDT.ToString() + " ' and stcd='" + stcdForCal + "'";
                         //TODO
                         DataTable dtForDaySumTemp = ExecuteDatatable(sqlConStr, strForSumTemp);
-                        //*******************************************需要修改*******************************************
-
-                        int countP = 0;
+                        int countP = 0;//记录人工操作次数
                         int sumdtForDaySumTempRows = dayDT.Rows.Count;
                         for (int j = 0; j < sumdtForDaySumTempRows; j++)
                         {
+
                             if (dtForDaySumTemp.Rows[j]["ACT"].ToString().Trim() == "PP" || dtForDaySumTemp.Rows[j]["ACT"].ToString().Trim() == "PE" || dtForDaySumTemp.Rows[j]["ACT"].ToString().Trim() == "ZE" || dtForDaySumTemp.Rows[j]["ACT"].ToString().Trim() == "RE")
                             {
                                 countP = countP + 1;
                             }
                         }
 
+
                         //雨量和蒸发值，明天8点减今天8点值，而不是累加值
                         if (countP == 0)
                         {
                             //*******************************************需要修改*******************************************
-                            string strForSum2 = "SELECT a.E-b.E as E, b.P-a.P as P FROM [Evaporation_Web].[dbo].[RawData] as a, [Evaporation_Web].[dbo].[RawData] as b where a.DT='" + theBegDT.AddHours(-1).ToString() + " ' AND b.DT = '" + theEndDT.AddHours(-1).ToString() + " ' and a.stcd='" + stcdForCal + "'";
+                            string strForSum2 = "SELECT a.E-b.E as E, b.P-a.P as P FROM RawData as a,RawData as b where a.DT='" + theBegDT.AddHours(-1).ToString() + " ' AND b.DT = '" + theEndDT.AddHours(-1).ToString() + " ' and a.stcd='" + stcdForCal + "'";
+                            string strForSum3 = "SELECT  b.P-a.P as P8 FROM RawData as a, RawData as b where a.DT='" + theMidDT.AddHours(-1).ToString() + " ' AND b.DT = '" + theEndDT.AddHours(-1).ToString() + " ' and a.stcd='" + stcdForCal + "'";
                             //TODO
                             DataTable dtForDaySum2 = ExecuteDatatable(sqlConStr, strForSum2);
-                            //*******************************************需要修改*******************************************
+                            DataTable dtForDaySum3 = ExecuteDatatable(sqlConStr, strForSum3);
 
-                            double E1 = 0.0d;
-                            double P2 = 0.0d;
-                            double E2 = 0.0d;
+                            tempP = decimal.Parse((dtForDaySum2.Rows[0]["P"]).ToString());//24小时降雨值存在temp中
+                            p8 = decimal.Parse((dtForDaySum3.Rows[0]["P8"]).ToString());//p8重赋值
+
+                            //double E1 = 0.0d;
+                            // double P2 = 0.0d;
+                            decimal E = 0.0m;
                             if (dtForDaySum2.Rows.Count > 0)  //如果取得到昨天八点到今天八点的值
                             {
-                                E1 = Convert.ToDouble(dayDT.Rows[0]["E"]);
-                                P2 = Convert.ToDouble(dtForDaySum2.Rows[0]["P"]);
-                                if (P2 < 0.03d)
+                                if (tempP < 0.03m)
                                 {
-                                    P2 = 0.0d;
+                                    tempP = 0.0m;
                                 }
-                                E2 = Convert.ToDouble(dtForDaySum2.Rows[0]["E"]) + P2;
-
-                                if (E2 <= 0)
+                                E = decimal.Parse((dtForDaySum2.Rows[0]["E"]).ToString()) + tempP;
+                                if (E > 0)
                                 {
-                                    dayDT.Rows[0]["E"] = E1;
-                                }
-                                else
-                                {
-                                    dayDT.Rows[0]["E"] = Math.Min(E1, E2);
+                                    tempE = Math.Min(tempE, E);
                                 }
                             }
                         }
 
-                        //==================写入日累积值，并触发网页程序=====================
-                        //构造hourData数组
+                        //用p的值减去p8的值即为p20的值，计算中没有涉及对降雨的修改，只有对蒸发的修改，因此直接相减即可
+                        decimal p20 = tempP - p8;//前12小时降雨
+
+
+
+                        //*****************日降雨补偿********************************
+                        int needCover = 0;
+                        decimal hourComP = 0m;//小时降雨补偿
+                        #region
+                        //当补偿系数不为0且降雨超过3个小时，需要进行日降雨补偿
+                        if (bool.Parse(rawDataNew[11]) != false && hourPNums > 3)
+                        {
+                            needCover = 1;
+                            decimal sumComP;
+                            if (hourPNums >= 13)
+                            {
+                                sumComP = 0.5m;
+                            }
+                            sumComP = 0.05m * (hourPNums - 3);//补偿总量        
+                            hourComP = sumComP / hourPNums;
+                            tempP += sumComP;//对日降雨量进行补偿
+                            p8 += hourComP * hourP8Nums;
+                            p20 = tempP - p8;
+                        }
+                        #endregion
+
+                        //构造dayData数组
                         dayData[0] = dayDT.Rows[0]["STCD"].ToString();
                         dayData[1] = theKeyDT1.AddDays(-1).ToShortDateString();
-                        dayData[2] = dayDT.Rows[0]["E"].ToString();  //真实蒸发，考虑容器的换算？
-                        dayData[3] = dayDT.Rows[0]["P"].ToString();
+                        dayData[2] = tempE.ToString();  //真实蒸发，考虑容器的换算？
+                        dayData[3] = tempP.ToString();
                         dayData[4] = dayDT.Rows[0]["T"].ToString();
-                        dayData[5] = "";
+                        dayData[5] = p8.ToString();//存储p8
+                        dayData[6] = p20.ToString();//存储p20
+                        dayData[7] = "";
 
 
                         evaDic.Add("dayE", dayData[2]);
                         evaDic.Add("dayP", dayData[3]);
                         evaDic.Add("dayT", dayData[4]);
+                        evaDic.Add("P8", dayData[5]);
+                        evaDic.Add("P20", dayData[6]);
+                        evaDic.Add("hourComP", hourComP.ToString());
+                        evaDic.Add("needCover", needCover.ToString());//只有拿到这个值为1时，去修改小时表，每个不为0的降雨全部加上hourComP 
+
                         #endregion
                     }
                     else
@@ -405,6 +516,10 @@ namespace EvaCal
                         evaDic.Add("dayE", "");
                         evaDic.Add("dayP", "");
                         evaDic.Add("dayT", "");
+                        evaDic.Add("P8", "");
+                        evaDic.Add("P20", "");
+                        evaDic.Add("hourComP", "");
+                        evaDic.Add("needCover", "");
                     }
 
                     #endregion
@@ -416,8 +531,8 @@ namespace EvaCal
 
         private DataTable ExecuteDatatable(string[] myConnection, string sql, params SqlParameter[] parameters)
         {
-            string connStr = string.Empty;
-            connStr = "Server=" + myConnection[0] + ";DataBase=" + myConnection[1] + ";Uid=" + myConnection[2] + ";Pwd=" + myConnection[3];
+            //string connStr = string.Empty;
+            //connStr = "Server=" + myConnection[0] + ";DataBase=" + myConnection[1] + ";Uid=" + myConnection[2] + ";Pwd=" + myConnection[3];
             //SqlConnection conn = new SqlConnection(connStr);
             //conn.Open();
             //SqlCommand cmd = new SqlCommand(sql);
@@ -425,7 +540,8 @@ namespace EvaCal
             //DataSet dataSet = new DataSet();
             //adapter.Fill(dataSet);
             //return dataSet.Tables[0];
-            using (SqlConnection conn = new SqlConnection(connStr))
+
+            using (SqlConnection conn = CDBManager.Instance.GetConnection())
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
@@ -462,5 +578,6 @@ namespace EvaCal
                 }
             }
         }
+
     }
 }

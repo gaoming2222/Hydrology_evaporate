@@ -176,6 +176,7 @@
             this.cmb_TimeSelect.Name = "cmb_TimeSelect";
             this.cmb_TimeSelect.Size = new System.Drawing.Size(117, 20);
             this.cmb_TimeSelect.TabIndex = 23;
+            this.cmb_TimeSelect.SelectedIndexChanged += new System.EventHandler(this.cmbTimeSelect_SelectedIndexChanged);
             // 
             // label9
             // 
@@ -413,7 +414,7 @@
             // 
             // m_lablePageIndex
             // 
-            this.m_lablePageIndex.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.m_lablePageIndex.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)));
             this.m_lablePageIndex.AutoSize = true;
             this.m_lablePageIndex.Location = new System.Drawing.Point(4, 7);

@@ -7,7 +7,7 @@ using Hydrology.Entity;
 
 namespace Hydrology.CControls
 {
-    partial class CRTDSanilityForm : Form, ITabPage
+    partial class CRTDEvaForm : Form, ITabPage
     {
         #region  ITABPAGE
         // 页面关闭事件
@@ -71,7 +71,7 @@ namespace Hydrology.CControls
         #endregion ///<PRIVATE_MEMBER
 
         #region 公共方法
-        public CRTDSanilityForm()
+        public CRTDEvaForm()
             : base()
         {
             // 初始化定时器
@@ -104,7 +104,7 @@ namespace Hydrology.CControls
             {
                 (m_mapSubCenterPage[station.SubCenterID.Value].DataGrid as CDataGridViewEvaRTD).AddRTD(entity);
             }
-            //(m_dgvAllPage.DataGrid as CDataGridViewSanilityRTD).RecalculateHeaderSize(); //计算表头宽度
+            //(m_dgvAllPage.DataGrid as CDataGridViewEvaRTD).RecalculateHeaderSize(); //计算表头宽度
         }
         /// <summary>
         /// 更新实时数据
@@ -191,22 +191,22 @@ namespace Hydrology.CControls
                 tmp.DataGrid = new CDataGridViewEvaRTD() { AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill };
                 tmp.Padding = new System.Windows.Forms.Padding(0, 0, 0, 3);
                 m_tabControl.AddPage(tmp);
-                //(tmp.DataGrid as CDataGridViewSanilityRTD).RecalculateHeaderSize(); //计算表头宽度
+                //(tmp.DataGrid as CDataGridViewEvaRTD).RecalculateHeaderSize(); //计算表头宽度
             }
 
             // 绑定消息，分中心变更消息
             CDBDataMgr.Instance.SubCenterUpdated += new EventHandler(this.EHSubCenterChanged);
             // 收到RTD消息
-            //CDBDataMgr.Instance.RecvedRTD_Sanility += new EventHandler<CEventSingleArgs<CEntityRealEva>>(EHRecvRTD);
+            CDBDataMgr.Instance.RecvedRTD_Eva += new EventHandler<CEventSingleArgs<CEntityRealEva>>(EHRecvRTD);
             // 收到清空RTD消息
-            //CDBDataMgr.Instance.RTDCleared_Sanility += new EventHandler(EHClearRTD);
+            CDBDataMgr.Instance.RTDCleared_Eva += new EventHandler(EHClearRTD);
 
             m_tabControl.ResumeLayout(false);
 
             // 开启定时器
             m_timer.Start();
 
-            //(m_dgvAllPage.DataGrid as CDataGridViewSanilityRTD).RecalculateHeaderSize();
+            //(m_dgvAllPage.DataGrid as CDataGridViewEvaRTD).RecalculateHeaderSize();
         }
 
         #endregion ///<帮助方法
@@ -281,7 +281,7 @@ namespace Hydrology.CControls
             {
                 result = result && (entity.Value.DataGrid as CDataGridViewEvaRTD).RefreshRTDTimeOutStatus();
             }
-            CSystemInfoMgr.Instance.AddInfo("刷新盐度实时数据状态");
+            CSystemInfoMgr.Instance.AddInfo("刷新蒸发实时数据状态");
         }
 
         private void EHFormClosing(object sender, FormClosingEventArgs e)

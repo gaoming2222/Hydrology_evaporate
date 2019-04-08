@@ -17,10 +17,11 @@ namespace Hydrology.DBManager.DB.SQLServer
         public static readonly string CN_CName = "CName";   //站点名字
         public static readonly string CN_CType = "CType";   //站点类型
         public static readonly string CN_DataTime = "DataTime";    //数据的采集时间
-        public static readonly string CN_Voltage = "U";  //电压
+        public static readonly string CN_ReceivedTime = "ReceivedTime";    //数据的接收时间
         public static readonly string CN_Temp = "T";  //温度
         public static readonly string CN_Eva = "E";  //蒸发值
         public static readonly string CN_Rain = "P";  //降雨
+        public static readonly string CN_DH = "DH";  //高度差
         public static readonly string CN_State = "CurrentState";    //实时数据状态
         #endregion
 
@@ -37,11 +38,12 @@ namespace Hydrology.DBManager.DB.SQLServer
             m_tableDataAdded.Columns.Add(CN_CName);
             m_tableDataAdded.Columns.Add(CN_CType);
             m_tableDataAdded.Columns.Add(CN_DataTime);
+            m_tableDataAdded.Columns.Add(CN_ReceivedTime);
 
-            m_tableDataAdded.Columns.Add(CN_Voltage);
             m_tableDataAdded.Columns.Add(CN_Temp);
             m_tableDataAdded.Columns.Add(CN_Eva);
             m_tableDataAdded.Columns.Add(CN_Rain);
+            m_tableDataAdded.Columns.Add(CN_DH);
 
             m_tableDataAdded.Columns.Add(CN_State);
 
@@ -99,10 +101,11 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_CName, CN_CName);
                     bulkCopy.ColumnMappings.Add(CN_CType, CN_CType);
                     bulkCopy.ColumnMappings.Add(CN_DataTime, CN_DataTime);
-                    bulkCopy.ColumnMappings.Add(CN_Voltage, CN_Voltage);
+                    bulkCopy.ColumnMappings.Add(CN_ReceivedTime, CN_ReceivedTime);
                     bulkCopy.ColumnMappings.Add(CN_Eva, CN_Eva);
                     bulkCopy.ColumnMappings.Add(CN_Temp, CN_Temp);
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
+                    bulkCopy.ColumnMappings.Add(CN_DH, CN_DH);
                     bulkCopy.ColumnMappings.Add(CN_State, CN_State);
 
                     try
@@ -176,10 +179,11 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_CName, CN_CName);
                     bulkCopy.ColumnMappings.Add(CN_CType, CN_CType);
                     bulkCopy.ColumnMappings.Add(CN_DataTime, CN_DataTime);
+                    bulkCopy.ColumnMappings.Add(CN_ReceivedTime, CN_ReceivedTime);
                     bulkCopy.ColumnMappings.Add(CN_Eva, CN_Eva);
-                    bulkCopy.ColumnMappings.Add(CN_Voltage, CN_Voltage);
                     bulkCopy.ColumnMappings.Add(CN_Temp, CN_Temp);
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
+                    bulkCopy.ColumnMappings.Add(CN_DH, CN_DH);
                     bulkCopy.ColumnMappings.Add(CN_State, CN_State);
 
                     try
@@ -217,10 +221,11 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_CName] = Eva.StrStationName;
                 row[CN_CType] = Eva.StationType;
                 row[CN_DataTime] = Eva.TimeDeviceGained.ToString(CDBParams.GetInstance().DBDateTimeFormat);
+                row[CN_ReceivedTime] = Eva.TimeReceived.ToString(CDBParams.GetInstance().DBDateTimeFormat);
                 row[CN_Temp] = Eva.Temperature;
-                row[CN_Voltage] = Eva.Voltage;
                 row[CN_Eva] = Eva.Eva;
                 row[CN_Rain] = Eva.Rain;
+                row[CN_DH] = Eva.DH;
                 row[CN_State] = Eva.ERTDState.ToString();
                 m_tableDataAdded.Rows.Add(row);
             }
@@ -240,10 +245,11 @@ namespace Hydrology.DBManager.DB.SQLServer
             row[CN_CName] = Eva.StrStationName;
             row[CN_CType] = Eva.StationType;
             row[CN_DataTime] = Eva.TimeDeviceGained.ToString(CDBParams.GetInstance().DBDateTimeFormat);
+            row[CN_ReceivedTime] = Eva.TimeReceived.ToString(CDBParams.GetInstance().DBDateTimeFormat);
             row[CN_Temp] = Eva.Temperature;
-            row[CN_Voltage] = Eva.Voltage;
             row[CN_Eva] = Eva.Eva;
             row[CN_Rain] = Eva.Rain;
+            row[CN_DH] = Eva.DH;
             row[CN_State] = Eva.ERTDState.ToString();
             //row[CN_TransType] = CEnumHelper.ChannelTypeToDBStr(Eva.ChannelType);
             m_tableDataAdded.Rows.Add(row);
@@ -277,6 +283,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 realtime.StrStationName = dataTableTmp.Rows[rowid][CN_CName].ToString();
                 realtime.StationType = CEnumHelper.DBRTStrToStationType(dataTableTmp.Rows[rowid][CN_CType].ToString());
                 realtime.TimeDeviceGained = DateTime.Parse(dataTableTmp.Rows[rowid][CN_DataTime].ToString());
+                realtime.TimeReceived = DateTime.Parse(dataTableTmp.Rows[rowid][CN_ReceivedTime].ToString());
                 if (!dataTableTmp.Rows[rowid][CN_Temp].ToString().Equals(""))
                 {
                     realtime.Temperature = Decimal.Parse(dataTableTmp.Rows[rowid][CN_Temp].ToString());
@@ -288,6 +295,10 @@ namespace Hydrology.DBManager.DB.SQLServer
                 if (!dataTableTmp.Rows[rowid][CN_Eva].ToString().Equals(""))
                 {
                     realtime.Eva = Decimal.Parse(dataTableTmp.Rows[rowid][CN_Eva].ToString());
+                }
+                if (!dataTableTmp.Rows[rowid][CN_DH].ToString().Equals(""))
+                {
+                    realtime.DH = Decimal.Parse(dataTableTmp.Rows[rowid][CN_DH].ToString());
                 }
 
                 realtime.ERTDState = CEnumHelper.DBStrToState(dataTableTmp.Rows[rowid][CN_State].ToString());

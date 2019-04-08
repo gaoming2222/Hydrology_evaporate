@@ -9,19 +9,18 @@ using System.Text;
 
 namespace Hydrology.DBManager.DB.SQLServer
 {
-    public class CSQLEva : CSQLBase, IEvaProxy
+    public class CSQLDEva : CSQLBase, IDEvaProxy
     {
         #region 静态常量
         private const string CT_EntityName = "CEntityEva";   //  数据库表Eva实体类
-        public static readonly string CT_TableName = "RawData";      //数据库中蒸发初始表的名字
+        public static readonly string CT_TableName = "DayData";      //数据库中蒸发初始表的名字
         public static readonly string CN_StationId = "STCD";   //站点ID
         public static readonly string CN_DataTime = "DT";    //数据的采集时间
         public static readonly string CN_Temp = "T";  //温度
         public static readonly string CN_Eva = "E";  //蒸发值
-        public static readonly string CN_Voltage = "U";  //电压
         public static readonly string CN_Rain = "P";  //降雨
-        public static readonly string CN_ACT = "ACT";    //蒸发模式
-        //public static readonly string CN_State = "state";
+        public static readonly string CN_Rain8 = "P8";   //8点到20点的降雨之和
+        public static readonly string CN_Rain20 = "P20";   //20点到8点的降雨之和
         #endregion
 
         #region 成员变量
@@ -51,7 +50,7 @@ namespace Hydrology.DBManager.DB.SQLServer
         public System.Timers.Timer m_addTimer_1;
         #endregion 
 
-        public CSQLEva()
+        public CSQLDEva()
             : base()
         {
             m_listDelRows = new List<long>();
@@ -63,16 +62,16 @@ namespace Hydrology.DBManager.DB.SQLServer
             m_tableDataAdded.Columns.Add(CN_Temp);
             m_tableDataAdded.Columns.Add(CN_Eva);
             m_tableDataAdded.Columns.Add(CN_Rain);
-            m_tableDataAdded.Columns.Add(CN_Voltage);
+            m_tableDataAdded.Columns.Add(CN_Rain8);
+            m_tableDataAdded.Columns.Add(CN_Rain20);
 
             //m_tableDataAdded.Columns.Add(CN_TransType);
 
-            m_tableDataAdded.Columns.Add(CN_ACT);
             // 分页查询相关
             m_strStaionId = null;
 
             // 初始化互斥量
-            m_mutexWriteToDB = CDBMutex.Mutex_TB_Eva;
+            m_mutexWriteToDB = CDBMutex.Mutex_TB_DEva;
 
             m_addTimer_1 = new System.Timers.Timer();
             m_addTimer_1.Elapsed += new System.Timers.ElapsedEventHandler(EHTimer_1);
@@ -104,7 +103,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 m_mutexDataTable.ReleaseMutex();
                 return;
             }
-            //清空内存表的所有内容，把内容复制到临时表tmp中
+            //清空内存表的所有内容，把内容复制到临日表tmp中
             DataTable tmp = dt.Copy();
             m_tableDataAdded.Rows.Clear();
 
@@ -113,27 +112,27 @@ namespace Hydrology.DBManager.DB.SQLServer
 
             try
             {
-                //将临时表中的内容写入数据库
+                //将临日表中的内容写入数据库
                 string connstr = CDBManager.Instance.GetConnectionString();
                 using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connstr, SqlBulkCopyOptions.FireTriggers))
                 {
                     // 蒸发表有插入触发器，如果遇到重复记录，则更新为当前的最新记录
                     //bulkCopy.BatchSize = 1;
                     bulkCopy.BulkCopyTimeout = 1800;
-                    bulkCopy.DestinationTableName = CSQLEva.CT_TableName;
+                    bulkCopy.DestinationTableName = CSQLDEva.CT_TableName;
                     bulkCopy.ColumnMappings.Add(CN_StationId, CN_StationId);
                     bulkCopy.ColumnMappings.Add(CN_DataTime, CN_DataTime);
                     bulkCopy.ColumnMappings.Add(CN_Eva, CN_Eva);
                     bulkCopy.ColumnMappings.Add(CN_Temp, CN_Temp);
-                    bulkCopy.ColumnMappings.Add(CN_Voltage, CN_Voltage);
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
-                    bulkCopy.ColumnMappings.Add(CN_ACT, CN_ACT);
+                    bulkCopy.ColumnMappings.Add(CN_Rain8, CN_Rain8);
+                    bulkCopy.ColumnMappings.Add(CN_Rain20, CN_Rain20);
 
                     try
                     {
                         bulkCopy.WriteToServer(tmp);
-                        Debug.WriteLine("###{0} :add {1} lines to Eva db", DateTime.Now, tmp.Rows.Count);
-                        CDBLog.Instance.AddInfo(string.Format("添加{0}行到蒸发表", tmp.Rows.Count));
+                        Debug.WriteLine("###{0} :add {1} lines to DEva db", DateTime.Now, tmp.Rows.Count);
+                        CDBLog.Instance.AddInfo(string.Format("添加{0}行到蒸发日表", tmp.Rows.Count));
                     }
                     catch (Exception e)
                     {
@@ -167,38 +166,23 @@ namespace Hydrology.DBManager.DB.SQLServer
 
         public void AddNewRow(CEntityEva Eva)
         {
-            m_mutexDataTable.WaitOne(); //等待互斥量
-
-            DataRow row = m_tableDataAdded.NewRow();
-            row[CN_StationId] = Eva.StationID;
-            row[CN_DataTime] = Eva.TimeCollect.ToString(CDBParams.GetInstance().DBDateTimeFormat);
-            row[CN_Temp] = Eva.Temperature;
-            row[CN_Eva] = Eva.Eva;
-            row[CN_Voltage] = Eva.Voltage;
-            row[CN_Rain] = Eva.Rain;
-            row[CN_ACT] = Eva.type; ;
-            m_tableDataAdded.Rows.Add(row);
-
-            // 如果超过最大值，写入数据库
-            NewTask(() => { AddDataToDB(); });
-
-            m_mutexDataTable.ReleaseMutex();
+            throw new NotImplementedException();
         }
 
-        public void AddNewRows(List<CEntityEva> evas)
+        public void AddNewRows(List<CEntityEva> sanilities)
         {
             // 记录超过1000条，或者时间超过1分钟，就将当前的数据写入数据库
             m_mutexDataTable.WaitOne(); //等待互斥量
-            foreach (CEntityEva Eva in evas)
+            foreach (CEntityEva Eva in sanilities)
             {
                 DataRow row = m_tableDataAdded.NewRow();
                 row[CN_StationId] = Eva.StationID;
                 row[CN_DataTime] = Eva.TimeCollect.ToString(CDBParams.GetInstance().DBDateTimeFormat);
                 row[CN_Temp] = Eva.Temperature;
                 row[CN_Eva] = Eva.Eva;
-                row[CN_Voltage] = Eva.Voltage;
                 row[CN_Rain] = Eva.Rain;
-                row[CN_ACT] = Eva.type; ;
+                row[CN_Rain8] = Eva.P8;
+                row[CN_Rain20] = Eva.P20;
                 m_tableDataAdded.Rows.Add(row);
             }
             if (m_tableDataAdded.Rows.Count >= CDBParams.GetInstance().AddBufferMax)
@@ -214,21 +198,20 @@ namespace Hydrology.DBManager.DB.SQLServer
             m_mutexDataTable.ReleaseMutex();
         }
 
-        public void AddNewRows_DataModify(List<CEntityEva> evas)
+        public void AddNewRows_DataModify(List<CEntityEva> sanilities)
         {
             // 记录超过1000条，或者时间超过1分钟，就将当前的数据写入数据库
             m_mutexDataTable.WaitOne(); //等待互斥量
-            foreach (CEntityEva Eva in evas)
+            foreach (CEntityEva Eva in sanilities)
             {
                 DataRow row = m_tableDataAdded.NewRow();
                 row[CN_StationId] = Eva.StationID;
                 row[CN_DataTime] = Eva.TimeCollect.ToString(CDBParams.GetInstance().DBDateTimeFormat);
                 row[CN_Temp] = Eva.Temperature;
                 row[CN_Eva] = Eva.Eva;
-                row[CN_Voltage] = Eva.Voltage;
                 row[CN_Rain] = Eva.Rain;
-                row[CN_ACT] = Eva.type;
-                //row[CN_TransType] = CEnumHelper.ChannelTypeToDBStr(Eva.ChannelType);
+                row[CN_Rain8] = Eva.P8;
+                row[CN_Rain20] = Eva.P20;
                 m_tableDataAdded.Rows.Add(row);
 
             }
@@ -343,21 +326,24 @@ namespace Hydrology.DBManager.DB.SQLServer
                     Eva.Eva = Decimal.Parse(table.Rows[startRow][CN_Eva].ToString());
 
                 }
-                if (!table.Rows[startRow][CN_Voltage].ToString().Equals(""))
-                {
-                    Eva.Voltage = Decimal.Parse(table.Rows[startRow][CN_Voltage].ToString());
-                }
                 if (!table.Rows[startRow][CN_Rain].ToString().Equals(""))
                 {
                     Eva.Rain = Decimal.Parse(table.Rows[startRow][CN_Rain].ToString());
                 }
-                Eva.type = table.Rows[startRow][CN_ACT].ToString(); ;
+                if (!table.Rows[startRow][CN_Rain8].ToString().Equals(""))
+                {
+                    Eva.P8 = Decimal.Parse(table.Rows[startRow][CN_Rain8].ToString());
+                }
+                if (!table.Rows[startRow][CN_Rain20].ToString().Equals(""))
+                {
+                    Eva.P20 = Decimal.Parse(table.Rows[startRow][CN_Rain20].ToString());
+                }
                 result.Add(Eva);
             }
             return result;
         }
 
-        public void SetFilter(string stationId, DateTime timeStart, DateTime timeEnd, bool TimeSelect)
+        public void SetFilter(string stationId, DateTime timeStart, DateTime timeEnd)
         {
             // 设置查询条件
             if (null == m_strStaionId)
@@ -368,12 +354,11 @@ namespace Hydrology.DBManager.DB.SQLServer
                 m_strStaionId = stationId;
                 m_startTime = timeStart;
                 m_endTime = timeEnd;
-                m_TimeSelect = TimeSelect;
             }
             else
             {
                 // 不是第一次查询
-                if (stationId != m_strStaionId || timeStart != m_startTime || timeEnd != m_endTime || m_TimeSelect != TimeSelect)
+                if (stationId != m_strStaionId || timeStart != m_startTime || timeEnd != m_endTime)
                 {
                     m_iRowCount = -1;
                     m_iPageCount = -1;
@@ -381,8 +366,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 }
                 m_strStaionId = stationId;
                 m_startTime = timeStart;
-                m_endTime = timeEnd;
-                m_TimeSelect = TimeSelect;
+                m_endTime = timeEnd;;
             }
         }
 
@@ -423,7 +407,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 m_mutexDataTable.ReleaseMutex();
                 return true;
             }
-            //清空内存表的所有内容，把内容复制到临时表tmp中
+            //清空内存表的所有内容，把内容复制到临日表tmp中
             DataTable tmp = m_tableDataAdded.Copy();
             m_tableDataAdded.Rows.Clear();
 
@@ -435,7 +419,7 @@ namespace Hydrology.DBManager.DB.SQLServer
 
             try
             {
-                //将临时表中的内容写入数据库
+                //将临日表中的内容写入数据库
                 string connstr = CDBManager.Instance.GetConnectionString();
                 using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connstr, SqlBulkCopyOptions.FireTriggers))
                 {
@@ -443,14 +427,14 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.BatchSize = 1;
                     bulkCopy.BulkCopyTimeout = 1800;
 
-                    bulkCopy.DestinationTableName = CSQLEva.CT_TableName;
+                    bulkCopy.DestinationTableName = CSQLDEva.CT_TableName;
                     bulkCopy.ColumnMappings.Add(CN_StationId, CN_StationId);
                     bulkCopy.ColumnMappings.Add(CN_DataTime, CN_DataTime);
                     bulkCopy.ColumnMappings.Add(CN_Eva, CN_Eva);
                     bulkCopy.ColumnMappings.Add(CN_Temp, CN_Temp);
-                    bulkCopy.ColumnMappings.Add(CN_Voltage, CN_Voltage);
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
-                    bulkCopy.ColumnMappings.Add(CN_ACT, CN_ACT);
+                    bulkCopy.ColumnMappings.Add(CN_Rain8, CN_Rain8);
+                    bulkCopy.ColumnMappings.Add(CN_Rain20, CN_Rain20);
 
                     try
                     {
@@ -470,8 +454,8 @@ namespace Hydrology.DBManager.DB.SQLServer
                 m_mutexWriteToDB.ReleaseMutex();
                 return false;
             }
-            Debug.WriteLine("###{0} :add {1} lines to Eva db", DateTime.Now, tmp.Rows.Count);
-            CDBLog.Instance.AddInfo(string.Format("添加{0}行到蒸发表", tmp.Rows.Count));
+            Debug.WriteLine("###{0} :add {1} lines to DEva db", DateTime.Now, tmp.Rows.Count);
+            CDBLog.Instance.AddInfo(string.Format("添加{0}行到蒸发日表", tmp.Rows.Count));
             m_mutexWriteToDB.ReleaseMutex();
             return true;
         }

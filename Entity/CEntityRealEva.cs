@@ -30,6 +30,11 @@ namespace Hydrology.Entity
         public EStationType StationType { get; set; }
 
         /// <summary>
+        /// 高度差
+        /// </summary>
+        public decimal? DH { get; set; }
+
+        /// <summary>
         /// 接收时间
         /// </summary>
         public DateTime TimeReceived { get; set; }

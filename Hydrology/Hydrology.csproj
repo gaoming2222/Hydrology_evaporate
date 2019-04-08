@@ -372,17 +372,17 @@
     <Compile Include="Forms\CSoilStationMgrForm2.designer.cs">
       <DependentUpon>CSoilStationMgrForm2.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\CStationDataAddForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\CStationDataAddForm.Designer.cs">
-      <DependentUpon>CStationDataAddForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\CStationDataMgrForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\CStationDataMgrForm.Designer.cs">
       <DependentUpon>CStationDataMgrForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CStationDataAddForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CStationDataAddForm.Designer.cs">
+      <DependentUpon>CStationDataAddForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\CStationMgrForm.cs">
       <SubType>Form</SubType>
@@ -440,11 +440,17 @@
     <Compile Include="Forms\CWelcomePage.Designer.cs">
       <DependentUpon>CWelcomePage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\DataText.cs">
+    <Compile Include="Forms\CEvaSetForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\DataText.Designer.cs">
-      <DependentUpon>DataText.cs</DependentUpon>
+    <Compile Include="Forms\CEvaSetForm.Designer.cs">
+      <DependentUpon>CEvaSetForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ShowForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ShowForm.Designer.cs">
+      <DependentUpon>ShowForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\DebugInfoSearch.cs">
       <SubType>Form</SubType>
@@ -576,11 +582,11 @@
     <EmbeddedResource Include="Forms\CSoilStationMgrForm2.resx">
       <DependentUpon>CSoilStationMgrForm2.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\CStationDataAddForm.resx">
-      <DependentUpon>CStationDataAddForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\CStationDataMgrForm.resx">
       <DependentUpon>CStationDataMgrForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CStationDataAddForm.resx">
+      <DependentUpon>CStationDataAddForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CStationMgrForm.resx">
       <DependentUpon>CStationMgrForm.cs</DependentUpon>
@@ -611,8 +617,11 @@
     <EmbeddedResource Include="Forms\CWelcomePage.resx">
       <DependentUpon>CWelcomePage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\DataText.resx">
-      <DependentUpon>DataText.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\CEvaSetForm.resx">
+      <DependentUpon>CEvaSetForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ShowForm.resx">
+      <DependentUpon>ShowForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DebugInfoSearch.resx">
       <DependentUpon>DebugInfoSearch.cs</DependentUpon>

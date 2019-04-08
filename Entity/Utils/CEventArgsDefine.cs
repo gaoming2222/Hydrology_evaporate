@@ -176,9 +176,24 @@ namespace Hydrology.Entity
         public Decimal? Voltage;
 
         /// <summary>
+        /// 蒸发
+        /// </summary>
+        public Nullable<Decimal> Eva;
+
+        /// <summary>
+        /// 温度
+        /// </summary>
+        public Nullable<Decimal> Temp;
+
+        /// <summary>
         /// 采集时间
         /// </summary>
         public DateTime DataTime;
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string EvpType;
     }
 
     /// <summary>

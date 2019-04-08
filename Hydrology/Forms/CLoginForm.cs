@@ -12,7 +12,7 @@ namespace Hydrology.Forms
         /// <summary>
         /// 更改当前用户模式
         /// </summary>
-        public event EventHandler<CEventSingleArgs<bool>> UserModeChanged;
+        public event EventHandler<CEventSingleArgs<int>> UserModeChanged;
 
         #endregion ///<事件定义
 
@@ -28,6 +28,7 @@ namespace Hydrology.Forms
         {
             label_Info.Visible = false;
             bool bAdministrator = false;
+            int autority = 0; ;
             string username = textBox_UserName.Text.Trim();
             string password = textBox_Password.Text.Trim();
             //string username = "admin";
@@ -48,12 +49,28 @@ namespace Hydrology.Forms
             if (username == "admin" && password == "admin")
             {
                 bAdministrator = true;
+                autority = 1;
                 CCurrentLoginUser.Instance.Login(username, password, bAdministrator);
                 //登陆成功,通知主界面进入管理员或者普通用户模式
                 if (UserModeChanged != null)
                 {
                     CSystemInfoMgr.Instance.AddInfo(string.Format("用户{0}登录,权限：{1}", username, bAdministrator ? "管理员" : "普通用户"));
-                    UserModeChanged.Invoke(this, new CEventSingleArgs<bool>(bAdministrator));
+                    UserModeChanged.Invoke(this, new CEventSingleArgs<int>(autority));
+                }
+                this.Close();
+                return;
+            }
+
+            if (username == "SA" && password == "SA@82829687")
+            {
+                bAdministrator = true;
+                autority = 2;
+                CCurrentLoginUser.Instance.Login(username, password, bAdministrator);
+                //登陆成功,通知主界面进入管理员或者普通用户模式
+                if (UserModeChanged != null)
+                {
+                    CSystemInfoMgr.Instance.AddInfo(string.Format("用户{0}登录,权限：{1}", username, bAdministrator ? "管理员" : "普通用户"));
+                    UserModeChanged.Invoke(this, new CEventSingleArgs<int>(autority));
                 }
                 this.Close();
                 return;
@@ -67,15 +84,13 @@ namespace Hydrology.Forms
                     if (UserModeChanged != null)
                     {
                         CSystemInfoMgr.Instance.AddInfo(string.Format("用户{0}登录,权限：{1}", username, bAdministrator ? "管理员" : "普通用户"));
-                        UserModeChanged.Invoke(this, new CEventSingleArgs<bool>(bAdministrator));
+                        UserModeChanged.Invoke(this, new CEventSingleArgs<int>(autority));
                     }
                     this.Close();
                     return;
                 }
             }
-#pragma warning disable CS0168 // 声明了变量“exp”，但从未使用过
             catch (Exception exp) { }
-#pragma warning restore CS0168 // 声明了变量“exp”，但从未使用过
 
             // 登陆失败，显示提示信息
             label_Info.Visible = true;

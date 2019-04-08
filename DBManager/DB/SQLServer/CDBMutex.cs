@@ -32,6 +32,10 @@ namespace Hydrology.DBManager.DB.SQLServer
 
         public static Mutex Mutex_TB_Eva = new Mutex();
 
+        public static Mutex Mutex_TB_HEva = new Mutex();
+
+        public static Mutex Mutex_TB_DEva = new Mutex();
+
         public static Mutex Mutex_TB_RealEva = new Mutex();
     }
 }
