@@ -19,7 +19,8 @@ namespace Hydrology.DBManager.DB.SQLServer
         public static readonly string CN_Temp = "T";  //温度
         public static readonly string CN_Eva = "E";  //蒸发值
         public static readonly string CN_Rain = "P";  //降雨
-        //public static readonly string CN_State = "state";
+        public static readonly string CN_Rain8 = "P8";   //8点到20点的降雨之和
+        public static readonly string CN_Rain20 = "P20";   //20点到8点的降雨之和
         #endregion
 
         #region 成员变量
@@ -61,6 +62,8 @@ namespace Hydrology.DBManager.DB.SQLServer
             m_tableDataAdded.Columns.Add(CN_Temp);
             m_tableDataAdded.Columns.Add(CN_Eva);
             m_tableDataAdded.Columns.Add(CN_Rain);
+            m_tableDataAdded.Columns.Add(CN_Rain8);
+            m_tableDataAdded.Columns.Add(CN_Rain20);
 
             //m_tableDataAdded.Columns.Add(CN_TransType);
 
@@ -122,6 +125,8 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_Eva, CN_Eva);
                     bulkCopy.ColumnMappings.Add(CN_Temp, CN_Temp);
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
+                    bulkCopy.ColumnMappings.Add(CN_Rain8, CN_Rain8);
+                    bulkCopy.ColumnMappings.Add(CN_Rain20, CN_Rain20);
 
                     try
                     {
@@ -176,6 +181,8 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_Temp] = Eva.Temperature;
                 row[CN_Eva] = Eva.Eva;
                 row[CN_Rain] = Eva.Rain;
+                row[CN_Rain8] = Eva.P8;
+                row[CN_Rain20] = Eva.P20;
                 m_tableDataAdded.Rows.Add(row);
             }
             if (m_tableDataAdded.Rows.Count >= CDBParams.GetInstance().AddBufferMax)
@@ -203,7 +210,8 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_Temp] = Eva.Temperature;
                 row[CN_Eva] = Eva.Eva;
                 row[CN_Rain] = Eva.Rain;
-                //row[CN_TransType] = CEnumHelper.ChannelTypeToDBStr(Eva.ChannelType);
+                row[CN_Rain8] = Eva.P8;
+                row[CN_Rain20] = Eva.P20;
                 m_tableDataAdded.Rows.Add(row);
 
             }
@@ -322,6 +330,14 @@ namespace Hydrology.DBManager.DB.SQLServer
                 {
                     Eva.Rain = Decimal.Parse(table.Rows[startRow][CN_Rain].ToString());
                 }
+                if (!table.Rows[startRow][CN_Rain8].ToString().Equals(""))
+                {
+                    Eva.P8 = Decimal.Parse(table.Rows[startRow][CN_Rain8].ToString());
+                }
+                if (!table.Rows[startRow][CN_Rain20].ToString().Equals(""))
+                {
+                    Eva.P20 = Decimal.Parse(table.Rows[startRow][CN_Rain20].ToString());
+                }
                 result.Add(Eva);
             }
             return result;
@@ -417,6 +433,8 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_Eva, CN_Eva);
                     bulkCopy.ColumnMappings.Add(CN_Temp, CN_Temp);
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
+                    bulkCopy.ColumnMappings.Add(CN_Rain8, CN_Rain8);
+                    bulkCopy.ColumnMappings.Add(CN_Rain20, CN_Rain20);
 
                     try
                     {

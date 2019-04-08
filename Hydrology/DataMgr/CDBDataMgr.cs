@@ -2517,10 +2517,11 @@ namespace Hydrology.DataMgr
                     {
                         if (cDic["hourE"] != "")
                         {
-                            Eva.Eva = Decimal.Parse(cDic["hourE"]);
-                            Eva.Rain = Decimal.Parse(cDic["hourP"]);
-                            Eva.Temperature = Decimal.Parse(cDic["hourT"]);
-                            Eva.Voltage = Decimal.Parse(cDic["hourU"]);
+                            Eva.Eva = decimal.Parse(cDic["hourE"]);
+                            Eva.Rain = decimal.Parse(cDic["hourP"]);
+                            Eva.Temperature = decimal.Parse(cDic["hourT"]);
+                            Eva.Voltage = decimal.Parse(cDic["hourU"]);
+                            Eva.DH = decimal.Parse(cDic["dH"]);
                             HEvas.Add(Eva);
                         }
                     }
@@ -2528,10 +2529,22 @@ namespace Hydrology.DataMgr
                     {
                         if (cDic["dayE"] != "")
                         {
-                            Eva.Eva = Decimal.Parse(cDic["dayE"]);
-                            Eva.Rain = Decimal.Parse(cDic["dayP"]);
-                            Eva.Temperature = Decimal.Parse(cDic["dayT"]);
+                            Eva.Eva = decimal.Parse(cDic["dayE"]);
+                            Eva.Rain = decimal.Parse(cDic["dayP"]);
+                            Eva.Temperature = decimal.Parse(cDic["dayT"]);
+                            Eva.P8 = decimal.Parse(cDic["P8"]);
+                            Eva.P20 = decimal.Parse(cDic["P20"]);
                             DEvas.Add(Eva);
+                        }
+                    }
+                    if (cDic.ContainsKey("needCover"))
+                    {
+                        if(cDic["needCover"] == "1")
+                        {
+                            DateTime startTime = data.DataTime.AddDays(-1).AddHours(1);
+                            DateTime endTime = data.DataTime.AddHours(-1);
+                            decimal comP = decimal.Parse(cDic["hourComP"]);
+                            m_proxyHEva.UpdateRows(startTime, endTime, comP);
                         }
                     }
                 }
@@ -2559,7 +2572,8 @@ namespace Hydrology.DataMgr
                 realtime.Rain = Decimal.Parse(cDic["hourP"]);
                 realtime.Temperature = Decimal.Parse(cDic["hourT"]);
                 realtime.Voltage = Decimal.Parse(cDic["hourU"]);
-                //realtime.TimeReceived = args.RecvDataTime;
+                realtime.DH = decimal.Parse(cDic["dH"]);
+                realtime.TimeReceived = args.RecvDataTime;
                 realtime.TimeDeviceGained = args.Datas[tmpDataCount - 1].DataTime; //采集时间
 
                 // 发消息，通知界面更新

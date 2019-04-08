@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Hydrology.CControls;
+using Hydrology.DataMgr;
+using Hydrology.Entity;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using Hydrology.CControls;
-using Hydrology.DataMgr;
-using Hydrology.Entity;
-using System.Diagnostics;
-using System.Data;
 
 namespace Hydrology.Forms
 {
@@ -46,6 +44,7 @@ namespace Hydrology.Forms
         private CChartEva m_chartEva;          //自定义蒸发过程线
 
         private bool m_bIsEditable = false;         //默认是查询模式
+        private bool m_bIsHEva = true;         //默认是小时表
         private List<CEntityStation> m_listStations; //所有水情站点的引用
         #endregion  ///<DATA_MENBER
 
@@ -54,6 +53,11 @@ namespace Hydrology.Forms
         {
             get { return m_bIsEditable; }
             set { SetEditable(value); }
+        }
+        public bool IsHEva
+        {
+            get { return m_bIsHEva; }
+            set { SetHEva(value); }
         }
         #endregion ///<PREOPERTY
 
@@ -67,7 +71,7 @@ namespace Hydrology.Forms
             InitDB();
 
             cmbQueryInfo_SelectedIndexChanged(null, null);
-            // cmbQueryInfo_SelectedIndexChanged(null, null);
+            cmbQueryInfo_SelectedIndexChanged(null, null);
             // 生成测试数据
             //InitRainData();
             //InitWaterStage();
@@ -128,6 +132,19 @@ namespace Hydrology.Forms
             }//end of bIsEditable
         }
 
+        public void SetHEva(bool bIsHEva)
+        {
+            m_bIsHEva = bIsHEva;
+            if (m_bIsHEva)
+            {
+                m_dgvEva.IsHEva = true;
+            }
+            else
+            {
+                m_dgvEva.IsHEva = false;
+            }
+        }
+
         #endregion ///< PUBLIC_METHOD
 
         #region 帮助方法
@@ -141,7 +158,7 @@ namespace Hydrology.Forms
 
             cmb_RainShape.Items.AddRange(new string[] { CS_CMB_RainShape_Periodrain, CS_CMB_RainShape_Differencerain, CS_CMB_ViewStyle_Dayrain });
 
-            cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData});
+            cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData });
             // 设置日期
             this.dtpTimeStart.Format = DateTimePickerFormat.Custom;
             this.dptTimeEnd.Format = DateTimePickerFormat.Custom;
@@ -247,7 +264,7 @@ namespace Hydrology.Forms
 
             m_chartWaterFlow = new CChartWaterStage();
             m_chartWaterFlow.Dock = DockStyle.Fill;
-           
+
             m_chartEva = new CChartEva();
             m_chartEva.Dock = DockStyle.Fill;
 
@@ -275,7 +292,7 @@ namespace Hydrology.Forms
 
             m_dgvVoltage.PageNumberChanged += new EventHandler<CEventSingleArgs<int>>(this.EHPageNumberChanged);
             m_dgvVoltage.DataReady += new EventHandler<CEventDBUIDataReadyArgs>(this.EHTableDataReady);
-            
+
             m_dgvEva.PageNumberChanged += new EventHandler<CEventSingleArgs<int>>(this.EHPageNumberChanged);
             m_dgvEva.DataReady += new EventHandler<CEventDBUIDataReadyArgs>(this.EHTableDataReady);
 
@@ -413,41 +430,41 @@ namespace Hydrology.Forms
 
         private void btnNewRecord_Click(object sender, EventArgs e)
         {
-                //添加新的记录
-                CStationDataAddForm form = new CStationDataAddForm();
+            //添加新的记录
+            CStationDataAddForm form = new CStationDataAddForm();
 
-                //  form.SetCurrentStation((cmbStation as CStationComboBox).GetStation());
-                CStationComboBox cmbStation_2 = new CStationComboBox();
-                //11.12
-                //    form.SetCurrentStation(cmbStation_2.GetStation());
-                if (cmbStation.Text != "")
+            //  form.SetCurrentStation((cmbStation as CStationComboBox).GetStation());
+            CStationComboBox cmbStation_2 = new CStationComboBox();
+            //11.12
+            //    form.SetCurrentStation(cmbStation_2.GetStation());
+            if (cmbStation.Text != "")
+            {
+                form.SetCurrentStation(CDBDataMgr.Instance.GetStationById(cmbStation.Text.Substring(1, 4)));
+            }
+            //form.Parent = this;
+            form.StartPosition = FormStartPosition.CenterScreen; //父窗口居中
+            DialogResult result = form.ShowDialog();
+            if (DialogResult.OK == result)
+            {
+                if (form.GetAddedRain() != null)
                 {
-                    form.SetCurrentStation(CDBDataMgr.Instance.GetStationById(cmbStation.Text.Substring(1, 4)));
+                    m_dgvRain.AddRain(form.GetAddedRain());
                 }
-                //form.Parent = this;
-                form.StartPosition = FormStartPosition.CenterScreen; //父窗口居中
-                DialogResult result = form.ShowDialog();
-                if (DialogResult.OK == result)
+                if (form.GetAddedVoltage() != null)
                 {
-                    if (form.GetAddedRain() != null)
-                    {
-                        m_dgvRain.AddRain(form.GetAddedRain());
-                    }
-                    if (form.GetAddedVoltage() != null)
-                    {
-                        m_dgvVoltage.AddVoltage(form.GetAddedVoltage());
-                    }
-                    if (form.GetAddedWater() != null)
-                    {
-                        m_dgvWater.AddWater(form.GetAddedWater());
-                    }
+                    m_dgvVoltage.AddVoltage(form.GetAddedVoltage());
                 }
-                else if (DialogResult.Abort == result)
+                if (form.GetAddedWater() != null)
                 {
-                    // 强行被退出，由于权限过时引起
-                    this.FormClosing -= this.CStationDataMgrForm_FormClosing;
-                    this.Close(); //关闭窗口
+                    m_dgvWater.AddWater(form.GetAddedWater());
                 }
+            }
+            else if (DialogResult.Abort == result)
+            {
+                // 强行被退出，由于权限过时引起
+                this.FormClosing -= this.CStationDataMgrForm_FormClosing;
+                this.Close(); //关闭窗口
+            }
         }
 
         private void cmbQueryInfo_SelectedIndexChanged(object sender, EventArgs e)
@@ -525,6 +542,21 @@ namespace Hydrology.Forms
                 m_chartEva.Show();
                 this.label6.Hide();
                 this.cmb_RainShape.Hide();
+            }
+        }
+
+        private void cmbTimeSelect_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbQueryInfo.Text.Equals(CS_CMB_Eva))
+            {
+                if (cmb_TimeSelect.Text.Equals(CS_CMB_TimeData))
+                {
+                    IsHEva = true;
+                }
+                else
+                {
+                    IsHEva = false;
+                }
             }
         }
 
@@ -791,14 +823,11 @@ namespace Hydrology.Forms
                     }
                 }
                 bool updateData = false;
-                if (m_dgvEva.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value, TimeSelect))
+                if (m_dgvEva.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value))
                 {
                     updateData = m_chartEva.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value, TimeSelect);
                 }
-                //if (updateData == true)
-                //{
                 m_dgvEva.UpdateDataToUI();
-                //}
                 #endregion 蒸发数据
             }
             this.Enabled = true;
@@ -811,12 +840,6 @@ namespace Hydrology.Forms
 
         #region 帮助方法
 
-        //         private string GetDisplayStationName(CEntityStation station)
-        //         {
-        //             return string.Format("({0,-4}|{1})", station.StationID, station.StationName);
-        //         }
-
-        // 保存当前修改，成功则为true,失败则为false
         private bool DoSave()
         {
             try

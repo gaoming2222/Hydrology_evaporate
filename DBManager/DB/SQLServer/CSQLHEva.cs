@@ -20,7 +20,7 @@ namespace Hydrology.DBManager.DB.SQLServer
         public static readonly string CN_Eva = "E";  //蒸发值
         public static readonly string CN_Rain = "P";  //降雨
         public static readonly string CN_Voltage = "U";  //电压
-        //public static readonly string CN_State = "state";
+        public static readonly string CN_DH = "DH";  //高度差
         #endregion
 
         #region 成员变量
@@ -63,9 +63,8 @@ namespace Hydrology.DBManager.DB.SQLServer
             m_tableDataAdded.Columns.Add(CN_Eva);
             m_tableDataAdded.Columns.Add(CN_Rain);
             m_tableDataAdded.Columns.Add(CN_Voltage);
-
-            //m_tableDataAdded.Columns.Add(CN_TransType);
-
+            m_tableDataAdded.Columns.Add(CN_DH);
+          
             // 分页查询相关
             m_strStaionId = null;
 
@@ -125,6 +124,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_Temp, CN_Temp);
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
                     bulkCopy.ColumnMappings.Add(CN_Voltage, CN_Voltage);
+                    bulkCopy.ColumnMappings.Add(CN_DH, CN_DH);
 
                     try
                     {
@@ -180,6 +180,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_Eva] = Eva.Eva;
                 row[CN_Rain] = Eva.Rain;
                 row[CN_Voltage] = Eva.Voltage;
+                row[CN_DH] = Eva.DH;
                 m_tableDataAdded.Rows.Add(row);
             }
             if (m_tableDataAdded.Rows.Count >= CDBParams.GetInstance().AddBufferMax)
@@ -208,7 +209,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_Eva] = Eva.Eva;
                 row[CN_Rain] = Eva.Rain;
                 row[CN_Voltage] = Eva.Voltage;
-                //row[CN_TransType] = CEnumHelper.ChannelTypeToDBStr(Eva.ChannelType);
+                row[CN_DH] = Eva.DH;
                 m_tableDataAdded.Rows.Add(row);
 
             }
@@ -331,6 +332,10 @@ namespace Hydrology.DBManager.DB.SQLServer
                 {
                     Eva.Voltage = Decimal.Parse(table.Rows[startRow][CN_Voltage].ToString());
                 }
+                if (!table.Rows[startRow][CN_DH].ToString().Equals(""))
+                {
+                    Eva.DH = Decimal.Parse(table.Rows[startRow][CN_DH].ToString());
+                }
                 result.Add(Eva);
             }
             return result;
@@ -427,6 +432,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_Temp, CN_Temp);
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
                     bulkCopy.ColumnMappings.Add(CN_Voltage, CN_Voltage);
+                    bulkCopy.ColumnMappings.Add(CN_DH, CN_DH);
 
                     try
                     {
@@ -449,6 +455,25 @@ namespace Hydrology.DBManager.DB.SQLServer
             Debug.WriteLine("###{0} :add {1} lines to HEva db", DateTime.Now, tmp.Rows.Count);
             CDBLog.Instance.AddInfo(string.Format("添加{0}行到蒸发时表", tmp.Rows.Count));
             m_mutexWriteToDB.ReleaseMutex();
+            return true;
+        }
+
+        public bool UpdateRows(DateTime sTime, DateTime eTime, decimal comP)
+        {
+            // 除主键外和站点外，其余信息随意修改
+            StringBuilder sql = new StringBuilder();
+            sql.AppendFormat("UPDATE {0} SET {1}={2} WHERE {3} BETWEEN {4} AND {5} AND {6} > 0;",
+                CT_TableName,
+                CN_Rain, CN_Rain + "+" + comP.ToString(),
+                CN_DataTime, sTime.ToString(), eTime.ToString(),
+                CN_Rain
+            );
+            // 更新数据库
+            if (!this.ExecuteSQLCommand(sql.ToString()))
+            {
+                return false;
+            }
+            ResetAll();
             return true;
         }
 

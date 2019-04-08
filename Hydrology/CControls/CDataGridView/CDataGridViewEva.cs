@@ -25,12 +25,16 @@ namespace Hydrology.CControls
         public static readonly string CS_Rain = "雨量";
         public static readonly string CS_Voltage = "电压";
         public static readonly string CS_Temp = "温度值";
+        public static readonly string CS_DH = "高度差";
+        public static readonly string CS_P8 = "8点-20点雨量和";
+        public static readonly string CS_P20 = "20点-8点雨量和";
 
         public static readonly string CS_TimeFormat = "yyy-MM-dd HH:mm:ss";
         #endregion  ///<STATIC_STRING
 
         #region 数据成员
         private bool m_bIsEditable; //编辑模式，默认非编辑模式
+        private bool m_bIsHEva; //表格类型，默认为小时表
         private List<CEntityEva> m_listUpdated; //更新的蒸发记录
         private List<long> m_listDeleteSanilities;    //删除的蒸发记
         private List<String> m_listDeleteSanilities_StationId;    //删除的蒸发记录
@@ -54,6 +58,11 @@ namespace Hydrology.CControls
             get { return m_bIsEditable; }
             set { SetEditable(value); }
         }
+        public bool IsHEva
+        {
+            get { return m_bIsHEva; }
+            set { SetHEva(value); }
+        }
         #endregion ///<PROPERTY
 
         #region 公共方法
@@ -63,7 +72,7 @@ namespace Hydrology.CControls
             // 设定标题栏,默认有个隐藏列,默认非编辑模式
             this.Header = new string[]
             {
-                CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain ,CS_Temp, CS_Voltage
+                CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain ,CS_Temp, CS_Voltage, CS_DH
             };
 
 
@@ -72,6 +81,7 @@ namespace Hydrology.CControls
 
             // 初始化成员变量
             m_bIsEditable = false; // 默认是非编辑模式
+            m_bIsHEva = true;  // 默认是小时表
             m_listUpdated = new List<CEntityEva>();
             m_listDeleteSanilities = new List<long>();
             m_listDeleteSanilities_StationId = new List<String>();
@@ -106,55 +116,58 @@ namespace Hydrology.CControls
             // 判断状态值
             List<string[]> newRows = new List<string[]>();
             List<EDataState> states = new List<EDataState>();
-            if (!m_bIsEditable)
+            if (m_bIsHEva)
             {
-                string[] newRow;
-                // 只读模式
-                for (int i = 0; i < listEva.Count; ++i)
+                if (!m_bIsEditable)
                 {
-                    EDataState state = EDataState.ENormal; //默认所有数据都是正常的
-                    string strStationName = "";
-                    string strStationId = "";
-                    CEntityStation station = CDBDataMgr.Instance.GetStationById(listEva[i].StationID);
-                    if (null != station)
+                    string[] newRow;
+                    // 只读模式
+                    for (int i = 0; i < listEva.Count; ++i)
                     {
+                        EDataState state = EDataState.ENormal; //默认所有数据都是正常的
+                        string strStationName = "";
+                        string strStationId = "";
+                        CEntityStation station = CDBDataMgr.Instance.GetStationById(listEva[i].StationID);
+                        if (null != station)
+                        {
 
-                        strStationName = station.StationName;
-                        strStationId = station.StationID;
-                    }
-                    newRow = new string[]
-                {
+                            strStationName = station.StationName;
+                            strStationId = station.StationID;
+                        }
+                        newRow = new string[]
+                        {
                         strStationId,
                         strStationName,/*站名*/
                         listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
                         listEva[i].Eva.ToString(), /*蒸发*/
                         listEva[i].Rain.ToString(), /*雨量*/
                         listEva[i].Temperature.ToString(), /*温度*/
-                        listEva[i].Voltage.ToString() /*电压*/
-                };
+                        listEva[i].Voltage.ToString(), /*电压*/
+                        listEva[i].DH.ToString() /*高度差*/
+                        };
 
-                    newRows.Add(newRow);
-                    states.Add(state);
-                }
-                // 添加到集合的数据表中
-                base.AddRowRange(newRows, states);
-            }
-            else
-            {
-                string[] newRow;
-                // 编辑模式，需要将更新的数据和删除的数据，与当前数据进行合并
-                for (int i = 0; i < listEva.Count; ++i)
-                {
-                    EDataState state = EDataState.ENormal; //默认所有数据都是正常的
-                    string strStationName = "";
-                    CEntityStation station = CDBDataMgr.Instance.GetStationById(listEva[i].StationID);
-                    if (null != station)
-                    {
-                        strStationName = station.StationName;
+                        newRows.Add(newRow);
+                        states.Add(state);
                     }
-
-                    newRow = new string[]
+                    // 添加到集合的数据表中
+                    base.AddRowRange(newRows, states);
+                }
+                else
                 {
+                    string[] newRow;
+                    // 编辑模式，需要将更新的数据和删除的数据，与当前数据进行合并
+                    for (int i = 0; i < listEva.Count; ++i)
+                    {
+                        EDataState state = EDataState.ENormal; //默认所有数据都是正常的
+                        string strStationName = "";
+                        CEntityStation station = CDBDataMgr.Instance.GetStationById(listEva[i].StationID);
+                        if (null != station)
+                        {
+                            strStationName = station.StationName;
+                        }
+
+                        newRow = new string[]
+                        {
                          "False", /*未选中*/
                         m_strStaionId,
                         strStationName,/*站名*/
@@ -162,26 +175,99 @@ namespace Hydrology.CControls
                         listEva[i].Eva.ToString(), /*蒸发*/
                         listEva[i].Rain.ToString(), /*雨量*/
                         listEva[i].Temperature.ToString(), /*温度*/
-                        listEva[i].Voltage.ToString() /*电压*/
-                };
+                        listEva[i].Voltage.ToString(), /*电压*/
+                        listEva[i].DH.ToString() /*高度差*/
+                        };
 
-                    newRows.Add(newRow);
-                    states.Add(state);
+                        newRows.Add(newRow);
+                        states.Add(state);
 
+                    }
+                    // 添加到集合的数据表中
+                    base.AddRowRange(newRows, states);
                 }
-                // 添加到集合的数据表中
-                base.AddRowRange(newRows, states);
+            }
+            else
+            {
+                if (!m_bIsEditable)
+                {
+                    string[] newRow;
+                    // 只读模式
+                    for (int i = 0; i < listEva.Count; ++i)
+                    {
+                        EDataState state = EDataState.ENormal; //默认所有数据都是正常的
+                        string strStationName = "";
+                        string strStationId = "";
+                        CEntityStation station = CDBDataMgr.Instance.GetStationById(listEva[i].StationID);
+                        if (null != station)
+                        {
+
+                            strStationName = station.StationName;
+                            strStationId = station.StationID;
+                        }
+                        newRow = new string[]
+                        {
+                        strStationId,
+                        strStationName,/*站名*/
+                        listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
+                        listEva[i].Eva.ToString(), /*蒸发*/
+                        listEva[i].Rain.ToString(), /*雨量*/
+                        listEva[i].Temperature.ToString(), /*温度*/
+                        listEva[i].P8.ToString(), /*8-20*/
+                        listEva[i].P20.ToString() /*20-8*/
+                        };
+
+                        newRows.Add(newRow);
+                        states.Add(state);
+                    }
+                    // 添加到集合的数据表中
+                    base.AddRowRange(newRows, states);
+                }
+                else
+                {
+                    string[] newRow;
+                    // 编辑模式，需要将更新的数据和删除的数据，与当前数据进行合并
+                    for (int i = 0; i < listEva.Count; ++i)
+                    {
+                        EDataState state = EDataState.ENormal; //默认所有数据都是正常的
+                        string strStationName = "";
+                        CEntityStation station = CDBDataMgr.Instance.GetStationById(listEva[i].StationID);
+                        if (null != station)
+                        {
+                            strStationName = station.StationName;
+                        }
+
+                        newRow = new string[]
+                        {
+                         "False", /*未选中*/
+                        m_strStaionId,
+                        strStationName,/*站名*/
+                        listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
+                        listEva[i].Eva.ToString(), /*蒸发*/
+                        listEva[i].Rain.ToString(), /*雨量*/
+                        listEva[i].Temperature.ToString(), /*温度*/
+                        listEva[i].P8.ToString(), /*8-20*/
+                        listEva[i].P20.ToString() /*20-8*/
+                        };
+
+                        newRows.Add(newRow);
+                        states.Add(state);
+
+                    }
+                    // 添加到集合的数据表中
+                    base.AddRowRange(newRows, states);
+                }
             }
         }
 
         // 设置查询条件
-        public bool SetFilter(string strStationId, DateTime timeStart, DateTime timeEnd, bool TimeSelect)
+        public bool SetFilter(string strStationId, DateTime timeStart, DateTime timeEnd)
         {
             ClearAllState();
             m_strStaionId = strStationId;
             m_dateTimeStart = timeStart;
             m_dateTimeEnd = timeEnd;
-            if (TimeSelect)
+            if (m_bIsHEva)
             {
                 m_proxyHEva.SetFilter(strStationId, timeStart, timeEnd);
                 if (-1 == m_proxyHEva.GetPageCount())
@@ -248,19 +334,42 @@ namespace Hydrology.CControls
                 if (m_listAddedEva.Count > 0)
                 {
                     //直接添加，不需要等待1分钟
-                    m_proxyHEva.AddNewRows_DataModify(m_listAddedEva);
+                    if (m_bIsHEva)
+                    {
+                        m_proxyHEva.AddNewRows_DataModify(m_listAddedEva);
+                    }
+                    else
+                    {
+                        m_proxyDEva.AddNewRows_DataModify(m_listAddedEva);
+                    }
                     m_listAddedEva.Clear();
                 }
                 // 修改
                 if (m_listUpdated.Count > 0)
                 {
-                    m_proxyHEva.AddNewRows_DataModify(m_listUpdated);
+                    if (m_bIsHEva)
+                    {
+                        m_proxyHEva.AddNewRows_DataModify(m_listUpdated);
+                    }
+                    else
+                    {
+                        m_proxyDEva.AddNewRows_DataModify(m_listUpdated);
+
+                    }
                     m_listUpdated.Clear();
                 }
                 // 删除
                 if (m_listDeleteSanilities_StationId.Count > 0)
                 {
-                    result = result && m_proxyHEva.DeleteRows(m_listDeleteSanilities_StationId, m_listDeleteSanilities_StationDate);
+                    if (m_bIsHEva)
+                    {
+                        result = result && m_proxyHEva.DeleteRows(m_listDeleteSanilities_StationId, m_listDeleteSanilities_StationDate);
+                    }
+                    else
+                    {
+                        result = result && m_proxyDEva.DeleteRows(m_listDeleteSanilities_StationId, m_listDeleteSanilities_StationDate);
+
+                    }
                     m_listDeleteSanilities.Clear();
                 }
                 if (result)
@@ -273,7 +382,14 @@ namespace Hydrology.CControls
                     //MessageBox.Show("保存失败");
                     return false;
                 }
-                SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
+                if (m_bIsHEva)
+                {
+                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
+                }
+                else
+                {
+                    SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage, true));
+                }
             }
             else
             {
@@ -303,10 +419,9 @@ namespace Hydrology.CControls
             m_bIsEditable = bEditable;
             if (m_bIsEditable)
             {
-                // 设定标题栏,默认有个隐藏列
                 this.Header = new string[]
                 {
-                    CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage
+                    CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage, CS_DH
                 };
 
                 //开启编辑模式,设置可编辑列
@@ -358,15 +473,191 @@ namespace Hydrology.CControls
                 };
                 base.SetColumnEditStyle(7, Vol);
 
-                // 设置删除列的宽度
-                //this.Columns[0].Width = 40; //删除列宽度为20
-                //this.Columns[3].Width = 125;
-                //this.Columns[6].Width = 125;
+                // 高度差编辑列
+                DataGridViewNumericUpDownColumn DH = new DataGridViewNumericUpDownColumn()
+                {
+                    Minimum = 0,
+                    Maximum = 65537,
+                    DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                };
+                base.SetColumnEditStyle(8, DH);
+
             }
             else
             {
                 //this.Columns[2].Width = 125;
                 //this.Columns[5].Width = 125;
+            }
+        }
+
+        public void SetHEva(bool bIsHEva)
+        {
+            m_bIsHEva = bIsHEva;
+            if (!m_bIsHEva)
+            {
+                if (!m_bIsEditable)
+                {
+                    //  是日蒸发表
+                    this.Header = new string[]
+                    {
+                        CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_P8, CS_P20
+                    };
+                }
+                else
+                {
+                    this.Header = new string[]
+                    {
+                        CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_P8, CS_P20
+                    };
+
+                    //开启编辑模式,设置可编辑列
+
+                    DataGridViewCheckBoxColumn deleteCol = new DataGridViewCheckBoxColumn();
+                    base.SetColumnEditStyle(0, deleteCol);
+
+                    //// 设置采集时间编辑列
+                    //CalendarColumn collectionCol = new CalendarColumn();
+                    //base.SetColumnEditStyle(2, collectionCol);
+
+                    // 蒸发编辑列
+                    DataGridViewNumericUpDownColumn Eva = new DataGridViewNumericUpDownColumn()
+                    {
+                        Minimum = 0,
+                        Maximum = 65537,
+                        DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                    };
+                    base.SetColumnEditStyle(4, Eva);
+
+                    // 雨量编辑列
+                    DataGridViewNumericUpDownColumn Rain = new DataGridViewNumericUpDownColumn()
+                    {
+                        Minimum = 0,
+                        Maximum = 65537,
+                        DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                    };
+                    base.SetColumnEditStyle(5, Rain);
+
+                    // 温度编辑列
+                    DataGridViewNumericUpDownColumn Temp = new DataGridViewNumericUpDownColumn()
+                    {
+                        Minimum = 0,
+                        Maximum = 65537,
+                        DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                    };
+                    base.SetColumnEditStyle(6, Temp);
+
+                    // 电压编辑列
+                    DataGridViewNumericUpDownColumn Vol = new DataGridViewNumericUpDownColumn()
+                    {
+                        Minimum = 0,
+                        Maximum = 65537,
+                        DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                    };
+                    base.SetColumnEditStyle(7, Vol);
+
+                    // 电压编辑列
+                    DataGridViewNumericUpDownColumn P8 = new DataGridViewNumericUpDownColumn()
+                    {
+                        Minimum = 0,
+                        Maximum = 65537,
+                        DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                    };
+                    base.SetColumnEditStyle(8, P8);
+
+                    // 电压编辑列
+                    DataGridViewNumericUpDownColumn P20 = new DataGridViewNumericUpDownColumn()
+                    {
+                        Minimum = 0,
+                        Maximum = 65537,
+                        DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                    };
+                    base.SetColumnEditStyle(9, P20);
+
+                }
+            }
+            else
+            {
+                if (!m_bIsEditable)
+                {
+                    //  是日蒸发表
+                    this.Header = new string[]
+                    {
+                        CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage, CS_DH
+                    };
+                }
+                else
+                {
+                    this.Header = new string[]
+                    {
+                        CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage, CS_DH
+                    };
+
+                    //开启编辑模式,设置可编辑列
+
+                    DataGridViewCheckBoxColumn deleteCol = new DataGridViewCheckBoxColumn();
+                    base.SetColumnEditStyle(0, deleteCol);
+
+                    //// 设置采集时间编辑列
+                    //CalendarColumn collectionCol = new CalendarColumn();
+                    //base.SetColumnEditStyle(2, collectionCol);
+
+                    // 蒸发编辑列
+                    DataGridViewNumericUpDownColumn Eva = new DataGridViewNumericUpDownColumn()
+                    {
+                        Minimum = 0,
+                        Maximum = 65537,
+                        DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                    };
+                    base.SetColumnEditStyle(4, Eva);
+
+                    // 雨量编辑列
+                    DataGridViewNumericUpDownColumn Rain = new DataGridViewNumericUpDownColumn()
+                    {
+                        Minimum = 0,
+                        Maximum = 65537,
+                        DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                    };
+                    base.SetColumnEditStyle(5, Rain);
+
+                    // 温度编辑列
+                    DataGridViewNumericUpDownColumn Temp = new DataGridViewNumericUpDownColumn()
+                    {
+                        Minimum = 0,
+                        Maximum = 65537,
+                        DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                    };
+                    base.SetColumnEditStyle(6, Temp);
+
+                    // 电压编辑列
+                    DataGridViewNumericUpDownColumn Vol = new DataGridViewNumericUpDownColumn()
+                    {
+                        Minimum = 0,
+                        Maximum = 65537,
+                        DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                    };
+                    base.SetColumnEditStyle(7, Vol);
+
+                    // 高度差编辑列
+                    DataGridViewNumericUpDownColumn DH = new DataGridViewNumericUpDownColumn()
+                    {
+                        Minimum = 0,
+                        Maximum = 65537,
+                        DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                    };
+                    base.SetColumnEditStyle(8, DH);
+                }
             }
         }
 
@@ -387,7 +678,16 @@ namespace Hydrology.CControls
                 dataTable.Columns.Add(CS_Eva, typeof(string));
                 dataTable.Columns.Add(CS_Rain, typeof(string));
                 dataTable.Columns.Add(CS_Temp, typeof(string));
-                dataTable.Columns.Add(CS_Voltage, typeof(string));
+                if (m_bIsHEva)
+                {
+                    dataTable.Columns.Add(CS_Voltage, typeof(string));
+                    dataTable.Columns.Add(CS_DH, typeof(string));
+                }
+                else
+                {
+                    dataTable.Columns.Add(CS_P8, typeof(string));
+                    dataTable.Columns.Add(CS_P20, typeof(string));
+                }
                 dataTable.Columns.Add(CS_TimeCollected, typeof(DateTime));
                 // 逐页读取数据
                 for (int i = 0; i < m_iTotalPage; ++i)
@@ -424,13 +724,43 @@ namespace Hydrology.CControls
                         {
                             row[CS_Temp] = "";
                         }
-                        if (Eva.Voltage != -9999)
+                        if (m_bIsHEva)
                         {
-                            row[CS_Voltage] = Eva.Voltage;
+                            if (Eva.Voltage != -9999)
+                            {
+                                row[CS_Voltage] = Eva.Voltage;
+                            }
+                            else
+                            {
+                                row[CS_Voltage] = "";
+                            }
+                            if (Eva.DH != -9999)
+                            {
+                                row[CS_DH] = Eva.DH;
+                            }
+                            else
+                            {
+                                row[CS_DH] = "";
+                            }
                         }
                         else
                         {
-                            row[CS_Voltage] = "";
+                            if (Eva.P8 != -9999)
+                            {
+                                row[CS_P8] = Eva.P8;
+                            }
+                            else
+                            {
+                                row[CS_P8] = "";
+                            }
+                            if (Eva.P20 != -9999)
+                            {
+                                row[CS_P20] = Eva.P20;
+                            }
+                            else
+                            {
+                                row[CS_P20] = "";
+                            }
                         }
                         row[CS_TimeCollected] = Eva.TimeCollect;
                         dataTable.Rows.Add(row);
@@ -479,7 +809,14 @@ namespace Hydrology.CControls
                     }
                     MessageBox.Show("保存成功");
                     // 保存成功，换页
-                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage - 1, true));
+                    if (m_bIsHEva)
+                    {
+                        SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage - 1, true));
+                    }
+                    else
+                    {
+                        SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage - 1, true));
+                    }
                     base.OnMenuPreviousPage(sender, e);
                 }
                 else if (DialogResult.No == result)
@@ -487,14 +824,28 @@ namespace Hydrology.CControls
                     //不保存，直接换页，直接退出
                     //清楚所有状态位
                     base.ClearAllState();
-                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage - 1, false));
+                    if (m_bIsHEva)
+                    {
+                        SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage - 1, false));
+                    }
+                    else
+                    {
+                        SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage - 1, false));
+                    }
                     base.OnMenuPreviousPage(sender, e);
                 }
             }
             else
             {
                 // 没有修改，直接换页
-                SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage - 1, false));
+                if (m_bIsHEva)
+                {
+                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage - 1, false));
+                }
+                else
+                {
+                    SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage - 1, false));
+                }
                 base.OnMenuPreviousPage(sender, e);
             }
 
@@ -522,7 +873,14 @@ namespace Hydrology.CControls
                     }
                     MessageBox.Show("保存成功");
                     // 保存成功，换页
-                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage + 1, true));
+                    if (m_bIsHEva)
+                    {
+                        SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage + 1, true));
+                    }
+                    else
+                    {
+                        SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage + 1, true));
+                    }
                     base.OnMenuNextPage(sender, e);
                 }
                 else if (DialogResult.No == result)
@@ -530,14 +888,28 @@ namespace Hydrology.CControls
                     //不保存，直接换页，直接退出
                     //清楚所有状态位
                     base.ClearAllState();
-                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage + 1, false));
+                    if (m_bIsHEva)
+                    {
+                        SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage + 1, true));
+                    }
+                    else
+                    {
+                        SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage + 1, true));
+                    }
                     base.OnMenuNextPage(sender, e);
                 }
             }
             else
             {
                 // 没有修改，直接换页
-                SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage + 1, false));
+                if (m_bIsHEva)
+                {
+                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage + 1, true));
+                }
+                else
+                {
+                    SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage + 1, true));
+                }
                 base.OnMenuNextPage(sender, e);
             }
         }
@@ -568,7 +940,14 @@ namespace Hydrology.CControls
                     MessageBox.Show("保存成功");
                     // 保存成功，换页
                     base.OnMenuFirstPage(sender, e);
-                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
+                    if (m_bIsHEva)
+                    {
+                        SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
+                    }
+                    else
+                    {
+                        SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage, true));
+                    }
                     this.UpdateDataToUI();
                 }
                 else if (DialogResult.No == result)
@@ -577,7 +956,14 @@ namespace Hydrology.CControls
                     //清楚所有状态位
                     base.ClearAllState();
                     base.OnMenuFirstPage(sender, e);
-                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, false));
+                    if (m_bIsHEva)
+                    {
+                        SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
+                    }
+                    else
+                    {
+                        SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage, true));
+                    }
                     this.UpdateDataToUI();
                 }
             }
@@ -585,7 +971,14 @@ namespace Hydrology.CControls
             {
                 // 没有修改，直接换页
                 base.OnMenuFirstPage(sender, e);
-                SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, false));
+                if (m_bIsHEva)
+                {
+                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
+                }
+                else
+                {
+                    SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage, true));
+                }
                 this.UpdateDataToUI();
             }
 
@@ -619,7 +1012,14 @@ namespace Hydrology.CControls
                         MessageBox.Show("保存成功");
                         // 保存成功，换页
                         base.OnMenuFirstPage(sender, e);
-                        SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
+                        if (m_bIsHEva)
+                        {
+                            SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
+                        }
+                        else
+                        {
+                            SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage, true));
+                        }
                         this.UpdateDataToUI();
                     }
                 }
@@ -629,7 +1029,14 @@ namespace Hydrology.CControls
                     //清楚所有状态位
                     base.ClearAllState();
                     base.OnMenuLastPage(sender, e);
-                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, false));
+                    if (m_bIsHEva)
+                    {
+                        SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
+                    }
+                    else
+                    {
+                        SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage, true));
+                    }
                     this.UpdateDataToUI();
                 }
             }
@@ -637,7 +1044,14 @@ namespace Hydrology.CControls
             {
                 // 没有修改，直接换页
                 base.OnMenuLastPage(sender, e);
-                SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, false));
+                if (m_bIsHEva)
+                {
+                    SetEva(m_proxyHEva.GetPageData(base.m_iCurrentPage, true));
+                }
+                else
+                {
+                    SetEva(m_proxyDEva.GetPageData(base.m_iCurrentPage, true));
+                }
                 this.UpdateDataToUI();
             }
         }
@@ -777,7 +1191,16 @@ namespace Hydrology.CControls
                 Eva.Rain = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Rain].Value.ToString());
                 Eva.Eva = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Eva].Value.ToString());
                 Eva.Temperature = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Temp].Value.ToString());
-                Eva.Voltage = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Voltage].Value.ToString());
+                if (m_bIsHEva)
+                {
+                    Eva.Voltage = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Voltage].Value.ToString());
+                    Eva.DH = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_DH].Value.ToString());
+                }
+                else
+                {
+                    Eva.P8 = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_P8].Value.ToString());
+                    Eva.P20 = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_P20].Value.ToString());
+                }
 
                 m_listUpdated.Add(Eva);
             }

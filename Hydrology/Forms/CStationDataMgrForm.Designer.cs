@@ -176,6 +176,7 @@
             this.cmb_TimeSelect.Name = "cmb_TimeSelect";
             this.cmb_TimeSelect.Size = new System.Drawing.Size(117, 20);
             this.cmb_TimeSelect.TabIndex = 23;
+            this.cmb_TimeSelect.SelectedIndexChanged += new System.EventHandler(this.cmbTimeSelect_SelectedIndexChanged);
             // 
             // label9
             // 

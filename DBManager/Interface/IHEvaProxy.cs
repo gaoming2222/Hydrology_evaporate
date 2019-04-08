@@ -39,5 +39,7 @@ namespace Hydrology.DBManager.Interface
         int GetRowCount();
 
         List<CEntityEva> GetPageData(int pageIndex,bool irefresh);
+
+        bool UpdateRows(DateTime sTime, DateTime eTime, decimal comP);
     }
 }

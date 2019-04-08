@@ -22,28 +22,42 @@ namespace Hydrology.Entity
         /// <summary>
         /// 温度
         /// </summary>
-        public Nullable<Decimal> Temperature { get; set; }
+        public decimal? Temperature { get; set; }
 
         /// <summary>
         /// 电压
         /// </summary>
-        public Nullable<Decimal> Voltage { get; set; }
+        public decimal? Voltage { get; set; }
 
         /// <summary>
         /// 蒸发值
         /// </summary>
-        public Nullable<Decimal> Eva { get; set; }
+        public decimal? Eva { get; set; }
 
         /// <summary>
         /// 雨量
         /// </summary>
-        public Nullable<Decimal> Rain { get; set; }
+        public decimal? Rain { get; set; }
 
         /// <summary>
         /// 蒸发模式
         /// </summary>
         public string type { get; set; }
 
+        /// <summary>
+        /// 小时表中的高度差DH
+        /// </summary>
+        public decimal? DH { get; set; }
+
+        /// <summary>
+        /// 日表中的8点到20点的雨量和
+        /// </summary>
+        public decimal? P8 { get; set; }
+
+        /// <summary>
+        /// 日表中的20点到8点的雨量和
+        /// </summary>
+        public decimal? P20 { get; set; }
         #endregion
     }
 }

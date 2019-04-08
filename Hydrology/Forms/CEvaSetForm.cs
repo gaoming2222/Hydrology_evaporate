@@ -25,7 +25,7 @@ namespace Hydrology.Forms
 
         private void quit_btn_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("确定要取消更改？", "取消", MessageBoxButtons.YesNo) == DialogResult.No)
+            if (MessageBox.Show("确定退出？", "确认", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 this.Close();
             }
