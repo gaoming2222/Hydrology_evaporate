@@ -51,24 +51,23 @@ namespace Hydrology.Forms
         private string getType()
         {
             string result = "";
-            foreach (var item in TableType.Controls)
-            {
-                if (item is RadioButton)
-                {
-                    RadioButton radioButton = item as RadioButton;
-                    if (radioButton.Checked)
-                    {
-                        result = radioButton.Text.Trim();
-                    }
-                }
-            }
+            //foreach (var item in TableType.Controls)
+            //{
+            //    if (item is RadioButton)
+            //    {
+            //        RadioButton radioButton = item as RadioButton;
+            //        if (radioButton.Checked)
+            //        {
+            //            result = radioButton.Text.Trim();
+            //        }
+            //    }
+            //}
             return result;
         }
         private void InitDate()
         {
             //DateTimer.CustomFormat = "yyyy年MM月";
-            DateTimer.Value = DateTime.Now;
-            endDateTime.Value = DateTime.Now;
+            ExldateTime.Value = DateTime.Now;
         }
         /// <summary>
         /// 初始化分中心信息
@@ -177,17 +176,17 @@ namespace Hydrology.Forms
         {
             //获取 radioButton 的table类型值；
             string tableType = "";
-            foreach (var item in TableType.Controls)
-            {
-                if (item is RadioButton)
-                {
-                    RadioButton radioButton = item as RadioButton;
-                    if (radioButton.Checked)
-                    {
-                        tableType = radioButton.Text.Trim();
-                    }
-                }
-            }
+            //foreach (var item in TableType.Controls)
+            //{
+            //    if (item is RadioButton)
+            //    {
+            //        RadioButton radioButton = item as RadioButton;
+            //        if (radioButton.Checked)
+            //        {
+            //            tableType = radioButton.Text.Trim();
+            //        }
+            //    }
+            //}
             // 获取分中心
             string subcenterName = SubCenter.Text;
             //获取时间  date.value;
@@ -220,8 +219,8 @@ namespace Hydrology.Forms
                 }
             }
 
-            DateTime dt1 = DateTimer.Value;
-            DateTime dt = dt1.Date;
+            //DateTime dt1 = DateTimer.Value;
+            //DateTime dt = dt1.Date;
             string type = getType();
 
             if (type.Equals("普通文本"))
@@ -265,7 +264,8 @@ namespace Hydrology.Forms
             DateTime ExlTimeTmp = ExldateTime.Value;
             DateTime ExlTimeStrt = new DateTime(ExlTimeTmp.Year, ExlTimeTmp.Month, 1, 0, 0, 0);
             DateTime ExlTimeEnd = new DateTime(ExlTimeTmp.Year, ExlTimeTmp.Month+1, 1, 0, 0, 0);
-
+            string dte = ExlTimeTmp.Year.ToString() + "年" + ExlTimeTmp.Month.ToString();
+            string month = ExlTimeTmp.Month.ToString();
 
             // 获取是雨量还是水位类型
             string type = getType();
@@ -302,12 +302,28 @@ namespace Hydrology.Forms
             string sourcePath = @"models/" + models.Text;
             if(models.Text == "降水量、蒸发量月报表.xls")
             {
+                string errMsg = "";
                 for (int i = 0; i < stationSelected.Count; i++)
                 {
-                    //string targetPath = @"ZfExcels/" + stationSelected[i].Split('|')[0] + stationSelected[i].Split('|')[1] + ExlTimeTmp.ToString() + "降水量、蒸发量月报表.xls";
-                    string targetPath = @"ZfExcels/降水量、蒸发量月报表.xls";
-
-                    getAndSetExcelValue(sourcePath, targetPath);
+                    string stationName = stationSelected[i].Split('|')[1].Trim();
+                    string stationid = stationSelected[i].Split('|')[0].Trim() ;
+                    string prefixName = stationSelected[i].Split('|')[1] + stationSelected[i].Split('|')[0] + "站" + dte + "降水量、蒸发量月报表.xls";
+                    string fileName = "ZfExcels/" + prefixName;
+                     //string targetPath = @"ZfExcels/" + stationSelected[i].Split('|')[0] + stationSelected[i].Split('|')[1] + ExlTimeTmp.ToString() + "降水量、蒸发量月报表.xls";
+                    string targetPath = @fileName;
+                    Dictionary<String,Object> result =  getAndSetExcelValueZf(sourcePath, targetPath,stationid,stationName, dte, ExlTimeStrt, ExlTimeEnd);
+                    if(result["ERR"].ToString() != "0")
+                    {
+                        errMsg = errMsg + result["ID"].ToString() + result["ERR"].ToString() + "/r/n";
+                    }
+                }
+                if(errMsg != "" && errMsg.Length > 0)
+                {
+                    MessageBox.Show(errMsg);
+                }
+                else
+                {
+                    MessageBox.Show("Excel导出成功！");
                 }
 
             }
@@ -315,9 +331,14 @@ namespace Hydrology.Forms
             {
                 for (int i = 0; i < stationSelected.Count; i++)
                 {
-                    string targetPath = @"GcExcels/" + stationSelected[i].Split('|')[0] + stationSelected[i].Split('|')[1] + ExlTimeTmp.ToString() + "蒸发观测记录表.xls";
+                    string stationName = stationSelected[i].Split('|')[1].Trim();
+                    string stationid = stationSelected[i].Split('|')[0].Trim();
+                    string prefixName = stationSelected[i].Split('|')[1] + stationSelected[i].Split('|')[0] + "站" + dte + "蒸发观测记录表.xls";
+                    string fileName = "GcExcels/" + prefixName;
+                    string targetPath = @fileName;
+                   
 
-                    getAndSetExcelValue(sourcePath, targetPath);
+                    getAndSetExcelValueGc(sourcePath, targetPath, stationid, stationName, dte, ExlTimeStrt, ExlTimeEnd);
                 }
             }
            
@@ -414,7 +435,7 @@ namespace Hydrology.Forms
             //            List<CEntityWater> waterList = new List<CEntityWater>();
             //            string stationid = stationSelected[i].Split('|')[0];
             //            List<string> waterInfoText = new List<string>();
-            //            waterList = CDBDataMgr.GetInstance().GetWaterByTime(stationid, startTime, endTime);
+                       //CDBDataMgr.GetInstance().GetWaterByTime(stationid, startTime, endTime);
             //            for (int j = 0; j < waterList.Count; j++)
             //            {
 
@@ -495,7 +516,7 @@ namespace Hydrology.Forms
 
             //            string stationid = stationSelected[i].Split('|')[0];
             //            List<string> hydroInfoText = new List<string>();
-            //            rainWaterList = CDBDataMgr.GetInstance().getRainAndWaterList(stationid, startTime, endTime);
+                        //CDBDataMgr.GetInstance().getRainAndWaterList(stationid, startTime, endTime);
             //            if (rainWaterList == null || rainWaterList.Count == 0)
             //            {
             //                continue;
@@ -578,33 +599,7 @@ namespace Hydrology.Forms
         private void TableTypeChanged(object sender, EventArgs e)
         {
             string type = getType();
-            if(type == "月 表")
-            {
-                label2.Hide();
-                DateTimer.Hide();
-                label6.Show();
-                ExldateTime.Show();
-                label4.Hide();
-                endDateTime.Hide();
-            }
-            if(type == "日 表")
-            {
-                label2.Show();
-                DateTimer.Show();
-                label6.Hide();
-                ExldateTime.Hide();
-                label4.Show();
-                endDateTime.Show();
-            }
-            if(type == "年 表")
-            {
-                label2.Hide();
-                DateTimer.Hide();
-                label6.Hide();
-                ExldateTime.Hide();
-                label4.Hide();
-                endDateTime.Hide();
-            }
+            
         }
 
         private void EHCheckAllChanged(object sender, EventArgs e)
@@ -674,75 +669,404 @@ namespace Hydrology.Forms
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public Dictionary<String,Object> getAndSetExcelValue(String sourcePath,String resultPaht)
+        public Dictionary<String,Object> getAndSetExcelValueZf(String sourcePath,String resultPaht,string stationid,string stationName,string dte, DateTime strtTime, DateTime endTime)
         {
+            
             Dictionary<String, Object> result = new Dictionary<string, object>();
-            FileStream fs = File.OpenRead(sourcePath);
-            //把文件内容写到工作簿中，然后关闭文件
-            //XSSFWorkbook workbook = new XSSFWorkbook(file);
-            //HSSFWorkbook workbook = new HSSFWorkbook(file)
-            IWorkbook workbook = new HSSFWorkbook(fs);
-            fs.Close();
-            //获取第一个sheet
-            ISheet sheet = workbook.GetSheetAt(0);
-
-            #region 降水量、蒸发量月报表
-            for (int i = 0; i <= sheet.LastRowNum; i++)
+            result["ERR"] = "0";
+            //查询获取所需数据
+            List<CEntityEva> evaList = new List<CEntityEva>();
+            evaList = CDBDataMgr.GetInstance().getEvaByTime(stationid, strtTime, endTime);
+            if(evaList == null || evaList.Count == 0)
             {
-                #region 表头 表尾
-                if(i == 0)
-                {
-                    //A1 站名 + 时间
-                    continue;
-                }
-                else if( i == 1) 
-                {
-                    //F1 站名
-                    continue;
-                }else if (i==36)
-                {
-
-                    continue;
-                }else if (i == 37)
-                {
-
-                    continue;
-                }else if(i == 38)
-                {
-
-                    continue;
-                }
-                #endregion
-
-                #region 蒸发数据
-                foreach (ICell cell in sheet.GetRow(i).Cells)
-                {
-                    /*
-                     * Excel数据Cell有不同的类型，当我们试图从一个数字类型的Cell读取出一个字符串并写入数据库时，就会出现Cannot get a text value from a numeric cell的异常错误。
-                     * 解决办法：先设置Cell的类型，然后就可以把纯数字作为String类型读进来了
-                     */
-                    cell.SetCellType(CellType.String);
-                    //cell.SetCellValue((Int32.Parse(cell.StringCellValue) * 2).ToString());
-                }
-                #endregion
+                result["ERR"] = "数据库无数据";
+                result["ID"] = stationid;
+                return result;
             }
+            #region 计算平均值 最大值 最小值等
+            Dictionary<string, CEntityEva> exlData = new Dictionary<string, CEntityEva>();
+            Decimal totalP = 0;
+            Decimal totalE = 0;
+            Decimal maxP = 0;
+            int totalePDays = 0;
+            string maxPDay = " 日";
+            Decimal maxE = 0;
+            string maxEDay = " 日";
+            Decimal minE = 9999;
+            string minEDay = " 日";
 
+            foreach(CEntityEva eva in evaList)
+            {
+                exlData[eva.TimeCollect.Day.ToString()] = eva;
+                if (eva.P.HasValue)
+                {
+                    totalP = totalP + eva.P.Value;
+                    totalePDays = totalePDays + 1;
+                    if(eva.P.Value > maxP)
+                    {
+                        maxP = eva.P.Value;
+                        maxPDay = eva.TimeCollect.Day.ToString() + "日";
+                    }
+                    
+                }
+                if (eva.E.HasValue)
+                {
+                    totalE = totalE + eva.E.Value;
+                    if(eva.E.Value > maxE)
+                    {
+                        maxE = eva.E.Value;
+                        maxEDay = eva.TimeCollect.Day.ToString() + "日";
+                    }
+                    if(eva.E.Value < minE)
+                    {
+                        minE = eva.E.Value;
+                        minEDay = eva.TimeCollect.Day.ToString() + "日";
+                    }
+                }
+            }
             #endregion
 
+            try
+            {
+                FileStream fs = File.OpenRead(sourcePath);
+                //把文件内容写到工作簿中，然后关闭文件
+                //XSSFWorkbook workbook = new XSSFWorkbook(file);
+                //HSSFWorkbook workbook = new HSSFWorkbook(file)
+                IWorkbook workbook = new HSSFWorkbook(fs);
+                fs.Close();
+                //获取第一个sheet
+                ISheet sheet = workbook.GetSheetAt(0);
 
-            #region 蒸发观测记录表
-            
+                //获取蒸发日表数据
+                #region 降水量、蒸发量月报表
+                for (int i = 0; i <= sheet.LastRowNum; i++)
+                {
+                    #region 表头 表尾
+                    if (i == 0)
+                    {
+                        //A1 站名 + 时间
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            /*
+                             * Excel数据Cell有不同的类型，当我们试图从一个数字类型的Cell读取出一个字符串并写入数据库时，就会出现Cannot get a text value from a numeric cell的异常错误。
+                             * 解决办法：先设置Cell的类型，然后就可以把纯数字作为String类型读进来了
+                             */
+                            string a = cell.StringCellValue;
+                            int iiii = cell.ColumnIndex;
+                            if (cell.ColumnIndex == 0)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(stationName + "站" + dte);
+                            }
+                        }
 
-           #endregion
+                        continue;
+                    }
+                    else if (i == 1)
+                    {
+                        //F1 站名
+                        continue;
+                    }
+                    else if (i == 2)
+                    {
+                        //F1 站名
+                        continue;
+                    }
+                    else if (i == 3)
+                    {
+                        //F1 站名
+                        continue;
+                    }
+                    else if (i == 35)
+                    {
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            if (cell.ColumnIndex == 4)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(totalP.ToString());
+                            }
+                            if (cell.ColumnIndex == 10)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(totalE.ToString());
+                            }
+                        }
+                        continue;
+                    }
+                    else if (i == 36)
+                    {
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            if (cell.ColumnIndex == 4)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(totalePDays.ToString() + "天");
+                            }
+                            if (cell.ColumnIndex == 10)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(maxE.ToString());
+                            }
+                            if (cell.ColumnIndex == 12)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(maxEDay);
+                            }
+                        }
 
+                        continue;
+                    }
+                    else if (i == 37)
+                    {
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            if (cell.ColumnIndex == 4)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(maxP.ToString());
+                            }
+                            if (cell.ColumnIndex == 6)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(maxPDay);
+                            }
+                            if (cell.ColumnIndex == 10)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(minE.ToString());
+                            }
+                            if (cell.ColumnIndex == 12)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(minEDay);
+                            }
+                        }
+                        continue;
+                    }
+                    else if (i == 38)
+                    {
 
-                //把编辑过后的工作薄重新保存为excel文件
-            FileStream fs2 = File.Create(resultPaht);
-            workbook.Write(fs2);
-            fs2.Close();
-             return result;
+                        continue;
+                    }
+                    #endregion
+                    //如果包含该日8：00的数据，则取出
+                    CEntityEva tmp = new CEntityEva();
+                    if (exlData.ContainsKey((i - 3).ToString()))
+                    {
+                        tmp = exlData[(i - 3).ToString()];
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                    #region 蒸发数据
+                    foreach (ICell cell in sheet.GetRow(i).Cells)
+                    {
+                        /*
+                         * Excel数据Cell有不同的类型，当我们试图从一个数字类型的Cell读取出一个字符串并写入数据库时，就会出现Cannot get a text value from a numeric cell的异常错误。
+                         * 解决办法：先设置Cell的类型，然后就可以把纯数字作为String类型读进来了
+                         */
+                        if (cell.ColumnIndex == 1)
+                        {
+                            cell.SetCellType(CellType.String);
+                            cell.SetCellValue(tmp.P20.ToString());
+                        }
+                        if (cell.ColumnIndex == 5)
+                        {
+                            cell.SetCellType(CellType.String);
+                            cell.SetCellValue(tmp.P8.ToString());
+                        }
+                        if (cell.ColumnIndex == 7)
+                        {
+                            cell.SetCellType(CellType.String);
+                            cell.SetCellValue(tmp.P.ToString());
+                        }
+                        if (cell.ColumnIndex == 10)
+                        {
+                            cell.SetCellType(CellType.String);
+                            cell.SetCellValue(tmp.E.ToString());
+                        }
+                    }
+                    #endregion
+                }
+                #endregion
+                FileStream fs2 = File.Create(resultPaht);
+                workbook.Write(fs2);
+                fs2.Close();
+                
+            }catch(Exception e)
+            {
+                result["ERR"] = e.Message;
+                result["ID"] = stationid;
+                return result;
+            }
+            return result;
+
         }
 
+        /// <summary>
+        /// 观测月表导出
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="resultPaht"></param>
+        /// <param name="stationid"></param>
+        /// <param name="stationName"></param>
+        /// <param name="dte"></param>
+        /// <param name="strtTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        public Dictionary<String, Object> getAndSetExcelValueGc(String sourcePath, String resultPaht, string stationid, string stationName, string dte, DateTime strtTime, DateTime endTime)
+        {
+
+            Dictionary<String, Object> result = new Dictionary<string, object>();
+            result["ERR"] = "0";
+            //查询获取所需数据
+            List<CEntityEva> evaList = new List<CEntityEva>();
+            evaList = CDBDataMgr.GetInstance().getEvaByTime(stationid, strtTime, endTime);
+            List<CEntityEva> evaSpList = new List<CEntityEva>();
+            evaSpList = CDBDataMgr.GetInstance().getSpEvaByTime(stationid, strtTime, endTime);
+            if (evaList == null || evaList.Count == 0)
+            {
+                result["ERR"] = "数据库无数据";
+                result["ID"] = stationid;
+                return result;
+            }
+            #region 计算平均值 最大值 最小值等
+            Dictionary<string, CEntityEva> exlData = new Dictionary<string, CEntityEva>();
+            Decimal totalP = 0;
+            Decimal totalE = 0;
+            Decimal maxP = 0;
+            int totalePDays = 0;
+            string maxPDay = " 日";
+            Decimal maxE = 0;
+            string maxEDay = " 日";
+            Decimal minE = 9999;
+            string minEDay = " 日";
+
+            foreach (CEntityEva eva in evaList)
+            {
+                exlData[eva.TimeCollect.Day.ToString()] = eva;
+                if (eva.P.HasValue)
+                {
+                    totalP = totalP + eva.P.Value;
+                    totalePDays = totalePDays + 1;
+                    if (eva.P.Value > maxP)
+                    {
+                        maxP = eva.P.Value;
+                        maxPDay = eva.TimeCollect.Day.ToString() + "日";
+                    }
+
+                }
+                if (eva.E.HasValue)
+                {
+                    totalE = totalE + eva.E.Value;
+                    if (eva.E.Value > maxE)
+                    {
+                        maxE = eva.E.Value;
+                        maxEDay = eva.TimeCollect.Day.ToString() + "日";
+                    }
+                    if (eva.E.Value < minE)
+                    {
+                        minE = eva.E.Value;
+                        minEDay = eva.TimeCollect.Day.ToString() + "日";
+                    }
+                }
+            }
+            #endregion
+
+            try
+            {
+                FileStream fs = File.OpenRead(sourcePath);
+                //把文件内容写到工作簿中，然后关闭文件
+                //XSSFWorkbook workbook = new XSSFWorkbook(file);
+                //HSSFWorkbook workbook = new HSSFWorkbook(file)
+                IWorkbook workbook = new HSSFWorkbook(fs);
+                fs.Close();
+                //获取第一个sheet
+                ISheet sheet = workbook.GetSheetAt(0);
+
+                //获取蒸发日表数据
+                #region 降水量、蒸发量月报表
+                for (int i = 0; i <= sheet.LastRowNum; i++)
+                {
+                    if (i == 0)
+                    {
+                        //A1 站名 + 时间
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            /*
+                             * Excel数据Cell有不同的类型，当我们试图从一个数字类型的Cell读取出一个字符串并写入数据库时，就会出现Cannot get a text value from a numeric cell的异常错误。
+                             * 解决办法：先设置Cell的类型，然后就可以把纯数字作为String类型读进来了
+                             */
+                            if (cell.ColumnIndex == 5)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(stationName + "站");
+                            }
+                        }
+                        continue;
+                    }
+
+                    if (i == 1)
+                    {
+                        //A1 站名 + 时间
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            /*
+                             * Excel数据Cell有不同的类型，当我们试图从一个数字类型的Cell读取出一个字符串并写入数据库时，就会出现Cannot get a text value from a numeric cell的异常错误。
+                             * 解决办法：先设置Cell的类型，然后就可以把纯数字作为String类型读进来了
+                             */
+                            
+                            if (cell.ColumnIndex == 13)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(dte + "月");
+                            }
+                        }
+                        continue;
+                    }
+
+                    if (i == 16)
+                    {
+                        //A1 站名 + 时间
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            if (cell.ColumnIndex == 6)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(totalE.ToString());
+                            }
+                            if (cell.ColumnIndex == 10)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(maxE.ToString());
+                            }
+                            if (cell.ColumnIndex == 14)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(minE.ToString());
+                            }
+                        }
+                        continue;
+                    }
+
+                }
+                #endregion
+                FileStream fs2 = File.Create(resultPaht);
+                workbook.Write(fs2);
+                fs2.Close();
+
+            }
+            catch (Exception e)
+            {
+                result["ERR"] = e.Message;
+                result["ID"] = stationid;
+                return result;
+            }
+            return result;
+
+        }
         public List<String> getNameInFile(String sourcePath)
         {
             List<String> result = new List<string>();

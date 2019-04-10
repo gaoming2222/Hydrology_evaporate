@@ -205,6 +205,10 @@ namespace Hydrology.Forms
                     //form = new CVoiceConfigForm();
                     form = new OneStationYear();
                     break;
+                case "蒸发统计":
+                    //form = new CVoiceConfigForm();
+                    form = new TextForm();
+                    break;
                 //gm 1203
                 case "关于":
                     MessageBox.Show("水文蒸发自动监测系统" + "\r\n" + "湖北一方科技发展有限责任公司");

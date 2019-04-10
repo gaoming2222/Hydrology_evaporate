@@ -509,5 +509,73 @@ namespace Hydrology.DBManager.DB.SQLServer
             ResetAll();
             return true;
         }
+
+        public List<CEntityEva> getEvabyTime(string stationid, DateTime start, DateTime end)
+        {
+            List<CEntityEva> evaList = new List<CEntityEva>();
+            String sql = "select * from " + CT_TableName + " where STCD=" + stationid + " and  ACT != null" + " and DT between '" + start + "'and '" + end + "';";
+            SqlDataAdapter adapter = new SqlDataAdapter(sql, CDBManager.GetInstacne().GetConnection());
+            DataTable dataTableTemp = new DataTable();
+            adapter.Fill(dataTableTemp);
+            int flag = dataTableTemp.Rows.Count;
+            if (flag == 0)
+            {
+                return null;
+            }
+            else
+            {
+                for (int rowid = 0; rowid < dataTableTemp.Rows.Count; ++rowid)
+                {
+                    CEntityEva eva = new CEntityEva();
+                    eva.StationID = dataTableTemp.Rows[rowid][CN_StationId].ToString();
+                    eva.TimeCollect = DateTime.Parse(dataTableTemp.Rows[rowid][CN_DataTime].ToString());
+                    if (dataTableTemp.Rows[rowid][CN_Voltage] != null && dataTableTemp.Rows[rowid][CN_Voltage].ToString() != "")
+                    {
+                        eva.Voltage = decimal.Parse(dataTableTemp.Rows[rowid][CN_Voltage].ToString());
+                    }
+                    else
+                    {
+                        eva.Voltage = null;
+                    }
+                    if (dataTableTemp.Rows[rowid][CN_Rain] != null && dataTableTemp.Rows[rowid][CN_Rain].ToString() != "")
+                    {
+                        eva.Rain= decimal.Parse(dataTableTemp.Rows[rowid][CN_Rain].ToString());
+                    }
+                    else
+                    {
+                        eva.Rain = null;
+                    }
+                    if (dataTableTemp.Rows[rowid][CN_Eva] != null && dataTableTemp.Rows[rowid][CN_Eva].ToString() != "")
+                    {
+                        eva.Eva = decimal.Parse(dataTableTemp.Rows[rowid][CN_Eva].ToString());
+                    }
+                    else
+                    {
+                        eva.Eva = null;
+                    }
+
+                    if (dataTableTemp.Rows[rowid][CN_Temp] != null && dataTableTemp.Rows[rowid][CN_Temp].ToString() != "")
+                    {
+                        eva.Temperature = decimal.Parse(dataTableTemp.Rows[rowid][CN_Temp].ToString());
+                    }
+                    else
+                    {
+                        eva.Temperature = null;
+                    }
+
+                    if (dataTableTemp.Rows[rowid][CN_ACT] != null && dataTableTemp.Rows[rowid][CN_ACT].ToString() != "")
+                    {
+                        eva.act= dataTableTemp.Rows[rowid][CN_Temp].ToString();
+                    }
+                    else
+                    {
+                        eva.act = string.Empty;
+                    }
+
+                    evaList.Add(eva);
+                }
+            }
+            return evaList;
+        }
     }
 }

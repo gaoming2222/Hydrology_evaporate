@@ -116,6 +116,7 @@
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.EvaCount = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.m_toolStrip.SuspendLayout();
             this.m_statusStrip.SuspendLayout();
@@ -169,21 +170,21 @@
             // MI_ChannelProtocolCfg
             // 
             this.MI_ChannelProtocolCfg.Name = "MI_ChannelProtocolCfg";
-            this.MI_ChannelProtocolCfg.Size = new System.Drawing.Size(180, 22);
+            this.MI_ChannelProtocolCfg.Size = new System.Drawing.Size(161, 22);
             this.MI_ChannelProtocolCfg.Tag = "通讯方式配置";
             this.MI_ChannelProtocolCfg.Text = "通讯方式配置";
             // 
             // MI_DataProtocolCfg
             // 
             this.MI_DataProtocolCfg.Name = "MI_DataProtocolCfg";
-            this.MI_DataProtocolCfg.Size = new System.Drawing.Size(180, 22);
+            this.MI_DataProtocolCfg.Size = new System.Drawing.Size(161, 22);
             this.MI_DataProtocolCfg.Tag = "数据协议配置";
             this.MI_DataProtocolCfg.Text = "数据协议配置";
             // 
             // toolStripSeparator13
             // 
             this.toolStripSeparator13.Name = "toolStripSeparator13";
-            this.toolStripSeparator13.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator13.Size = new System.Drawing.Size(158, 6);
             // 
             // MI_CommunicationPort
             // 
@@ -193,7 +194,7 @@
             this.MI_Beidou,
             this.MI_Beidou500});
             this.MI_CommunicationPort.Name = "MI_CommunicationPort";
-            this.MI_CommunicationPort.Size = new System.Drawing.Size(180, 22);
+            this.MI_CommunicationPort.Size = new System.Drawing.Size(161, 22);
             this.MI_CommunicationPort.Text = "通讯口配置";
             // 
             // MI_SerialPortConfig
@@ -227,21 +228,21 @@
             // MI_DatabaseConfig
             // 
             this.MI_DatabaseConfig.Name = "MI_DatabaseConfig";
-            this.MI_DatabaseConfig.Size = new System.Drawing.Size(180, 22);
+            this.MI_DatabaseConfig.Size = new System.Drawing.Size(161, 22);
             this.MI_DatabaseConfig.Tag = "数据库配置";
             this.MI_DatabaseConfig.Text = "数据库配置(&C)...";
             // 
             // MI_VoiceConfig
             // 
             this.MI_VoiceConfig.Name = "MI_VoiceConfig";
-            this.MI_VoiceConfig.Size = new System.Drawing.Size(180, 22);
+            this.MI_VoiceConfig.Size = new System.Drawing.Size(161, 22);
             this.MI_VoiceConfig.Tag = "声音配置";
             this.MI_VoiceConfig.Text = "声音配置...";
             // 
             // MI_EvaSet
             // 
             this.MI_EvaSet.Name = "MI_EvaSet";
-            this.MI_EvaSet.Size = new System.Drawing.Size(180, 22);
+            this.MI_EvaSet.Size = new System.Drawing.Size(161, 22);
             this.MI_EvaSet.Tag = "蒸发参数设置";
             this.MI_EvaSet.Text = "蒸发参数设置";
             this.MI_EvaSet.Visible = false;
@@ -249,7 +250,7 @@
             // MI_FormShowSet
             // 
             this.MI_FormShowSet.Name = "MI_FormShowSet";
-            this.MI_FormShowSet.Size = new System.Drawing.Size(180, 22);
+            this.MI_FormShowSet.Size = new System.Drawing.Size(161, 22);
             this.MI_FormShowSet.Tag = "界面显示设置";
             this.MI_FormShowSet.Text = "界面显示设置";
             this.MI_FormShowSet.Visible = false;
@@ -257,12 +258,12 @@
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(158, 6);
             // 
             // MI_SystemExit
             // 
             this.MI_SystemExit.Name = "MI_SystemExit";
-            this.MI_SystemExit.Size = new System.Drawing.Size(180, 22);
+            this.MI_SystemExit.Size = new System.Drawing.Size(161, 22);
             this.MI_SystemExit.Tag = "退出";
             this.MI_SystemExit.Text = "退出(&X)";
             // 
@@ -427,7 +428,8 @@
             this.MoreStationMonth,
             this.MoreStationDay,
             this.Communicate,
-            this.OneStationYear});
+            this.OneStationYear,
+            this.EvaCount});
             this.帮助ToolStripMenuItem.Name = "帮助ToolStripMenuItem";
             this.帮助ToolStripMenuItem.Size = new System.Drawing.Size(59, 21);
             this.帮助ToolStripMenuItem.Text = "报表(&T)";
@@ -435,35 +437,35 @@
             // OneStationMonth
             // 
             this.OneStationMonth.Name = "OneStationMonth";
-            this.OneStationMonth.Size = new System.Drawing.Size(145, 22);
+            this.OneStationMonth.Size = new System.Drawing.Size(152, 22);
             this.OneStationMonth.Tag = "单站月";
             this.OneStationMonth.Text = "单站月报表...";
             // 
             // MoreStationMonth
             // 
             this.MoreStationMonth.Name = "MoreStationMonth";
-            this.MoreStationMonth.Size = new System.Drawing.Size(145, 22);
+            this.MoreStationMonth.Size = new System.Drawing.Size(152, 22);
             this.MoreStationMonth.Tag = "多站月";
             this.MoreStationMonth.Text = "多站月报表...";
             // 
             // MoreStationDay
             // 
             this.MoreStationDay.Name = "MoreStationDay";
-            this.MoreStationDay.Size = new System.Drawing.Size(145, 22);
+            this.MoreStationDay.Size = new System.Drawing.Size(152, 22);
             this.MoreStationDay.Tag = "多站日";
             this.MoreStationDay.Text = "多站日报表...";
             // 
             // Communicate
             // 
             this.Communicate.Name = "Communicate";
-            this.Communicate.Size = new System.Drawing.Size(145, 22);
+            this.Communicate.Size = new System.Drawing.Size(152, 22);
             this.Communicate.Tag = "畅通率";
             this.Communicate.Text = "畅通率报表...";
             // 
             // OneStationYear
             // 
             this.OneStationYear.Name = "OneStationYear";
-            this.OneStationYear.Size = new System.Drawing.Size(145, 22);
+            this.OneStationYear.Size = new System.Drawing.Size(152, 22);
             this.OneStationYear.Tag = "单站年";
             this.OneStationYear.Text = "单站年报表...";
             // 
@@ -920,6 +922,13 @@
             this.splitContainer2.SplitterDistance = 215;
             this.splitContainer2.TabIndex = 0;
             // 
+            // EvaCount
+            // 
+            this.EvaCount.Name = "EvaCount";
+            this.EvaCount.Size = new System.Drawing.Size(152, 22);
+            this.EvaCount.Tag = "蒸发统计";
+            this.EvaCount.Text = "蒸发统计报表";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1044,6 +1053,7 @@
         private System.Windows.Forms.ToolStripMenuItem MI_RealEva;
         private System.Windows.Forms.ToolStripMenuItem MI_FormShowSet;
         private System.Windows.Forms.ToolStripMenuItem MI_EvaSet;
+        private System.Windows.Forms.ToolStripMenuItem EvaCount;
     }
 }
 

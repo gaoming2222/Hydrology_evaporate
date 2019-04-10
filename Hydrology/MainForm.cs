@@ -679,6 +679,8 @@ namespace Hydrology
 
             this.OneStationYear.Click += new EventHandler(FormHelper.ShowForm);
 
+            this.EvaCount.Click += new EventHandler(FormHelper.ShowForm);
+
 
             /**********   帮助栏   **********/
 

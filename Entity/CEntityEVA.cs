@@ -50,6 +50,15 @@ namespace Hydrology.Entity
         public decimal? DH { get; set; }
 
         /// <summary>
+        /// 日表中的日蒸发
+        /// </summary>
+        public decimal? E { get; set; }
+
+        /// <summary>
+        /// 日表中的日降雨量
+        /// </summary>
+        public decimal? P { get; set; }
+        /// <summary>
         /// 日表中的8点到20点的雨量和
         /// </summary>
         public decimal? P8 { get; set; }
@@ -58,6 +67,11 @@ namespace Hydrology.Entity
         /// 日表中的20点到8点的雨量和
         /// </summary>
         public decimal? P20 { get; set; }
+
+        /// <summary>
+        /// 注水、排水说明
+        /// </summary>
+        public string act { get; set; }
         #endregion
     }
 }

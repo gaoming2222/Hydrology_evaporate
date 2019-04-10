@@ -3422,6 +3422,19 @@ namespace Hydrology.DataMgr
             return results;
         }
 
+        public List<CEntityEva> getEvaByTime(string station, DateTime start, DateTime end)
+        {
+            List<CEntityEva> results = new List<CEntityEva>();
+            results = m_proxyDEva.getEvabyTime(station, start, end);
+            return results;
+        }
+
+        public List<CEntityEva> getSpEvaByTime(string station, DateTime start, DateTime end)
+        {
+            List<CEntityEva> results = new List<CEntityEva>();
+            results = m_proxyEva.getEvabyTime(station, start, end);
+            return results;
+        }
 
         #region 雨量表定时更新
         //System.Timers.Timer aTimer = new System.Timers.Timer();
