@@ -456,6 +456,10 @@ namespace Hydrology.DataMgr
                                 {
                                     tempP = 0.0m;
                                 }
+                                if (p8 < 0.03m)
+                                { 
+                                    p8 = 0.0m;
+                                }
                                 E = decimal.Parse((dtForDaySum2.Rows[0]["E"]).ToString()) + tempP;
                                 if (E > 0)
                                 {
@@ -494,7 +498,7 @@ namespace Hydrology.DataMgr
                         dayData[0] = dayDT.Rows[0]["STCD"].ToString();
                         dayData[1] = theKeyDT1.AddDays(-1).ToShortDateString();
                         dayData[2] = tempE.ToString();  //真实蒸发，考虑容器的换算？
-                        dayData[3] = tempP.ToString();
+                        dayData[3] = tempP.ToString();  
                         dayData[4] = dayDT.Rows[0]["T"].ToString();
                         dayData[5] = p8.ToString();//存储p8
                         dayData[6] = p20.ToString();//存储p20

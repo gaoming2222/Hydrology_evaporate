@@ -75,7 +75,7 @@
     <Compile Include="CControls\CChart\CChartEva.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CControls\CChart\CChartSoilData.cs">
+    <Compile Include="CControls\CChart\CChartTemp.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CControls\CChart\CChartVoltage.cs">

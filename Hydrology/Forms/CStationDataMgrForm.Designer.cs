@@ -52,7 +52,7 @@
             this.dptTimeEnd = new System.Windows.Forms.DateTimePicker();
             this.label2 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.dtpTimeStart = new System.Windows.Forms.DateTimePicker();
+            this.dptTimeStart = new System.Windows.Forms.DateTimePicker();
             this.cmbQueryInfo = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.panelRight = new System.Windows.Forms.Panel();
@@ -158,7 +158,7 @@
             this.panelLeft.Controls.Add(this.dptTimeEnd);
             this.panelLeft.Controls.Add(this.label2);
             this.panelLeft.Controls.Add(this.label4);
-            this.panelLeft.Controls.Add(this.dtpTimeStart);
+            this.panelLeft.Controls.Add(this.dptTimeStart);
             this.panelLeft.Controls.Add(this.cmbQueryInfo);
             this.panelLeft.Controls.Add(this.label3);
             this.panelLeft.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -336,14 +336,14 @@
             // 
             // dtpTimeStart
             // 
-            this.dtpTimeStart.CustomFormat = "yyyy-MM-dd HH:mm:ss";
-            this.dtpTimeStart.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dtpTimeStart.Location = new System.Drawing.Point(80, 174);
-            this.dtpTimeStart.Name = "dtpTimeStart";
-            this.dtpTimeStart.ShowUpDown = true;
-            this.dtpTimeStart.Size = new System.Drawing.Size(117, 21);
-            this.dtpTimeStart.TabIndex = 6;
-            this.dtpTimeStart.Value = new System.DateTime(2010, 1, 1, 0, 0, 0, 0);
+            this.dptTimeStart.CustomFormat = "yyyy-MM-dd HH:mm:ss";
+            this.dptTimeStart.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dptTimeStart.Location = new System.Drawing.Point(80, 174);
+            this.dptTimeStart.Name = "dtpTimeStart";
+            this.dptTimeStart.ShowUpDown = true;
+            this.dptTimeStart.Size = new System.Drawing.Size(117, 21);
+            this.dptTimeStart.TabIndex = 6;
+            this.dptTimeStart.Value = new System.DateTime(2010, 1, 1, 0, 0, 0, 0);
             // 
             // cmbQueryInfo
             // 
@@ -467,7 +467,7 @@
         private System.Windows.Forms.DateTimePicker dptTimeEnd;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.DateTimePicker dtpTimeStart;
+        private System.Windows.Forms.DateTimePicker dptTimeStart;
         public System.Windows.Forms.ComboBox cmbQueryInfo;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Panel panelRight;
