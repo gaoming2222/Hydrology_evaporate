@@ -14,7 +14,8 @@ namespace Hydrology.Forms
         private static readonly string CS_CMB_Rain = "雨量";
         private static readonly string CS_CMB_Water = "水位";
         private static readonly string CS_CMB_Voltage = "电压";
-        private static readonly string CS_CMB_Eva = "蒸发";
+        private static readonly string CS_CMB_Eva = "蒸发-降雨";
+        private static readonly string CS_CMB_Temp = "温度-电压";
 
         private static readonly string CS_CMB_ViewStyle_All = "图表";
         private static readonly string CS_CMB_ViewStyle_Table = "表格";
@@ -41,7 +42,8 @@ namespace Hydrology.Forms
         private CChartRain m_chartRain;                 //自定义雨量图
         private CChartVoltage m_chartVoltage;           //自定义电压过程线
         private CChartWaterStage m_chartWaterFlow;      //自定义水位流量图
-        private CChartEva m_chartEva;          //自定义蒸发过程线
+        private CChartEva m_chartEva;          //自定义蒸发雨量柱状图
+        private CChartTemp m_chartTemp;          //自定义温度电压过程线
 
         private bool m_bIsEditable = false;         //默认是查询模式
         private bool m_bIsHEva = true;         //默认是小时表
@@ -154,21 +156,21 @@ namespace Hydrology.Forms
             // 初始化测站
             // 初始化查询信息类型
             this.SuspendLayout();
-            cmbQueryInfo.Items.AddRange(new string[] { CS_CMB_Rain, CS_CMB_Water, CS_CMB_Voltage, CS_CMB_Eva });
+            cmbQueryInfo.Items.AddRange(new string[] { CS_CMB_Rain, CS_CMB_Water, CS_CMB_Voltage, CS_CMB_Eva, CS_CMB_Temp });
 
             cmb_RainShape.Items.AddRange(new string[] { CS_CMB_RainShape_Periodrain, CS_CMB_RainShape_Differencerain, CS_CMB_ViewStyle_Dayrain });
 
             cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData });
             // 设置日期
-            this.dtpTimeStart.Format = DateTimePickerFormat.Custom;
+            this.dptTimeStart.Format = DateTimePickerFormat.Custom;
             this.dptTimeEnd.Format = DateTimePickerFormat.Custom;
-            dtpTimeStart.CustomFormat = "yyyy-MM-dd HH:mm:ss";
+            dptTimeStart.CustomFormat = "yyyy-MM-dd HH:mm:ss";
             dptTimeEnd.CustomFormat = "yyyy-MM-dd HH:mm:ss";
 
             TimeSpan span = new TimeSpan(1, 0, 0, 0);
             DateTime now = DateTime.Now;
             dptTimeEnd.Value = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0);
-            dtpTimeStart.Value = dptTimeEnd.Value.Subtract(span);// 减少一天
+            dptTimeStart.Value = dptTimeEnd.Value.Subtract(span);// 减少一天
 
 
             // 
@@ -268,16 +270,21 @@ namespace Hydrology.Forms
             m_chartEva = new CChartEva();
             m_chartEva.Dock = DockStyle.Fill;
 
+            m_chartTemp = new CChartTemp();
+            m_chartTemp.Dock = DockStyle.Fill;
+
             m_panelChart.Controls.Add(m_chartRain);
             m_panelChart.Controls.Add(m_chartVoltage);
             m_panelChart.Controls.Add(m_chartWaterFlow);
             m_panelChart.Controls.Add(m_chartEva);
+            m_panelChart.Controls.Add(m_chartTemp);
 
             panelRight.Controls.Add(m_panelChart);
 
             m_chartVoltage.Visible = false;
             m_chartWaterFlow.Visible = false;
             m_chartEva.Visible = false;
+            m_chartTemp.Visible = false;
 
             m_panelChart.Height = panelRight.Height / 2;
 
@@ -382,6 +389,8 @@ namespace Hydrology.Forms
             m_chartVoltage.InitDataSource(CDBDataMgr.GetInstance().GetVoltageProxy());
             m_chartEva.InitDataSource(CDBDataMgr.GetInstance().GetHEvaProxy());
             m_chartEva.InitDataSource(CDBDataMgr.GetInstance().GetDEvaProxy());
+            m_chartTemp.InitDataSource(CDBDataMgr.GetInstance().GetHEvaProxy());
+            m_chartTemp.InitDataSource(CDBDataMgr.GetInstance().GetDEvaProxy());
 
             List<CEntitySubCenter> listSubCenter = CDBDataMgr.Instance.GetAllSubCenter();
 
@@ -485,6 +494,8 @@ namespace Hydrology.Forms
                 m_chartRain.Show();
                 m_chartVoltage.Hide();
                 m_chartWaterFlow.Hide();
+                m_chartEva.Hide();
+                m_chartTemp.Hide();
                 this.label6.Show();
                 this.cmb_RainShape.Show();
             }
@@ -504,6 +515,7 @@ namespace Hydrology.Forms
                 m_chartVoltage.Hide();
                 m_chartWaterFlow.Show();
                 m_chartEva.Hide();
+                m_chartTemp.Hide();
                 this.label6.Hide();
                 this.cmb_RainShape.Hide();
             }
@@ -522,6 +534,7 @@ namespace Hydrology.Forms
                 m_chartVoltage.Show();
                 m_chartWaterFlow.Hide();
                 m_chartEva.Hide();
+                m_chartTemp.Hide();
                 this.label6.Hide();
                 this.cmb_RainShape.Hide();
             }
@@ -540,6 +553,26 @@ namespace Hydrology.Forms
                 m_chartVoltage.Hide();
                 m_chartWaterFlow.Hide();
                 m_chartEva.Show();
+                m_chartTemp.Hide();
+                this.label6.Hide();
+                this.cmb_RainShape.Hide();
+            }
+            else if (cmbQueryInfo.Text.Equals(CS_CMB_Temp))
+            {
+                //查询蒸发数据
+                cmb_TimeSelect.Items.Clear();
+                cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_DayData });
+                cmb_TimeSelect.SelectedIndex = 0;
+                m_dgvRain.Hide();
+                m_dgvWater.Hide();
+                m_dgvVoltage.Hide();
+                m_dgvEva.Show();
+                // 图形
+                m_chartRain.Hide();
+                m_chartVoltage.Hide();
+                m_chartWaterFlow.Hide();
+                m_chartEva.Hide();
+                m_chartTemp.Show();
                 this.label6.Hide();
                 this.cmb_RainShape.Hide();
             }
@@ -547,16 +580,24 @@ namespace Hydrology.Forms
 
         private void cmbTimeSelect_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cmbQueryInfo.Text.Equals(CS_CMB_Eva))
+            if (cmbQueryInfo.Text.Equals(CS_CMB_Eva)|| cmbQueryInfo.Text.Equals(CS_CMB_Temp))
             {
                 if (cmb_TimeSelect.Text.Equals(CS_CMB_TimeData))
                 {
                     IsHEva = true;
+                    dptTimeStart.Value = dptTimeEnd.Value.AddDays(-1);// 减少一天
                 }
                 else
                 {
                     IsHEva = false;
+                    DateTime now = DateTime.Now;
+                    int day = now.Day;
+                    dptTimeStart.Value = day >= 15 ? new DateTime(now.Year, now.Month, 15, 0, 0 ,0) : new DateTime(now.Year, now.Month, 1, 0, 0, 0);
                 }
+            }
+            else
+            {
+                dptTimeStart.Value = dptTimeEnd.Value.AddDays(-1);// 减少一天
             }
         }
 
@@ -655,7 +696,7 @@ namespace Hydrology.Forms
                 return;
             }
             // 判断开始时间是否小于结束时间
-            if (dtpTimeStart.Value >= dptTimeEnd.Value)
+            if (dptTimeStart.Value >= dptTimeEnd.Value)
             {
                 MessageBox.Show("开始时间必须小于结束时间");
                 return;
@@ -706,10 +747,10 @@ namespace Hydrology.Forms
                         return;// 退出查询
                     }
                 }
-                if (m_dgvRain.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value, TimeSelect))
+                if (m_dgvRain.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect))
                 {
                     // 如果查询成功
-                    m_chartRain.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value, cmb_RainShape.SelectedIndex, TimeSelect);
+                    m_chartRain.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, cmb_RainShape.SelectedIndex, TimeSelect);
                 }
 
                 m_dgvRain.UpdateDataToUI();
@@ -744,9 +785,9 @@ namespace Hydrology.Forms
                         return;// 退出查询
                     }
                 }
-                if (m_dgvWater.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value, TimeSelect))
+                if (m_dgvWater.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect))
                 {
-                    m_chartWaterFlow.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value, TimeSelect);
+                    m_chartWaterFlow.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect);
                 }
                 m_dgvWater.UpdateDataToUI();
                 #endregion 水位
@@ -782,9 +823,9 @@ namespace Hydrology.Forms
                     }
                 }
                 bool updateData = false;
-                if (m_dgvVoltage.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value, TimeSelect))
+                if (m_dgvVoltage.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect))
                 {
-                    updateData = m_chartVoltage.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value, TimeSelect);
+                    updateData = m_chartVoltage.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect);
                 }
                 //if (updateData == true)
                 //{
@@ -823,9 +864,47 @@ namespace Hydrology.Forms
                     }
                 }
                 bool updateData = false;
-                if (m_dgvEva.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value))
+                if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value))
                 {
-                    updateData = m_chartEva.SetFilter(stationId, dtpTimeStart.Value, dptTimeEnd.Value, TimeSelect);
+                    updateData = m_chartEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect);
+                }
+                m_dgvEva.UpdateDataToUI();
+                #endregion 蒸发数据
+            }
+            else if (cmbQueryInfo.Text.Equals(CS_CMB_Temp))
+            {
+                #region 温度数据
+                // 查询蒸发
+                if (m_dgvEva.IsModifiedUnSaved())
+                {
+                    DialogResult result = MessageBox.Show("当前所做修改尚未保存，强行查询会导致修改丢失,是否保存？", "提示", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                    if (DialogResult.Yes == result)
+                    {
+                        // 保存当前修改
+                        if (DoSave())
+                        {
+                            // 保存成功以后， 继续查询
+                        }
+                        else
+                        {
+                            // 保存失败，不查询
+                            return;
+                        }
+                    }
+                    else if (DialogResult.No == result)
+                    {
+                        //直接退出
+                    }
+                    else if (DialogResult.Cancel == result)
+                    {
+                        this.Close();
+                        return;// 退出查询
+                    }
+                }
+                bool updateData = false;
+                if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value))
+                {
+                    updateData = m_chartTemp.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect);
                 }
                 m_dgvEva.UpdateDataToUI();
                 #endregion 蒸发数据
