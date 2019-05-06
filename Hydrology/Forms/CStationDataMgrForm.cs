@@ -26,7 +26,7 @@ namespace Hydrology.Forms
         private static readonly string CS_CMB_ViewStyle_Dayrain = "日雨量";
 
         private static readonly string CS_CMB_AllData = "全部数据";
-        private static readonly string CS_CMB_TimeData = "整点数据";
+        private static readonly string CS_CMB_TimeData = "时段数据";
         private static readonly string CS_CMB_DayData = "日数据";
 
         private readonly string CS_All_Station = "所有站点";
@@ -156,7 +156,7 @@ namespace Hydrology.Forms
             // 初始化测站
             // 初始化查询信息类型
             this.SuspendLayout();
-            cmbQueryInfo.Items.AddRange(new string[] { CS_CMB_Rain, CS_CMB_Water, CS_CMB_Voltage, CS_CMB_Eva, CS_CMB_Temp });
+            cmbQueryInfo.Items.AddRange(new string[] { CS_CMB_Eva, CS_CMB_Rain, CS_CMB_Water, CS_CMB_Voltage,  CS_CMB_Temp });
 
             cmb_RainShape.Items.AddRange(new string[] { CS_CMB_RainShape_Periodrain, CS_CMB_RainShape_Differencerain, CS_CMB_ViewStyle_Dayrain });
 
@@ -185,6 +185,7 @@ namespace Hydrology.Forms
             this.cmbStation.Size = new System.Drawing.Size(117, 20);
             this.cmbStation.TabIndex = 1;
             this.panelLeft.Controls.Add(this.cmbStation);
+            this.cmbStation.SelectedIndexChanged += new EventHandler(EHStationChanged);
 
 
             #region 表
@@ -321,7 +322,15 @@ namespace Hydrology.Forms
 
             this.cmb_SubCenter.SelectedIndexChanged += new EventHandler(EHSubCenterChanged);
         }
-
+        private void EHStationChanged(object sender, EventArgs e)
+        {
+            int i = 0;
+        }
+        /// <summary>
+        /// 分中心变动
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void EHSubCenterChanged(object sender, EventArgs e)
         {
             this.cmbStation.Text = "";

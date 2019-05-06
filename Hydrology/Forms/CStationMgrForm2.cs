@@ -78,6 +78,7 @@ namespace Hydrology.Forms
                 cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.ERainFall));
                 cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.ERiverWater));
                 cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.EHydrology));
+                cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.EEva));
                 // 初始化雨量精度
 
                 cmb_RainAccuracy.Items.Add("0.1");
@@ -561,7 +562,7 @@ namespace Hydrology.Forms
                     // 设置了水位最小值
                     station.DWaterMin = Decimal.Parse(textBox_WaterMin.Text.Trim());
                 }
-                if (station.StationType == EStationType.ERainFall || station.StationType == EStationType.EHydrology)
+                if (station.StationType == EStationType.ERainFall || station.StationType == EStationType.EHydrology || station.StationType == EStationType.EEva)
                 {
                     // 雨量精度不能为空
                     try

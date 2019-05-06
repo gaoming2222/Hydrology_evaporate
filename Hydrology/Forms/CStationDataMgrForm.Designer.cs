@@ -334,12 +334,12 @@
             this.label4.TabIndex = 5;
             this.label4.Text = "结束时间：";
             // 
-            // dtpTimeStart
+            // dptTimeStart
             // 
             this.dptTimeStart.CustomFormat = "yyyy-MM-dd HH:mm:ss";
             this.dptTimeStart.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dptTimeStart.Location = new System.Drawing.Point(80, 174);
-            this.dptTimeStart.Name = "dtpTimeStart";
+            this.dptTimeStart.Name = "dptTimeStart";
             this.dptTimeStart.ShowUpDown = true;
             this.dptTimeStart.Size = new System.Drawing.Size(117, 21);
             this.dptTimeStart.TabIndex = 6;
@@ -414,7 +414,7 @@
             // 
             // m_lablePageIndex
             // 
-            this.m_lablePageIndex.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.m_lablePageIndex.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.m_lablePageIndex.AutoSize = true;
             this.m_lablePageIndex.Location = new System.Drawing.Point(4, 7);

@@ -338,7 +338,7 @@ namespace Hydrology.CControls
                         Station.Watersensor = base.Rows[m_listEditedRows[i]].Cells[CS_Watersensor].Value.ToString();
                         Station.Reportinterval = base.Rows[m_listEditedRows[i]].Cells[CS_Reportinterval].Value.ToString();
                     }
-                    else if (Station.StationType == EStationType.EHydrology)
+                    else if (Station.StationType == EStationType.EHydrology || Station.StationType == EStationType.EEva)
                     {
                         Station.DWaterBase = CStringFromatHelper.ConvertToNullableDecimal(base.Rows[m_listEditedRows[i]].Cells[CS_WBase].Value.ToString());
                         Station.DWaterMax = CStringFromatHelper.ConvertToNullableDecimal(base.Rows[m_listEditedRows[i]].Cells[CS_WMax].Value.ToString());
@@ -420,6 +420,7 @@ namespace Hydrology.CControls
                     cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.ERainFall));
                     cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.ERiverWater));
                     cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.EHydrology));
+                    cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.EEva));
                     base.SetColumnEditStyle(listHeader.IndexOf(CS_Stationtype), cmb_StationType);
 
 
@@ -765,7 +766,7 @@ namespace Hydrology.CControls
                         }
                     }
                 }
-                else if (station.StationType == EStationType.EHydrology)
+                else if (station.StationType == EStationType.EHydrology || station.StationType == EStationType.EEva)
                 {
                     if (station.DRainAccuracy.ToString() == "无")
                     {
@@ -1059,7 +1060,7 @@ namespace Hydrology.CControls
                         "无", s.Reportinterval.ToString()
                                         }, EDataState.ENormal);
                     }
-                    else if (s.StationType == EStationType.EHydrology)
+                    else if (s.StationType == EStationType.EHydrology || station.StationType == EStationType.EEva)
                     {
                         base.AddRow(new string[]
                     {

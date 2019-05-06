@@ -2507,6 +2507,7 @@ namespace Hydrology.DataMgr
                     Eva.Rain = data.TotalRain;
                     Eva.Voltage = data.Voltage;
                     Eva.type = data.EvpType;
+                    
 
                     cDic = cal.EvaCal(Eva);
                     if (cDic.Count == 0)
@@ -2575,6 +2576,10 @@ namespace Hydrology.DataMgr
                 realtime.DH = decimal.Parse(cDic["dH"]);
                 realtime.TimeReceived = args.RecvDataTime;
                 realtime.TimeDeviceGained = args.Datas[tmpDataCount - 1].DataTime; //采集时间
+                realtime.RawEva = args.Datas[tmpDataCount - 1].Eva;
+                realtime.RawRain = args.Datas[tmpDataCount - 1].TotalRain;
+                realtime.RawVoltage = args.Datas[tmpDataCount - 1].Voltage;
+                realtime.act = args.Datas[tmpDataCount - 1].EvpType;
 
                 // 发消息，通知界面更新
                 if (RecvedRTD_Eva != null)

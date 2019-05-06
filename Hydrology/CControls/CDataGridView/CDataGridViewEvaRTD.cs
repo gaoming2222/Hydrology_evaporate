@@ -19,9 +19,14 @@ namespace Hydrology.CControls
         public static readonly string CS_StationType = "站点类型";
         public static readonly string CS_TimeCollected = "采集时间";
         public static readonly string CS_TimeReceived = "接收时间";
-        public static readonly string CS_Eva = "蒸发";
-        public static readonly string CS_Rain = "雨量";
-        public static readonly string CS_Temp = "温度";
+        public static readonly string CS_Eva = "时段蒸发";
+        public static readonly string CS_Rain = "时段雨量";
+        public static readonly string CS_Temp = "蒸发器水温";
+        public static readonly string CS_RawE = "蒸发器液位";
+        public static readonly string CS_RawP = "雨量器液位";
+        //public static readonly string CS_RawT = "蒸发器水温";
+        public static readonly string CS_RawV = "电池电压";
+        public static readonly string CS_ACT = "排注水操作";
         public static readonly string CS_DH = "高度差";
         public static readonly string CS_NullUIStr = "---";
         #endregion ///<STATIC_STRING
@@ -43,10 +48,12 @@ namespace Hydrology.CControls
             {
                 CS_StationID, CS_StationName, CS_StationType, CS_TimeCollected,
                 CS_TimeReceived,
-                CS_Eva, CS_Rain, CS_Temp,CS_DH
+                CS_Eva, CS_Rain, CS_Temp,
+                CS_RawE,CS_RawP,CS_RawV,CS_ACT,
+                CS_DH
             };
             // 隐藏延迟列，串口列
-            //base.HideColomns = new int[] { 4, 10, 11, 14, 15 };
+            base.HideColomns = new int[] { 12 };
             // 设置一页的数量
             this.PageRowCount = CDBParams.GetInstance().UIPageRowCount;
             //this.PageRowCount = 300;   //  默认一页显示数量
@@ -431,13 +438,24 @@ namespace Hydrology.CControls
             List<string> result = new List<string>();
             result.Add(entity.StrStationID);
             result.Add(entity.StrStationName);
-            result.Add(CEnumHelper.StationTypeToUIStr(entity.StationType));
+            //result.Add(CEnumHelper.StationTypeToUIStr(entity.StationType));
+            result.Add("蒸发站");
             result.Add(entity.TimeDeviceGained.ToString());
             result.Add(entity.TimeReceived.ToString());
-
             result.Add(entity.Eva >= 0 ? entity.Eva.Value.ToString() : CS_NullUIStr);
             result.Add(entity.Rain.HasValue ? entity.Rain.ToString() : CS_NullUIStr);
             result.Add(entity.Temperature.HasValue ? entity.Temperature.ToString() : CS_NullUIStr);
+            result.Add(entity.RawEva >= 0 ? entity.RawEva.Value.ToString() : CS_NullUIStr);
+            result.Add(entity.RawRain >= 0 ? entity.RawRain.Value.ToString() : CS_NullUIStr);
+            result.Add(entity.RawVoltage >= 0 ? entity.RawVoltage.Value.ToString() : CS_NullUIStr);
+            if(entity.act == null)
+            {
+                result.Add(CS_NullUIStr);
+            }
+            else
+            {
+                result.Add(entity.act);
+            }
             result.Add(entity.DH.HasValue ? entity.DH.ToString() : CS_NullUIStr);
             return result;
         }
