@@ -38,6 +38,7 @@
             this.eva_numPk = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
             this.comP_cmb = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.rain_numPk)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dh_numPk)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.eva_numPk)).BeginInit();
@@ -51,10 +52,10 @@
             this.rain_numPk.Size = new System.Drawing.Size(120, 21);
             this.rain_numPk.TabIndex = 0;
             this.rain_numPk.Value = new decimal(new int[] {
-            1,
+            356,
             0,
             0,
-            0});
+            196608});
             // 
             // kp_lbl
             // 
@@ -102,7 +103,7 @@
             this.dh_numPk.Size = new System.Drawing.Size(120, 21);
             this.dh_numPk.TabIndex = 4;
             this.dh_numPk.Value = new decimal(new int[] {
-            1,
+            10,
             0,
             0,
             0});
@@ -124,10 +125,10 @@
             this.eva_numPk.Size = new System.Drawing.Size(120, 21);
             this.eva_numPk.TabIndex = 6;
             this.eva_numPk.Value = new decimal(new int[] {
-            1,
+            1037,
             0,
             0,
-            0});
+            196608});
             // 
             // label3
             // 
@@ -146,11 +147,21 @@
             this.comP_cmb.Size = new System.Drawing.Size(121, 20);
             this.comP_cmb.TabIndex = 10;
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(310, 141);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(17, 12);
+            this.label4.TabIndex = 11;
+            this.label4.Text = "mm";
+            // 
             // CEvaSetForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(371, 298);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.comP_cmb);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -183,5 +194,6 @@
         private System.Windows.Forms.NumericUpDown eva_numPk;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox comP_cmb;
+        private System.Windows.Forms.Label label4;
     }
 }

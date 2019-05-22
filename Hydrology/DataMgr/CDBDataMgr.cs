@@ -129,6 +129,12 @@ namespace Hydrology.DataMgr
         private static int hourInterval;
         private readonly string CONFIG_PATH = "Config/RainIntervalConfig.xml";
 
+
+        Nullable<decimal> lastDayRain = 0;
+        Nullable<decimal> DayRain = 0;
+        Nullable<decimal> lastDayEva = 0;
+        Nullable<decimal> DayEva = 0;
+
         private System.Windows.Forms.Timer aTimer = new System.Windows.Forms.Timer()
         {
             Enabled = false,
@@ -2485,6 +2491,7 @@ namespace Hydrology.DataMgr
                 #region 蒸发表
                 List<CEntityEva> HEvas = new List<CEntityEva>();
                 List<CEntityEva> DEvas = new List<CEntityEva>();
+                
                 foreach (CSingleStationData data in args.Datas)
                 {
                     // 是否和上一条时间一致, 就丢失当条数据
@@ -2502,12 +2509,25 @@ namespace Hydrology.DataMgr
                     CEntityEva Eva = new CEntityEva();
                     Eva.StationID = args.StrStationID;
                     Eva.Eva = data.Eva;
+                    Eva.TE = data.Eva;
                     Eva.TimeCollect = data.DataTime;
                     Eva.Temperature = data.Temp;
                     Eva.Rain = data.TotalRain;
+                    Eva.TP = data.TotalRain;
                     Eva.Voltage = data.Voltage;
                     Eva.type = data.EvpType;
-                    
+
+
+                    CEntityEva DEva = new CEntityEva();
+                    DEva.StationID = args.StrStationID;
+                    DEva.Eva = data.Eva;
+                    DEva.TE = data.Eva;
+                    DEva.TimeCollect = data.DataTime;
+                    DEva.Temperature = data.Temp;
+                    DEva.Rain = data.TotalRain;
+                    DEva.TP = data.TotalRain;
+                    DEva.Voltage = data.Voltage;
+                    DEva.type = data.EvpType;
 
                     cDic = cal.EvaCal(Eva);
                     if (cDic.Count == 0)
@@ -2516,6 +2536,7 @@ namespace Hydrology.DataMgr
                     }
                     if (cDic.ContainsKey("hourE"))
                     {
+
                         if (cDic["hourE"] != "")
                         {
                             Eva.Eva = decimal.Parse(cDic["hourE"]);
@@ -2523,6 +2544,8 @@ namespace Hydrology.DataMgr
                             Eva.Temperature = decimal.Parse(cDic["hourT"]);
                             Eva.Voltage = decimal.Parse(cDic["hourU"]);
                             Eva.DH = decimal.Parse(cDic["dH"]);
+                            DayEva = DayEva + decimal.Parse(cDic["hourE"]);
+                            DayRain = DayRain + decimal.Parse(cDic["hourP"]);
                             HEvas.Add(Eva);
                         }
                     }
@@ -2530,12 +2553,17 @@ namespace Hydrology.DataMgr
                     {
                         if (cDic["dayE"] != "")
                         {
-                            Eva.Eva = decimal.Parse(cDic["dayE"]);
-                            Eva.Rain = decimal.Parse(cDic["dayP"]);
-                            Eva.Temperature = decimal.Parse(cDic["dayT"]);
-                            Eva.P8 = decimal.Parse(cDic["P8"]);
-                            Eva.P20 = decimal.Parse(cDic["P20"]);
-                            DEvas.Add(Eva);
+                            DEva.Eva = decimal.Parse(cDic["dayE"]);
+                            DEva.Rain = decimal.Parse(cDic["dayP"]);
+                            DEva.Temperature = decimal.Parse(cDic["dayT"]);
+                            DEva.P8 = decimal.Parse(cDic["P8"]);
+                            DEva.P20 = decimal.Parse(cDic["P20"]);
+                            DayEva = 0;
+                            DayRain = 0;
+                            lastDayEva = decimal.Parse(cDic["dayE"]);
+                            lastDayRain = decimal.Parse(cDic["dayP"]);
+
+                            DEvas.Add(DEva);
                         }
                     }
                     if (cDic.ContainsKey("needCover"))
@@ -2560,36 +2588,83 @@ namespace Hydrology.DataMgr
                 #endregion
 
                 #region 实时蒸发表
+                CEntityRealEva realtime = new CEntityRealEva();
                 if (!cDic.ContainsKey("hourE"))
                 {
-                    return;
-                }
-                CEntityRealEva realtime = new CEntityRealEva();
-                realtime.StrStationID = station.StationID;
-                realtime.StationType = station.StationType;
-                realtime.StrStationName = station.StationName;
-                //realtime.EIChannelType = args.EChannelType;
-                realtime.Eva = Decimal.Parse(cDic["hourE"]);
-                realtime.Rain = Decimal.Parse(cDic["hourP"]);
-                realtime.Temperature = Decimal.Parse(cDic["hourT"]);
-                realtime.Voltage = Decimal.Parse(cDic["hourU"]);
-                realtime.DH = decimal.Parse(cDic["dH"]);
-                realtime.TimeReceived = args.RecvDataTime;
-                realtime.TimeDeviceGained = args.Datas[tmpDataCount - 1].DataTime; //采集时间
-                realtime.RawEva = args.Datas[tmpDataCount - 1].Eva;
-                realtime.RawRain = args.Datas[tmpDataCount - 1].TotalRain;
-                realtime.RawVoltage = args.Datas[tmpDataCount - 1].Voltage;
-                realtime.act = args.Datas[tmpDataCount - 1].EvpType;
+                    realtime.StrStationID = station.StationID;
+                    realtime.StationType = station.StationType;
+                    realtime.StrStationName = station.StationName;
+                   
+                    //所有数据为空
+                    realtime.LastDayRain = null;
+                    realtime.LastDayEva = null;
+                    realtime.DayRain = null;
+                    realtime.DayEva = null;
+                    realtime.Eva = null;
+                    realtime.Rain = null;
+                    realtime.Temperature = null;
+                    realtime.Voltage =null;
+                    realtime.DH =null;
 
-                // 发消息，通知界面更新
-                if (RecvedRTD_Eva != null)
+                    realtime.TimeReceived = args.RecvDataTime;
+                    realtime.TimeDeviceGained = args.Datas[tmpDataCount - 1].DataTime; //采集时间
+                    realtime.RawEva = args.Datas[tmpDataCount - 1].Eva;
+                    realtime.RawRain = args.Datas[tmpDataCount - 1].TotalRain;
+                    realtime.RawVoltage = args.Datas[tmpDataCount - 1].Voltage;
+
+                    realtime.LastDayRain = lastDayRain;
+                    realtime.LastDayEva = lastDayEva;
+                    realtime.DayRain = DayRain;
+                    realtime.DayEva = DayEva;
+                    if(args.Datas[tmpDataCount - 1].EvpType != null && (args.Datas[tmpDataCount - 1].EvpType.ToString().Length >= 2)){
+                        realtime.act = args.Datas[tmpDataCount - 1].EvpType;
+                    }
+                    //realtime.act = args.Datas[tmpDataCount - 1].EvpType;
+
+                    // 发消息，通知界面更新
+                    if (RecvedRTD_Eva != null)
+                    {
+                        Task.Factory.StartNew(() => { RecvedRTD_Eva.Invoke(this, new CEventSingleArgs<CEntityRealEva>(realtime)); });
+                    }
+
+                    m_mapStationRTS[station.StationID] = realtime;
+
+                    m_proxyRealEva.AddNewRow(realtime);
+                }
+                else
                 {
-                    Task.Factory.StartNew(() => { RecvedRTD_Eva.Invoke(this, new CEventSingleArgs<CEntityRealEva>(realtime)); });
+                    realtime.StrStationID = station.StationID;
+                    realtime.StationType = station.StationType;
+                    realtime.StrStationName = station.StationName;
+                    //TODO
+                    realtime.LastDayRain = lastDayRain;
+                    realtime.LastDayEva = lastDayEva ;
+                    realtime.DayRain = DayRain;
+                    realtime.DayEva = DayEva;
+                    //realtime.EIChannelType = args.EChannelType;
+                    realtime.Eva = Decimal.Parse(cDic["hourE"]);
+                    realtime.Rain = Decimal.Parse(cDic["hourP"]);
+                    realtime.Temperature = Decimal.Parse(cDic["hourT"]);
+                    realtime.Voltage = Decimal.Parse(cDic["hourU"]);
+                    realtime.DH = decimal.Parse(cDic["dH"]);
+                    realtime.TimeReceived = args.RecvDataTime;
+                    realtime.TimeDeviceGained = args.Datas[tmpDataCount - 1].DataTime; //采集时间
+                    realtime.RawEva = args.Datas[tmpDataCount - 1].Eva;
+                    realtime.RawRain = args.Datas[tmpDataCount - 1].TotalRain;
+                    realtime.RawVoltage = args.Datas[tmpDataCount - 1].Voltage;
+                    realtime.act = args.Datas[tmpDataCount - 1].EvpType;
+
+                    // 发消息，通知界面更新
+                    if (RecvedRTD_Eva != null)
+                    {
+                        Task.Factory.StartNew(() => { RecvedRTD_Eva.Invoke(this, new CEventSingleArgs<CEntityRealEva>(realtime)); });
+                    }
+
+                    m_mapStationRTS[station.StationID] = realtime;
+
+                    m_proxyRealEva.AddNewRow(realtime);
+
                 }
-
-                m_mapStationRTS[station.StationID] = realtime;
-
-                m_proxyRealEva.AddNewRow(realtime);
                 #endregion
             }
             catch (Exception ex)
@@ -3644,5 +3719,9 @@ namespace Hydrology.DataMgr
         }
 
         #endregion
+
+       
+        
+
     } // end of class
 }

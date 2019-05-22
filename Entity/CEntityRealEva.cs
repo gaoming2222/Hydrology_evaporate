@@ -79,6 +79,27 @@ namespace Hydrology.Entity
         /// </summary>
         public Nullable<Decimal> RawVoltage { get; set; }
 
+
+        /// <summary>
+        /// 昨日雨量
+        /// </summary>
+        public Nullable<Decimal> LastDayRain { get; set; }
+
+        /// <summary>
+        /// 昨日蒸发
+        /// </summary>
+        public Nullable<Decimal> LastDayEva { get; set; }
+
+        /// <summary>
+        /// 今日雨量
+        /// </summary>
+        public Nullable<Decimal> DayRain { get; set; }
+
+        /// <summary>
+        /// 今日蒸发
+        /// </summary>
+        public Nullable<Decimal> DayEva { get; set; }
+
         /// <summary>
         /// 批注水操作
         /// </summary>

@@ -55,9 +55,21 @@ namespace Hydrology.Entity
         public decimal? E { get; set; }
 
         /// <summary>
-        /// 日表中的日降雨量
+        /// 日表中的日
         /// </summary>
         public decimal? P { get; set; }
+
+        /// <summary>
+        /// 转换后的蒸发
+        /// </summary>
+        public decimal? TE { get; set; }
+
+        /// <summary>
+        /// 转换后的雨量
+        /// </summary>
+        public decimal? TP { get; set; }
+
+
         /// <summary>
         /// 日表中的8点到20点的雨量和
         /// </summary>

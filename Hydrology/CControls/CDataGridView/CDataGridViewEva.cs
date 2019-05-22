@@ -21,13 +21,13 @@ namespace Hydrology.CControls
         public static readonly string CS_StationID = "站号";
         public static readonly string CS_StationName = "站名";
         public static readonly string CS_TimeCollected = "采集时间";
-        public static readonly string CS_Eva = "蒸发";
-        public static readonly string CS_Rain = "雨量";
-        public static readonly string CS_Voltage = "电压";
+        public static readonly string CS_Eva = "蒸发(mm)";
+        public static readonly string CS_Rain = "雨量(mm)";
+        public static readonly string CS_Voltage = "电压(mm)";
         public static readonly string CS_Temp = "温度值";
-        public static readonly string CS_DH = "高度差";
-        public static readonly string CS_P8 = "8点-20点雨量和";
-        public static readonly string CS_P20 = "20点-8点雨量和";
+        public static readonly string CS_DH = "蒸发器水面高度(mm)";
+        public static readonly string CS_P8 = "8点-20点雨量和(mm)";
+        public static readonly string CS_P20 = "20点-8点雨量和(mm)";
 
         public static readonly string CS_TimeFormat = "yyy-MM-dd HH:mm:ss";
         #endregion  ///<STATIC_STRING
@@ -209,7 +209,7 @@ namespace Hydrology.CControls
                         {
                         strStationId,
                         strStationName,/*站名*/
-                        listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
+                        listEva[i].TimeCollect.Year.ToString() + "年" + listEva[i].TimeCollect.Month.ToString() + "月"  + (listEva[i].TimeCollect.Day-1).ToString() + "日",
                         listEva[i].Eva.ToString(), /*蒸发*/
                         listEva[i].Rain.ToString(), /*雨量*/
                         listEva[i].Temperature.ToString(), /*温度*/
@@ -242,7 +242,8 @@ namespace Hydrology.CControls
                          "False", /*未选中*/
                         m_strStaionId,
                         strStationName,/*站名*/
-                        listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
+                        //listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
+                        listEva[i].TimeCollect.Year.ToString() + "年" + listEva[i].TimeCollect.Month.ToString() + "月"  + (listEva[i].TimeCollect.Day-1).ToString() + "日",
                         listEva[i].Eva.ToString(), /*蒸发*/
                         listEva[i].Rain.ToString(), /*雨量*/
                         listEva[i].Temperature.ToString(), /*温度*/

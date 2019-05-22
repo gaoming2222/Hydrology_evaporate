@@ -18,8 +18,10 @@ namespace Hydrology.DBManager.DB.SQLServer
         public static readonly string CN_DataTime = "DT";    //数据的采集时间
         public static readonly string CN_Temp = "T";  //温度
         public static readonly string CN_Eva = "E";  //蒸发值
+        public static readonly string CN_TEva = "TE";  //转换后的蒸发值
         public static readonly string CN_Voltage = "U";  //电压
         public static readonly string CN_Rain = "P";  //降雨
+        public static readonly string CN_TRain = "TP";  //转换后的降雨
         public static readonly string CN_ACT = "ACT";    //蒸发模式
         //public static readonly string CN_State = "state";
         #endregion
@@ -64,6 +66,9 @@ namespace Hydrology.DBManager.DB.SQLServer
             m_tableDataAdded.Columns.Add(CN_Eva);
             m_tableDataAdded.Columns.Add(CN_Rain);
             m_tableDataAdded.Columns.Add(CN_Voltage);
+
+            m_tableDataAdded.Columns.Add(CN_TEva);
+            m_tableDataAdded.Columns.Add(CN_TRain);
 
             //m_tableDataAdded.Columns.Add(CN_TransType);
 
@@ -164,10 +169,13 @@ namespace Hydrology.DBManager.DB.SQLServer
 
             return;
         }
-
+        /// <summary>
+        /// 增加原始蒸发数据表
+        /// </summary>
+        /// <param name="Eva"></param>
         public void AddNewRow(CEntityEva Eva)
         {
-            m_mutexDataTable.WaitOne(); //等待互斥量
+            //m_mutexDataTable.WaitOne(); //等待互斥量
 
             DataRow row = m_tableDataAdded.NewRow();
             row[CN_StationId] = Eva.StationID;
@@ -176,13 +184,33 @@ namespace Hydrology.DBManager.DB.SQLServer
             row[CN_Eva] = Eva.Eva;
             row[CN_Voltage] = Eva.Voltage;
             row[CN_Rain] = Eva.Rain;
-            row[CN_ACT] = Eva.type; ;
+            row[CN_ACT] = Eva.type; 
+            row[CN_TEva] = Eva.TE;
+            row[CN_TRain] = Eva.TP;
             m_tableDataAdded.Rows.Add(row);
 
             // 如果超过最大值，写入数据库
             NewTask(() => { AddDataToDB(); });
 
-            m_mutexDataTable.ReleaseMutex();
+           //m_mutexDataTable.ReleaseMutex();
+        }
+
+        /// <summary>
+        /// 单条更新蒸发原始数据表
+        /// </summary>
+        /// <param name="sTime"></param>
+        /// <param name="eTime"></param>
+        /// <param name="comP"></param>
+        /// <returns></returns>
+        public bool UpdateRows(string sqlStr)
+        {
+           
+            // 更新数据库
+            if (!this.ExecuteSQLCommand(sqlStr.ToString()))
+            {
+                return false;
+            }
+            return true;
         }
 
         public void AddNewRows(List<CEntityEva> evas)
@@ -451,6 +479,8 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_Voltage, CN_Voltage);
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
                     bulkCopy.ColumnMappings.Add(CN_ACT, CN_ACT);
+                    bulkCopy.ColumnMappings.Add(CN_TRain, CN_TRain);
+                    bulkCopy.ColumnMappings.Add(CN_TEva, CN_TEva);
 
                     try
                     {

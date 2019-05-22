@@ -19,15 +19,21 @@ namespace Hydrology.CControls
         public static readonly string CS_StationType = "站点类型";
         public static readonly string CS_TimeCollected = "采集时间";
         public static readonly string CS_TimeReceived = "接收时间";
-        public static readonly string CS_Eva = "时段蒸发";
-        public static readonly string CS_Rain = "时段雨量";
-        public static readonly string CS_Temp = "蒸发器水温";
-        public static readonly string CS_RawE = "蒸发器液位";
-        public static readonly string CS_RawP = "雨量器液位";
+
+        public static readonly string CS_LastDayRain = "昨日降雨(mm)";
+        public static readonly string CS_LastDayEva = "昨日蒸发(mm)";
+        public static readonly string CS_DayRain= "当前降雨(mm)";
+        public static readonly string CS_DayEva = "当前蒸发(mm)";
+
+        public static readonly string CS_Eva = "时段蒸发(mm)";
+        public static readonly string CS_Rain = "时段雨量(mm)";
+        public static readonly string CS_Temp = "蒸发器水温(℃)";
+        public static readonly string CS_RawE = "蒸发器液位(mm)";
+        public static readonly string CS_RawP = "雨量器液位(mm)";
         //public static readonly string CS_RawT = "蒸发器水温";
-        public static readonly string CS_RawV = "电池电压";
+        public static readonly string CS_RawV = "电池电压(V)";
         public static readonly string CS_ACT = "排注水操作";
-        public static readonly string CS_DH = "高度差";
+        public static readonly string CS_DH = "高度差(mm)";
         public static readonly string CS_NullUIStr = "---";
         #endregion ///<STATIC_STRING
 
@@ -46,14 +52,14 @@ namespace Hydrology.CControls
             // 设定标题栏,默认有个隐藏列
             this.Header = new string[] 
             {
-                CS_StationID, CS_StationName, CS_StationType, CS_TimeCollected,
-                CS_TimeReceived,
+                CS_StationName,  CS_StationID,CS_StationType, CS_TimeCollected,
+                CS_TimeReceived,CS_LastDayRain,CS_LastDayEva,CS_DayRain,CS_DayEva,
                 CS_Eva, CS_Rain, CS_Temp,
                 CS_RawE,CS_RawP,CS_RawV,CS_ACT,
                 CS_DH
             };
             // 隐藏延迟列，串口列
-            base.HideColomns = new int[] { 12 };
+            base.HideColomns = new int[] { 2,4,16 };
             // 设置一页的数量
             this.PageRowCount = CDBParams.GetInstance().UIPageRowCount;
             //this.PageRowCount = 300;   //  默认一页显示数量
@@ -436,12 +442,19 @@ namespace Hydrology.CControls
         private List<string> GetUIShowStringList(CEntityRealEva entity)
         {
             List<string> result = new List<string>();
-            result.Add(entity.StrStationID);
             result.Add(entity.StrStationName);
+            result.Add(entity.StrStationID);
+           
             //result.Add(CEnumHelper.StationTypeToUIStr(entity.StationType));
             result.Add("蒸发站");
             result.Add(entity.TimeDeviceGained.ToString());
             result.Add(entity.TimeReceived.ToString());
+
+            result.Add(entity.LastDayRain >= 0 ? entity.LastDayRain.Value.ToString() : CS_NullUIStr);
+            result.Add(entity.LastDayEva >= 0 ? entity.LastDayEva.Value.ToString() : CS_NullUIStr);
+            result.Add(entity.DayRain >= 0 ? entity.DayRain.Value.ToString() : CS_NullUIStr);
+            result.Add(entity.DayEva >= 0 ? entity.DayEva.Value.ToString() : CS_NullUIStr);
+
             result.Add(entity.Eva >= 0 ? entity.Eva.Value.ToString() : CS_NullUIStr);
             result.Add(entity.Rain.HasValue ? entity.Rain.ToString() : CS_NullUIStr);
             result.Add(entity.Temperature.HasValue ? entity.Temperature.ToString() : CS_NullUIStr);
@@ -452,9 +465,23 @@ namespace Hydrology.CControls
             {
                 result.Add(CS_NullUIStr);
             }
+            else if(entity.act.Contains("PP"))
+            {
+                result.Add("雨量筒排水" + entity.TimeDeviceGained.ToString());
+            }else if (entity.act.Contains("PE"))
+            {
+                result.Add("蒸发器排水" + entity.TimeDeviceGained.ToString());
+            }else if (entity.act.Contains("ZE"))
+            {
+                result.Add("蒸发器补水" + entity.TimeDeviceGained.ToString());
+            }
+            else if (entity.act.Contains("ER"))
+            {
+                result.Add("异常扰动" + entity.TimeDeviceGained.ToString());
+            }
             else
             {
-                result.Add(entity.act);
+                result.Add(CS_NullUIStr);
             }
             result.Add(entity.DH.HasValue ? entity.DH.ToString() : CS_NullUIStr);
             return result;
