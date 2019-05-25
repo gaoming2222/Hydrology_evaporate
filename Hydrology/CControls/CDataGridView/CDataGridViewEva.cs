@@ -28,13 +28,16 @@ namespace Hydrology.CControls
         public static readonly string CS_DH = "蒸发器水面高度(mm)";
         public static readonly string CS_P8 = "8点-20点雨量和(mm)";
         public static readonly string CS_P20 = "20点-8点雨量和(mm)";
-
+        public static readonly string CS_RawEva = "蒸发器示数(mm)";
+        public static readonly string CS_RawRain = "雨量筒示数(mm)";
         public static readonly string CS_TimeFormat = "yyy-MM-dd HH:mm:ss";
+        public static readonly string CS_RawACT = "排注水操作";
         #endregion  ///<STATIC_STRING
 
         #region 数据成员
         private bool m_bIsEditable; //编辑模式，默认非编辑模式
         private bool m_bIsHEva; //表格类型，默认为小时表
+        private bool m_isREva;
         private List<CEntityEva> m_listUpdated; //更新的蒸发记录
         private List<long> m_listDeleteSanilities;    //删除的蒸发记
         private List<String> m_listDeleteSanilities_StationId;    //删除的蒸发记录
@@ -42,8 +45,9 @@ namespace Hydrology.CControls
         private List<CEntityEva> m_listAddedEva;   //新增的蒸发记录
 
         // 查询相关信息
-        private IHEvaProxy m_proxyHEva;   //蒸发表的操作接口
-        private IDEvaProxy m_proxyDEva;   //蒸发表的操作接口
+        private IHEvaProxy m_proxyHEva;   //蒸发小时表的操作接口
+        private IDEvaProxy m_proxyDEva;   //蒸发日表的操作接口
+        private IEvaProxy m_proxyEva;     //蒸发原始表操作接口
         private string m_strStaionId;            //查询的测站ID
         private DateTime m_dateTimeStart;   //查询的起点日期
         private DateTime m_dateTimeEnd;     //查询的起点日期
@@ -63,6 +67,13 @@ namespace Hydrology.CControls
             get { return m_bIsHEva; }
             set { SetHEva(value); }
         }
+
+        public bool IsREva
+        {
+            get { return m_bIsHEva; }
+            set { SetREva(value); }
+        }
+
         #endregion ///<PROPERTY
 
         #region 公共方法
@@ -82,11 +93,15 @@ namespace Hydrology.CControls
             // 初始化成员变量
             m_bIsEditable = false; // 默认是非编辑模式
             m_bIsHEva = true;  // 默认是小时表
+            m_isREva = false;
             m_listUpdated = new List<CEntityEva>();
             m_listDeleteSanilities = new List<long>();
             m_listDeleteSanilities_StationId = new List<String>();
             m_listDeleteSanilities_StationDate = new List<String>();
             m_listAddedEva = new List<CEntityEva>();
+
+            //初始话原始蒸发信息表
+            m_proxyEva = CDBDataMgr.GetInstance().GetEvaProxy();
 
         }
 
@@ -116,6 +131,62 @@ namespace Hydrology.CControls
             // 判断状态值
             List<string[]> newRows = new List<string[]>();
             List<EDataState> states = new List<EDataState>();
+            //if (m_isREva)
+            //{
+            //    if (!m_bIsEditable)
+            //    {
+            //        string[] newRow;
+            //        // 只读模式
+            //        for (int i = 0; i < listEva.Count; ++i)
+            //        {
+            //            EDataState state = EDataState.ENormal; //默认所有数据都是正常的
+            //            string strStationName = "";
+            //            string strStationId = "";
+            //            CEntityStation station = CDBDataMgr.Instance.GetStationById(listEva[i].StationID);
+            //            if (null != station)
+            //            {
+
+            //                strStationName = station.StationName;
+            //                strStationId = station.StationID;
+            //            }
+            //            string act = "--";
+            //            if (listEva[i] != null)
+            //            {
+            //                if (listEva[i].ToString().Contains("PP")){
+            //                    act = "雨量筒排水";
+            //                }
+            //                if (listEva[i].ToString().Contains("PE"))
+            //                {
+            //                    act = "蒸发器排水"; 
+            //                }
+            //                if (listEva[i].ToString().Contains("ZE"))
+            //                {
+            //                    act = "蒸发器补水";
+            //                }
+            //                if (listEva[i].ToString().Contains("ER"))
+            //                {
+            //                    act = "异常扰动";
+            //                }
+            //            }
+            //            newRow = new string[]
+            //            {
+            //            strStationId,
+            //            strStationName,/*站名*/
+            //            listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
+            //            listEva[i].Eva.ToString(), /*蒸发*/
+            //            listEva[i].Rain.ToString(), /*雨量*/
+            //            listEva[i].Temperature.ToString(), /*温度*/
+            //            //listEva[i].Voltage.ToString(), /*电压*/
+            //            act /*排注水操作*/
+            //            };
+            //            newRows.Add(newRow);
+            //            states.Add(state);
+            //        }
+            //        // 添加到集合的数据表中
+            //        base.AddRowRange(newRows, states);
+            //    }
+
+            //}
             if (m_bIsHEva)
             {
                 if (!m_bIsEditable)
@@ -261,13 +332,96 @@ namespace Hydrology.CControls
             }
         }
 
+
+
+        public void SetREva(List<CEntityEva> listEva)
+        {
+            base.m_dataTable.Rows.Clear();
+            List<string[]> newRows = new List<string[]>();
+            List<EDataState> states = new List<EDataState>();
+            if (!m_bIsEditable)
+            {
+                string[] newRow;
+                // 只读模式
+                for (int i = 0; i < listEva.Count; ++i)
+                {
+                    EDataState state = EDataState.ENormal; //默认所有数据都是正常的
+                    string strStationName = "";
+                    string strStationId = "";
+                    CEntityStation station = CDBDataMgr.Instance.GetStationById(listEva[i].StationID);
+                    if (null != station)
+                    {
+
+                        strStationName = station.StationName;
+                        strStationId = station.StationID;
+                    }
+                    string act = "--";
+                    if (listEva[i] != null)
+                    {
+                        if (listEva[i].act.ToString().Contains("PP"))
+                        {
+                            act = "雨量筒排水";
+                        }
+                        if (listEva[i].act.ToString().Contains("PE"))
+                        {
+                            act = "蒸发器排水";
+                        }
+                        if (listEva[i].act.ToString().Contains("ZE"))
+                        {
+                            act = "蒸发器补水";
+                        }
+                        if (listEva[i].act.ToString().Contains("ER"))
+                        {
+                            act = "异常扰动";
+                        }
+                    }
+                    newRow = new string[]
+                    {
+                        strStationId,
+                        strStationName,/*站名*/
+                        listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
+                        listEva[i].Eva.ToString(), /*蒸发*/
+                        listEva[i].Rain.ToString(), /*雨量*/
+                        listEva[i].Temperature.ToString(), /*温度*/
+                        //listEva[i].Voltage.ToString(), /*电压*/
+                        act /*蒸发模式*/
+                    };
+
+                    newRows.Add(newRow);
+                    states.Add(state);
+                }
+                // 添加到集合的数据表中
+                base.AddRowRange(newRows, states);
+            }
+        }
+
         // 设置查询条件
-        public bool SetFilter(string strStationId, DateTime timeStart, DateTime timeEnd)
+        public bool SetFilter(string strStationId, DateTime timeStart, DateTime timeEnd,bool isRawData)
         {
             ClearAllState();
             m_strStaionId = strStationId;
             m_dateTimeStart = timeStart;
             m_dateTimeEnd = timeEnd;
+            if (isRawData)
+            {
+                //TODO
+                m_proxyEva.SetFilter(strStationId, timeStart, timeEnd,true);
+                if (-1 == m_proxyEva.GetPageCount())
+                {
+                    // 查询失败
+                    MessageBox.Show("数据库忙，查询失败，请稍后再试！");
+                    return false;
+                }
+                else
+                {
+                    // 并查询数据，显示第一页
+                    this.OnMenuFirstPage(this, null);
+                    base.TotalPageCount = m_proxyHEva.GetPageCount();
+                    base.TotalRowCount = m_proxyHEva.GetRowCount();
+                    SetREva(m_proxyEva.GetPageData(1, false));
+                    return true;
+                }
+            }
             if (m_bIsHEva)
             {
                 m_proxyHEva.SetFilter(strStationId, timeStart, timeEnd);
@@ -492,9 +646,26 @@ namespace Hydrology.CControls
             }
         }
 
+        public void SetREva(bool bIsREva)
+        {
+            if (bIsREva)
+            {
+                if (!m_bIsEditable)
+                {
+                    //  是原始蒸发表
+                    this.Header = new string[]
+                    {
+                        CS_StationID,CS_StationName,CS_TimeCollected, CS_RawEva, CS_RawRain, CS_Temp, CS_RawACT
+                    };
+                }
+            }
+            
+        }
+
         public void SetHEva(bool bIsHEva)
         {
             m_bIsHEva = bIsHEva;
+
             if (!m_bIsHEva)
             {
                 if (!m_bIsEditable)
