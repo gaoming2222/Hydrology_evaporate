@@ -26,8 +26,9 @@ namespace Hydrology.Forms
         private static readonly string CS_CMB_ViewStyle_Dayrain = "日雨量";
 
         private static readonly string CS_CMB_AllData = "全部数据";
-        private static readonly string CS_CMB_TimeData = "时段数据";
+        private static readonly string CS_CMB_TimeData = "小时数据";
         private static readonly string CS_CMB_DayData = "日数据";
+        private static readonly string CS_CMB_RawData = "原始数据";
 
         private readonly string CS_All_Station = "所有站点";
         #endregion ///<静态常量
@@ -61,11 +62,13 @@ namespace Hydrology.Forms
             get { return m_bIsHEva; }
             set { SetHEva(value); }
         }
+        private bool isRawData;
         #endregion ///<PREOPERTY
 
         #region 公共方法
         public CStationDataMgrForm()
         {
+            isRawData = false;
             InitializeComponent();
 
             // 自定义初始化
@@ -160,7 +163,7 @@ namespace Hydrology.Forms
 
             cmb_RainShape.Items.AddRange(new string[] { CS_CMB_RainShape_Periodrain, CS_CMB_RainShape_Differencerain, CS_CMB_ViewStyle_Dayrain });
 
-            cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData });
+            cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData, CS_CMB_RawData });
             // 设置日期
             this.dptTimeStart.Format = DateTimePickerFormat.Custom;
             this.dptTimeEnd.Format = DateTimePickerFormat.Custom;
@@ -551,7 +554,7 @@ namespace Hydrology.Forms
             {
                 //查询蒸发数据
                 cmb_TimeSelect.Items.Clear();
-                cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_DayData });
+                cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_DayData, CS_CMB_RawData });
                 cmb_TimeSelect.SelectedIndex = 0;
                 m_dgvRain.Hide();
                 m_dgvWater.Hide();
@@ -594,6 +597,10 @@ namespace Hydrology.Forms
                 if (cmb_TimeSelect.Text.Equals(CS_CMB_TimeData))
                 {
                     IsHEva = true;
+                    dptTimeStart.Value = dptTimeEnd.Value.AddDays(-1);// 减少一天
+                }else if (cmb_TimeSelect.Text.Equals(CS_CMB_RawData))
+                {
+                    isRawData = true;
                     dptTimeStart.Value = dptTimeEnd.Value.AddDays(-1);// 减少一天
                 }
                 else

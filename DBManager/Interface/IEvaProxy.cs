@@ -38,6 +38,9 @@ namespace Hydrology.DBManager.Interface
         /// <returns>-1 表示查询失败</returns>
         int GetRowCount();
 
+
+        bool UpdateRows(string sqlStr);
+
         List<CEntityEva> GetPageData(int pageIndex,bool irefresh);
 
         List<CEntityEva> getEvabyTime(string stationid, DateTime start, DateTime end);

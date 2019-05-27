@@ -185,7 +185,7 @@
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(65, 12);
             this.label9.TabIndex = 22;
-            this.label9.Text = "整点选择：";
+            this.label9.Text = "时段选择：";
             // 
             // cmb_SubCenter
             // 
@@ -242,7 +242,7 @@
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(65, 12);
             this.label5.TabIndex = 13;
-            this.label5.Text = "图表选择：";
+            this.label5.Text = "展示形式：";
             // 
             // btnNewRecord
             // 
@@ -323,7 +323,7 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(65, 12);
             this.label2.TabIndex = 2;
-            this.label2.Text = "查询信息：";
+            this.label2.Text = "数据类别：";
             // 
             // label4
             // 
