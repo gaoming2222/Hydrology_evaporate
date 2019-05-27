@@ -316,7 +316,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     "select top " + topcount.ToString() + " row_number() over( order by " + CN_DataTime + " ) as " + CN_RowId + ",* " +
                     "from " + CT_TableName + " " +
                     "where " + CN_StationId + "=" + m_strStaionId.ToString() + " " +
-                    "and " + TimeSelectString + CN_DataTime + " between " + DateTimeToDBStr(m_startTime) +
+                    "and "  + CN_DataTime + " between " + DateTimeToDBStr(m_startTime) +
                     "and " + DateTimeToDBStr(m_endTime) +
                     ") as tmp1 " +
                     "where " + CN_RowId + ">" + rowidmim.ToString() +
@@ -336,7 +336,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     "select top " + topcount.ToString() + " row_number() over( order by " + CN_DataTime + " ) as " + CN_RowId + ",* " +
                     "from " + CT_TableName + " " +
                     "where " + CN_StationId + "=" + m_strStaionId.ToString() + " " +
-                    "and " + TimeSelectString + CN_DataTime + " between " + DateTimeToDBStr(m_startTime) +
+                    "and " + CN_DataTime + " between " + DateTimeToDBStr(m_startTime) +
                     "and " + DateTimeToDBStr(m_endTime) +
                     ") as tmp1 " +
                     "where " + CN_RowId + ">" + rowidmim.ToString() +
@@ -379,7 +379,8 @@ namespace Hydrology.DBManager.DB.SQLServer
                 {
                     Eva.Rain = Decimal.Parse(table.Rows[startRow][CN_Rain].ToString());
                 }
-                Eva.type = table.Rows[startRow][CN_ACT].ToString(); ;
+                Eva.type = table.Rows[startRow][CN_ACT].ToString(); 
+                Eva.act = table.Rows[startRow][CN_ACT].ToString(); 
                 result.Add(Eva);
             }
             return result;

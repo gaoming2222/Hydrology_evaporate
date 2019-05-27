@@ -48,6 +48,8 @@ namespace Hydrology.Forms
 
         private bool m_bIsEditable = false;         //默认是查询模式
         private bool m_bIsHEva = true;         //默认是小时表
+        private bool m_bIsREva = false;         //默认是小时表
+
         private List<CEntityStation> m_listStations; //所有水情站点的引用
         #endregion  ///<DATA_MENBER
 
@@ -61,6 +63,12 @@ namespace Hydrology.Forms
         {
             get { return m_bIsHEva; }
             set { SetHEva(value); }
+        }
+
+        public bool IsREva
+        {
+            get { return m_bIsREva; }
+            set { SetREva(value); }
         }
         private bool isRawData;
         #endregion ///<PREOPERTY
@@ -147,6 +155,20 @@ namespace Hydrology.Forms
             else
             {
                 m_dgvEva.IsHEva = false;
+            }
+        }
+
+
+        public void SetREva(bool bIsREva)
+        {
+            m_bIsREva = bIsREva;
+            if (m_bIsREva)
+            {
+                m_dgvEva.IsREva = true;
+            }
+            else
+            {
+                m_dgvEva.IsREva = false;
             }
         }
 
@@ -596,16 +618,22 @@ namespace Hydrology.Forms
             {
                 if (cmb_TimeSelect.Text.Equals(CS_CMB_TimeData))
                 {
+                    IsREva = false;
                     IsHEva = true;
+                    isRawData = false;
                     dptTimeStart.Value = dptTimeEnd.Value.AddDays(-1);// 减少一天
                 }else if (cmb_TimeSelect.Text.Equals(CS_CMB_RawData))
                 {
                     isRawData = true;
+                    IsHEva = false;
+                    IsREva = true;
                     dptTimeStart.Value = dptTimeEnd.Value.AddDays(-1);// 减少一天
                 }
                 else
                 {
                     IsHEva = false;
+                    IsREva = false;
+                    isRawData = false;
                     DateTime now = DateTime.Now;
                     int day = now.Day;
                     dptTimeStart.Value = day >= 15 ? new DateTime(now.Year, now.Month, 15, 0, 0 ,0) : new DateTime(now.Year, now.Month, 1, 0, 0, 0);
@@ -880,9 +908,12 @@ namespace Hydrology.Forms
                     }
                 }
                 bool updateData = false;
-                if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value))
+                if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value,isRawData))
                 {
-                    updateData = m_chartEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect);
+                    if (!isRawData)
+                    {
+                        updateData = m_chartEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect);
+                    }
                 }
                 m_dgvEva.UpdateDataToUI();
                 #endregion 蒸发数据
@@ -918,7 +949,7 @@ namespace Hydrology.Forms
                     }
                 }
                 bool updateData = false;
-                if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value))
+                if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value,isRawData))
                 {
                     updateData = m_chartTemp.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect);
                 }
