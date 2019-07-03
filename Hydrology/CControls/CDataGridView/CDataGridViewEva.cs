@@ -460,8 +460,6 @@ namespace Hydrology.CControls
                     return true;
                 }
             }
-
-
         }
 
         // 添加电压记录
