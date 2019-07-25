@@ -947,6 +947,10 @@ namespace Hydrology.Forms
                 {
                     this.txt_DataProtocolName.Text = "ZFXY";
                 }
+                else if (this.txt_DataDllFileName.Text == "Protocol.Data.DRoute.dll")
+                {
+                    this.txt_DataProtocolName.Text = "DRoute";
+                }
             }
         }
         private void btnDataSaveAddNew_Click(object sender, EventArgs e)

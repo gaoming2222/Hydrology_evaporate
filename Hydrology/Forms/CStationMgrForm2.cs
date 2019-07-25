@@ -75,12 +75,13 @@ namespace Hydrology.Forms
                 }
                 cmb_SubCenter.SelectedIndex = 0;
                 // 初始化站点类型
+                cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.EEva));
                 cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.ERainFall));
                 cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.ERiverWater));
                 cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.EHydrology));
-                cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.EEva));
-                // 初始化雨量精度
 
+                // 初始化雨量精度
+                
                 cmb_RainAccuracy.Items.Add("0.1");
                 cmb_RainAccuracy.Items.Add("0.2");
                 cmb_RainAccuracy.Items.Add("0.5");
@@ -127,6 +128,34 @@ namespace Hydrology.Forms
                 //数值参数初始化
                 textBox_WaterBase.Enabled = false;
 
+
+                //初始化默认值
+                cmb_RainAccuracy.Enabled = false;
+                cmb_RainAccuracy.Items.Remove("无");
+                cmb_RainAccuracy.SelectedIndex = 2;
+
+                comb_WaterSensor.Enabled = false;
+                comb_WaterSensor.Items.Remove("无");
+                comb_WaterSensor.SelectedIndex = 0;
+
+                comb_RainSensor.Enabled = true;
+                comb_RainSensor.Items.Remove("无");
+                comb_RainSensor.SelectedIndex = 0;
+
+                textBox_WaterMin.Enabled = true;
+                textBox_WaterMin.Text = "0.365";  //
+
+                textBox_WaterMax.Enabled = true;
+                textBox_WaterMax.Text = "1.037";
+
+                textBox_WaterChange.Enabled = true;
+                textBox_WaterChange.Text = "10.000";
+
+                textBox_RainChange.Enabled = true;
+                textBox_RainChange.Text = "80.0";
+
+                textBox_WaterBase.Enabled = false;
+                textBox_WaterBase.Text = "0.0";
                 if (cmb_StationType.Text == "雨量站")
                 {
                     cmb_RainAccuracy.Enabled = true;
@@ -213,6 +242,36 @@ namespace Hydrology.Forms
                     textBox_RainChange.Text = "80.0";
 
                     textBox_WaterBase.Enabled = true;
+                    textBox_WaterBase.Text = "0.0";
+                }
+
+                if (cmb_StationType.Text == "蒸发站")
+                {
+                    cmb_RainAccuracy.Enabled = false;
+                    cmb_RainAccuracy.Items.Remove("无");
+                    cmb_RainAccuracy.SelectedIndex = 2;
+
+                    comb_WaterSensor.Enabled = false;
+                    comb_WaterSensor.Items.Remove("无");
+                    comb_WaterSensor.SelectedIndex = 0;
+
+                    comb_RainSensor.Enabled = true;
+                    comb_RainSensor.Items.Remove("无");
+                    comb_RainSensor.SelectedIndex = 0;
+
+                    textBox_WaterMin.Enabled = true;
+                    textBox_WaterMin.Text = "0.365";  //
+
+                    textBox_WaterMax.Enabled = true;
+                    textBox_WaterMax.Text = "1.037";
+
+                    textBox_WaterChange.Enabled = true;
+                    textBox_WaterChange.Text = "10.000";
+
+                    textBox_RainChange.Enabled = true;
+                    textBox_RainChange.Text = "80.0";
+
+                    textBox_WaterBase.Enabled = false;
                     textBox_WaterBase.Text = "0.0";
                 }
 
@@ -1003,6 +1062,36 @@ namespace Hydrology.Forms
                     textBox_RainChange.Text = "80.0";
 
                     textBox_WaterBase.Enabled = true;
+                    textBox_WaterBase.Text = "0.0";
+                }
+
+                if (cmb_StationType.Text == "蒸发站")
+                {
+                    cmb_RainAccuracy.Enabled = false;
+                    cmb_RainAccuracy.Items.Remove("无");
+                    cmb_RainAccuracy.SelectedIndex = 2;
+
+                    comb_WaterSensor.Enabled = false;
+                    comb_WaterSensor.Items.Remove("无");
+                    comb_WaterSensor.SelectedIndex = 0;
+
+                    comb_RainSensor.Enabled = true;
+                    comb_RainSensor.Items.Remove("无");
+                    comb_RainSensor.SelectedIndex = 0;
+
+                    textBox_WaterMin.Enabled = true;
+                    textBox_WaterMin.Text = "0.365";  //
+
+                    textBox_WaterMax.Enabled = true;
+                    textBox_WaterMax.Text = "1.037";
+
+                    textBox_WaterChange.Enabled = true;
+                    textBox_WaterChange.Text = "10.000";
+
+                    textBox_RainChange.Enabled = true;
+                    textBox_RainChange.Text = "80.0";
+
+                    textBox_WaterBase.Enabled = false;
                     textBox_WaterBase.Text = "0.0";
                 }
             }

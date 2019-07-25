@@ -27,9 +27,9 @@ namespace Hydrology.CControls
         public static readonly string CS_SubCenterID = "分中心";
         public static readonly string CS_Stationtype = "站类";
         public static readonly string CS_WBase = "水位基值";
-        public static readonly string CS_WMax = "水位上限";
-        public static readonly string CS_WMin = "水位下限";
-        public static readonly string CS_Change = "水位阀值";
+        public static readonly string CS_WMax = "蒸发转换系数";
+        public static readonly string CS_WMin = "降雨转换系数";
+        public static readonly string CS_Change = "蒸发传感器与电测针读数差";
         public static readonly string CS_RAccuracy = "雨量精度";
         public static readonly string CS_RChange = "雨量阀值";
         public static readonly string CS_Gsm = "GSM号码";
@@ -402,7 +402,7 @@ namespace Hydrology.CControls
                       CS_Maintran,CS_Subtran, CS_Dataprotocol ,CS_Watersensor,
                       CS_Rainsensor,CS_Reportinterval
                 };
-                    this.HideColomns = new int[] { 18, 19, 20 };
+                    this.HideColomns = new int[] {18, 19, 20 };
                     List<string> listHeader = new List<string>(this.Header);
                     ////开启编辑模式,设置可编辑列
                     DataGridViewCheckBoxColumn deleteCol = new DataGridViewCheckBoxColumn();

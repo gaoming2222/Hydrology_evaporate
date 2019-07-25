@@ -138,7 +138,7 @@ namespace Hydrology.DataMgr
         private System.Windows.Forms.Timer aTimer = new System.Windows.Forms.Timer()
         {
             Enabled = false,
-            Interval = 5 * 60 * 1000// 5分钟
+            Interval = 1 * 60 * 1000// 5分钟
         };
 
         //  System.Timers.Timer aTimer = new System.Timers.Timer((60 - DateTime.Now.Second) * 1000); 
@@ -148,9 +148,9 @@ namespace Hydrology.DataMgr
 
         public bool Init()
         {
-            //aTimer.Tick += new EventHandler(atimer_Tick);
-            //aTimer.Enabled = true;
-            //aTimer.Start();
+            aTimer.Tick += new EventHandler(atimer_Tick);
+            aTimer.Enabled = true;
+            aTimer.Start();
             // 如果连接失败，则返回false
             if (!CDBManager.Instance.TryToConnection())
             {
@@ -2516,6 +2516,11 @@ namespace Hydrology.DataMgr
                     Eva.TP = data.TotalRain;
                     Eva.Voltage = data.Voltage;
                     Eva.type = data.EvpType;
+                    Eva.kp = station.DWaterMin;
+                    Eva.ke = station.DWaterMax;
+                    Eva.dh = station.DWaterChange;
+                    Eva.comP = 0;
+                    
 
 
                     CEntityEva DEva = new CEntityEva();
@@ -2672,6 +2677,9 @@ namespace Hydrology.DataMgr
                 Console.WriteLine(ex.ToString());
             }
         }
+
+
+        
 
         private void DealRTDDatas(CEventRecvStationDatasArgs args)
         {
@@ -3518,74 +3526,82 @@ namespace Hydrology.DataMgr
 
         #region 雨量表定时更新
         //System.Timers.Timer aTimer = new System.Timers.Timer();
+        //        private void atimer_Tick(object sender, EventArgs e)
+        //        {
+
+        //            if (DateTime.Now.Hour == 3 && DateTime.Now.Minute >= 10 && DateTime.Now.Minute < 15)
+        //            {
+        //                try
+        //                {
+        //                    Nullable<Decimal> lastTotalRain = null;
+        //                    CEntityRain LastSharpMes = new CEntityRain();
+        //                    CEntityRain LastDayMes = new CEntityRain();
+        //                    List<string> updateStation = new List<string>();
+        //                    //更新雨量表
+        //                    DateTime dt = DateTime.Now;
+        //                    DateTime start = dt.Subtract(new TimeSpan(24, 0, 0));
+        //                    updateStation = m_proxyRain.getUpdateStations(start, dt);
+        //                    for (int k = 0; k < updateStation.Count; k++)
+        //                    {
+        //                        DateTime tmp = new DateTime(dt.Year, dt.Month, dt.Day, 8, 0, 0);
+        //                        DateTime tmp8 = tmp.Subtract(new TimeSpan(48, 0, 0));
+        //                        //CEntityStation station = m_proxyStation.QueryById(updateStation[k]);
+        //                        CEntityStation station = m_proxyStation.QueryById(updateStation[k]);
+        //                        if (station != null)
+        //                        {
+        //                            lastTotalRain = m_proxyRain.GetLastRain(updateStation[k], start).TotalRain;
+        //                            LastSharpMes = m_proxyRain.GetLastSharpRain(updateStation[k], start);
+        //                            LastDayMes = m_proxyRain.GetLastDayRain(updateStation[k], tmp8);
+        //                            Nullable<Decimal> lastSharpTotalRain = LastSharpMes.TotalRain;
+        //                            Nullable<DateTime> lastSharpTotalTime = LastSharpMes.TimeCollect;
+        //                            Nullable<Decimal> lastDayTotalRain = LastDayMes.TotalRain;
+        //                            Nullable<DateTime> lastDayTime = LastDayMes.TimeCollect;
+        //                            int startIndex = 0;
+        //                            int status = 1;
+        //                            List<CEntityRain> rains = m_proxyRain.getListRainForUpdate(updateStation[k], start, dt);
+        //                            for (int i = 0; i < rains.Count; i++)
+        //                            {
+        //                                if ((rains[i].TimeCollect.Minute + rains[i].TimeCollect.Second) == 0)
+        //                                {
+        //                                    //rains[i].PeriodRain = CalPeriodRain_1(station.DRainAccuracy, rains[i].TotalRain, rains[i].TimeCollect, lastSharpTotalRain);
+        //                                    rains[i].PeriodRain = CalPeriodRain_2(station.StationID, station.DRainAccuracy, rains[i].TotalRain, rains[i].TimeCollect, lastSharpTotalRain, lastSharpTotalTime);
+        //                                    lastSharpTotalTime = rains[i].TimeCollect;
+        //                                    lastSharpTotalRain = rains[i].TotalRain;
+        //                                }
+        //                                if (rains[i].TimeCollect.Hour == 8)
+        //                                {
+        //                                    rains[i].DayRain = CalDayRain_2(station.StationID, station.DRainAccuracy, rains[i].TotalRain, rains[i].TimeCollect, lastDayTotalRain, lastDayTime);
+        //                                    lastDayTotalRain = rains[i].TotalRain;//可以不更新
+        //                                    lastDayTime = rains[i].TimeCollect;
+        //                                }
+        //                                rains[i].DifferneceRain = CalDifferenceRain_1(station.DRainAccuracy, rains[i].TotalRain, lastTotalRain, station.DRainChange, ref status);
+        //                                rains[i].BState = status;
+        //                                lastTotalRain = rains[i].TotalRain;
+        //                            }
+        //                            //可以所有的站点批量搞？？
+        //                            m_proxyRain.UpdateRows_1(rains, startIndex);
+        //                        }
+        //                    }
+        //                }
+        //#pragma warning disable CS0168 // 声明了变量“ex”，但从未使用过
+        //                catch (Exception ex)
+        //#pragma warning restore CS0168 // 声明了变量“ex”，但从未使用过
+        //                {
+        //                    Console.WriteLine("夜间更新报错！");
+        //                }
+
+
+        //            }
+        //            //将rains更新到数据库
+
+        //        }
         private void atimer_Tick(object sender, EventArgs e)
         {
-
-            if (DateTime.Now.Hour == 3 && DateTime.Now.Minute >= 10 && DateTime.Now.Minute < 15)
+            if (DateTime.Now.Hour == 8 && DateTime.Now.Minute == 30)
             {
-                try
-                {
-                    Nullable<Decimal> lastTotalRain = null;
-                    CEntityRain LastSharpMes = new CEntityRain();
-                    CEntityRain LastDayMes = new CEntityRain();
-                    List<string> updateStation = new List<string>();
-                    //更新雨量表
-                    DateTime dt = DateTime.Now;
-                    DateTime start = dt.Subtract(new TimeSpan(24, 0, 0));
-                    updateStation = m_proxyRain.getUpdateStations(start, dt);
-                    for (int k = 0; k < updateStation.Count; k++)
-                    {
-                        DateTime tmp = new DateTime(dt.Year, dt.Month, dt.Day, 8, 0, 0);
-                        DateTime tmp8 = tmp.Subtract(new TimeSpan(48, 0, 0));
-                        //CEntityStation station = m_proxyStation.QueryById(updateStation[k]);
-                        CEntityStation station = m_proxyStation.QueryById(updateStation[k]);
-                        if (station != null)
-                        {
-                            lastTotalRain = m_proxyRain.GetLastRain(updateStation[k], start).TotalRain;
-                            LastSharpMes = m_proxyRain.GetLastSharpRain(updateStation[k], start);
-                            LastDayMes = m_proxyRain.GetLastDayRain(updateStation[k], tmp8);
-                            Nullable<Decimal> lastSharpTotalRain = LastSharpMes.TotalRain;
-                            Nullable<DateTime> lastSharpTotalTime = LastSharpMes.TimeCollect;
-                            Nullable<Decimal> lastDayTotalRain = LastDayMes.TotalRain;
-                            Nullable<DateTime> lastDayTime = LastDayMes.TimeCollect;
-                            int startIndex = 0;
-                            int status = 1;
-                            List<CEntityRain> rains = m_proxyRain.getListRainForUpdate(updateStation[k], start, dt);
-                            for (int i = 0; i < rains.Count; i++)
-                            {
-                                if ((rains[i].TimeCollect.Minute + rains[i].TimeCollect.Second) == 0)
-                                {
-                                    //rains[i].PeriodRain = CalPeriodRain_1(station.DRainAccuracy, rains[i].TotalRain, rains[i].TimeCollect, lastSharpTotalRain);
-                                    rains[i].PeriodRain = CalPeriodRain_2(station.StationID, station.DRainAccuracy, rains[i].TotalRain, rains[i].TimeCollect, lastSharpTotalRain, lastSharpTotalTime);
-                                    lastSharpTotalTime = rains[i].TimeCollect;
-                                    lastSharpTotalRain = rains[i].TotalRain;
-                                }
-                                if (rains[i].TimeCollect.Hour == 8)
-                                {
-                                    rains[i].DayRain = CalDayRain_2(station.StationID, station.DRainAccuracy, rains[i].TotalRain, rains[i].TimeCollect, lastDayTotalRain, lastDayTime);
-                                    lastDayTotalRain = rains[i].TotalRain;//可以不更新
-                                    lastDayTime = rains[i].TimeCollect;
-                                }
-                                rains[i].DifferneceRain = CalDifferenceRain_1(station.DRainAccuracy, rains[i].TotalRain, lastTotalRain, station.DRainChange, ref status);
-                                rains[i].BState = status;
-                                lastTotalRain = rains[i].TotalRain;
-                            }
-                            //可以所有的站点批量搞？？
-                            m_proxyRain.UpdateRows_1(rains, startIndex);
-                        }
-                    }
-                }
-#pragma warning disable CS0168 // 声明了变量“ex”，但从未使用过
-                catch (Exception ex)
-#pragma warning restore CS0168 // 声明了变量“ex”，但从未使用过
-                {
-                    Console.WriteLine("夜间更新报错！");
-                }
-
-
+                //定时调用
+                cal.Timing();
             }
-            //将rains更新到数据库
-
         }
 
         private Nullable<Decimal> CalDifferenceRain_1(float dRainArruracy, Nullable<Decimal> totalRain, Nullable<Decimal> lastTotalRain, Nullable<Decimal> MaxChange, ref int status)

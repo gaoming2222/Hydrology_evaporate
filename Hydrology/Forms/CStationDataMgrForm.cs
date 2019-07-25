@@ -15,7 +15,8 @@ namespace Hydrology.Forms
         private static readonly string CS_CMB_Water = "水位";
         private static readonly string CS_CMB_Voltage = "电压";
         private static readonly string CS_CMB_Eva = "蒸发-降雨";
-        private static readonly string CS_CMB_Temp = "温度-电压";
+        private static readonly string CS_CMB_Temp = "温度";
+        //private static readonly string CS_CMB_Temp = "温度-电压";
 
         private static readonly string CS_CMB_ViewStyle_All = "图表";
         private static readonly string CS_CMB_ViewStyle_Table = "表格";
@@ -420,7 +421,7 @@ namespace Hydrology.Forms
 
             m_chartRain.InitDataSource(CDBDataMgr.GetInstance().GetRainProxy());
             m_chartWaterFlow.InitDataSource(CDBDataMgr.GetInstance().GetWaterProxy());
-            m_chartVoltage.InitDataSource(CDBDataMgr.GetInstance().GetVoltageProxy());
+           // m_chartVoltage.InitDataSource(CDBDataMgr.GetInstance().GetVoltageProxy());
             m_chartEva.InitDataSource(CDBDataMgr.GetInstance().GetHEvaProxy());
             m_chartEva.InitDataSource(CDBDataMgr.GetInstance().GetDEvaProxy());
             m_chartTemp.InitDataSource(CDBDataMgr.GetInstance().GetHEvaProxy());
@@ -557,12 +558,12 @@ namespace Hydrology.Forms
             {
                 //查询电压
                 cmb_TimeSelect.Items.Clear();
-                cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData });
+                cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData });
                 cmb_TimeSelect.SelectedIndex = 0;
                 m_dgvRain.Hide();
                 m_dgvWater.Hide();
-                m_dgvVoltage.Show();
-                m_dgvEva.Hide();
+                m_dgvVoltage.Hide();
+                m_dgvEva.Show();
                 // 图形
                 m_chartRain.Hide();
                 m_chartVoltage.Show();
@@ -867,13 +868,14 @@ namespace Hydrology.Forms
                     }
                 }
                 bool updateData = false;
-                if (m_dgvVoltage.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect))
+                if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, isRawData))
                 {
                     updateData = m_chartVoltage.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect);
                 }
+                m_dgvEva.UpdateDataToUI();
                 //if (updateData == true)
                 //{
-                m_dgvVoltage.UpdateDataToUI();
+                //m_dgvVoltage.UpdateDataToUI();
                 //}
                 #endregion 电压
             }
@@ -1021,7 +1023,7 @@ namespace Hydrology.Forms
                 currentDate = currentDate.AddHours(1).AddMinutes(5).AddSeconds(1);
                 lists.Add(voltage);
             }
-            m_chartVoltage.AddVoltages(lists);
+           // m_chartVoltage.AddVoltages(lists);
         }
 
         //public void InitRainData()

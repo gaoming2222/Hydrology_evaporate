@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Hydrology.DBManager.DB.SQLServer
 {
-    public class CSQLHEva : CSQLBase, IHEvaProxy
+    public class CSQLHEva : CSQLBase, IHEvaProxy 
     {
         #region 静态常量
         private const string CT_EntityName = "CEntityEva";   //  数据库表Eva实体类

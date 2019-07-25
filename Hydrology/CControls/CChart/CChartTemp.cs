@@ -22,10 +22,10 @@ namespace Hydrology.CControls
         public static readonly string CS_AsixY_Name = "温度(℃)";
 
         // 电压的坐标名字
-        public static readonly string CS_AsixY2_Name = "电压(V)";
+        //public static readonly string CS_AsixY2_Name = "电压(V)";
 
         // 图表名字
-        public static readonly string CS_Chart_Name = "温度&电压过程线";
+        public static readonly string CS_Chart_Name = "温度过程线";
 
         // 温度线条名字
         public static readonly string CS_Serial_Name_Temp = "Serial_Temp";
@@ -282,7 +282,8 @@ namespace Hydrology.CControls
         private void EH_MI_VoltageSerial(object sender, EventArgs e)
         {
             m_MIVoltageSerial.Checked = !m_MIVoltageSerial.Checked;
-            m_serialVoltage.Enabled = m_MIVoltageSerial.Checked;
+            //m_serialVoltage.Enabled = m_MIVoltageSerial.Checked;
+            m_serialVoltage.Enabled = false;
             //m_serialVoltage.Enabled = true;
             //m_serialEvaState.Enabled = true;
             if (m_MIVoltageSerial.Checked && (!m_MITempSerial.Checked))
@@ -309,7 +310,8 @@ namespace Hydrology.CControls
             if (m_serialVoltage.Enabled)
             {
                 // 电压可见
-                m_chartAreaDefault.AxisY2.Enabled = AxisEnabled.True;
+                //m_chartAreaDefault.AxisY2.Enabled = AxisEnabled.True;
+                m_chartAreaDefault.AxisY2.Enabled = AxisEnabled.False;
             }
             else
             {
@@ -407,7 +409,7 @@ namespace Hydrology.CControls
 
             // m_chartAreaDefault.AxisX.Title = CS_Asix_DateTime; //不显示名字
             m_chartAreaDefault.AxisY.Title = CS_AsixY_Name;
-            m_chartAreaDefault.AxisY2.Title = CS_AsixY2_Name;
+            //m_chartAreaDefault.AxisY2.Title = CS_AsixY2_Name;
             m_chartAreaDefault.AxisY.IsStartedFromZero = true;
             m_chartAreaDefault.AxisY2.IsStartedFromZero = true;
 
@@ -419,22 +421,22 @@ namespace Hydrology.CControls
 
 
             #region 电压
-            m_serialVoltage = this.Series.Add(CS_Serial_Name_Voltage);
-            m_serialVoltage.Name = "电压"; //用来显示图例的
-            m_serialVoltage.ChartArea = CS_ChartAreaName_Default;
-            m_serialVoltage.ChartType = SeriesChartType.Line; //如果点数过多， 画图很慢，初步测试不能超过2000个
-            m_serialVoltage.BorderWidth = 1;
-            //m_serialVoltage.BorderColor = Color.FromArgb(120, 147, 190);
-            m_serialVoltage.Color = Color.Blue;
-            //m_serialVoltage.ShadowOffset = 2;
-            //  设置时间类型,对于serial来说
-            m_serialVoltage.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-            m_serialVoltage.IsXValueIndexed = false; // 自己计算X值，以及边界值,否则翻译不出正确的值
+            //m_serialVoltage = this.Series.Add(CS_Serial_Name_Voltage);
+            //m_serialVoltage.Name = "电压"; //用来显示图例的
+            //m_serialVoltage.ChartArea = CS_ChartAreaName_Default;
+            //m_serialVoltage.ChartType = SeriesChartType.Line; //如果点数过多， 画图很慢，初步测试不能超过2000个
+            //m_serialVoltage.BorderWidth = 1;
+            ////m_serialVoltage.BorderColor = Color.FromArgb(120, 147, 190);
+            //m_serialVoltage.Color = Color.Blue;
+            ////m_serialVoltage.ShadowOffset = 2;
+            ////  设置时间类型,对于serial来说
+            //m_serialVoltage.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            //m_serialVoltage.IsXValueIndexed = false; // 自己计算X值，以及边界值,否则翻译不出正确的值
 
-            //  绑定数据
-            m_serialVoltage.XValueMember = CS_CN_DateTime;
-            m_serialVoltage.YValueMembers = CS_CN_Voltage;
-            m_serialVoltage.YAxisType = AxisType.Secondary;
+            ////  绑定数据
+            //m_serialVoltage.XValueMember = CS_CN_DateTime;
+            //m_serialVoltage.YValueMembers = CS_CN_Voltage;
+            //m_serialVoltage.YAxisType = AxisType.Secondary;
             #endregion 电压
 
             #region 温度

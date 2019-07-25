@@ -59,7 +59,7 @@ namespace Hydrology.CControls
                 CS_DH
             };
             // 隐藏延迟列，串口列
-            base.HideColomns = new int[] { 2,4,16 };
+            base.HideColomns = new int[] { 2,4,5,6,7,8,16 };
             // 设置一页的数量
             this.PageRowCount = CDBParams.GetInstance().UIPageRowCount;
             //this.PageRowCount = 300;   //  默认一页显示数量

@@ -2906,7 +2906,6 @@ namespace Hydrology.DataMgr
                         EvpType = item.EvpType
                     });
                 }
-
                 //  写入内存，写库
                 CDBDataMgr.Instance.EHRecvEvaDatas(null, stationDatas);
             }

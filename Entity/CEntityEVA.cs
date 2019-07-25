@@ -84,6 +84,15 @@ namespace Hydrology.Entity
         /// 注水、排水说明
         /// </summary>
         public string act { get; set; }
+
+
+        //********************参数部分*****************
+        public decimal? kp { get; set; }  //降雨转换系数
+        public decimal? ke { get; set; }  //蒸发转换系数
+        public decimal? dh { get; set; }  //人工数据比测初始高度差
+        public decimal? comP { get; set; } //是否降雨补偿
+
+
         #endregion
     }
 }

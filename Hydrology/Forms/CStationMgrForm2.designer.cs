@@ -399,7 +399,7 @@
             // label22
             // 
             this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(227, 103);
+            this.label22.Location = new System.Drawing.Point(222, 78);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(11, 12);
             this.label22.TabIndex = 83;
@@ -407,7 +407,7 @@
             // 
             // textBox_Voltage
             // 
-            this.textBox_Voltage.Location = new System.Drawing.Point(122, 100);
+            this.textBox_Voltage.Location = new System.Drawing.Point(116, 69);
             this.textBox_Voltage.Name = "textBox_Voltage";
             this.textBox_Voltage.Size = new System.Drawing.Size(100, 21);
             this.textBox_Voltage.TabIndex = 82;
@@ -415,7 +415,7 @@
             // label23
             // 
             this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(29, 103);
+            this.label23.Location = new System.Drawing.Point(33, 75);
             this.label23.Name = "label23";
             this.label23.Size = new System.Drawing.Size(89, 12);
             this.label23.TabIndex = 81;
@@ -440,7 +440,7 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(264, 69);
+            this.label14.Location = new System.Drawing.Point(278, 69);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(89, 12);
             this.label14.TabIndex = 78;
@@ -449,45 +449,44 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(228, 66);
+            this.label15.Location = new System.Drawing.Point(306, 118);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(11, 12);
+            this.label15.Size = new System.Drawing.Size(17, 12);
             this.label15.TabIndex = 77;
-            this.label15.Text = "m";
+            this.label15.Text = "mm";
             // 
             // textBox_WaterChange
             // 
-            this.textBox_WaterChange.Location = new System.Drawing.Point(122, 66);
+            this.textBox_WaterChange.Location = new System.Drawing.Point(200, 109);
             this.textBox_WaterChange.Name = "textBox_WaterChange";
             this.textBox_WaterChange.Size = new System.Drawing.Size(100, 21);
             this.textBox_WaterChange.TabIndex = 76;
+            this.textBox_WaterChange.Text = "10.000";
             // 
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(29, 69);
+            this.label17.Location = new System.Drawing.Point(33, 112);
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(89, 12);
+            this.label17.Size = new System.Drawing.Size(161, 12);
             this.label17.TabIndex = 75;
-            this.label17.Text = "水位跳变阀值：";
+            this.label17.Text = "蒸发传感器与电测针读数差：";
             // 
             // label12
             // 
             this.label12.AutoSize = true;
             this.label12.Location = new System.Drawing.Point(472, 29);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(11, 12);
+            this.label12.Size = new System.Drawing.Size(0, 12);
             this.label12.TabIndex = 70;
-            this.label12.Text = "m";
             // 
             // label11
             // 
             this.label11.AutoSize = true;
             this.label11.Location = new System.Drawing.Point(227, 32);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(11, 12);
+            this.label11.Size = new System.Drawing.Size(0, 12);
             this.label11.TabIndex = 69;
-            this.label11.Text = "m";
             // 
             // textBox_WaterMin
             // 
@@ -495,15 +494,16 @@
             this.textBox_WaterMin.Name = "textBox_WaterMin";
             this.textBox_WaterMin.Size = new System.Drawing.Size(100, 21);
             this.textBox_WaterMin.TabIndex = 68;
+            this.textBox_WaterMin.Text = "1.037";
             // 
             // label10
             // 
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(279, 31);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(65, 12);
+            this.label10.Size = new System.Drawing.Size(89, 12);
             this.label10.TabIndex = 67;
-            this.label10.Text = "水位下限：";
+            this.label10.Text = "蒸发转换系数：";
             // 
             // textBox_WaterMax
             // 
@@ -511,15 +511,16 @@
             this.textBox_WaterMax.Name = "textBox_WaterMax";
             this.textBox_WaterMax.Size = new System.Drawing.Size(100, 21);
             this.textBox_WaterMax.TabIndex = 66;
+            this.textBox_WaterMax.Text = "0.365";
             // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(35, 32);
+            this.label13.Location = new System.Drawing.Point(33, 32);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(65, 12);
+            this.label13.Size = new System.Drawing.Size(89, 12);
             this.label13.TabIndex = 65;
-            this.label13.Text = "水位上限：";
+            this.label13.Text = "降雨转换系数：";
             // 
             // panel2
             // 
@@ -640,7 +641,6 @@
             this.label6.Size = new System.Drawing.Size(53, 12);
             this.label6.TabIndex = 82;
             this.label6.Text = "备信道：";
-          
             // 
             // label5
             // 
@@ -650,7 +650,6 @@
             this.label5.Size = new System.Drawing.Size(53, 12);
             this.label5.TabIndex = 81;
             this.label5.Text = "主信道：";
-           
             // 
             // cmb_SubCenter
             // 
@@ -734,7 +733,6 @@
             this.MinimizeBox = false;
             this.Name = "CStationMgrForm2";
             this.Text = "测站管理";
-           
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.panel1.ResumeLayout(false);

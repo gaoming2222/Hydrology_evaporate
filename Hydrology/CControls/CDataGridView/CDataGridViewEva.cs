@@ -23,13 +23,16 @@ namespace Hydrology.CControls
         public static readonly string CS_TimeCollected = "采集时间";
         public static readonly string CS_Eva = "蒸发(mm)";
         public static readonly string CS_Rain = "雨量(mm)";
-        public static readonly string CS_Voltage = "电压(mm)";
-        public static readonly string CS_Temp = "温度值";
+        public static readonly string CS_Voltage = "电压(V)";
+        public static readonly string CS_Temp = "温度值(℃)";
         public static readonly string CS_DH = "蒸发器水面高度(mm)";
         public static readonly string CS_P8 = "8点-20点雨量和(mm)";
         public static readonly string CS_P20 = "20点-8点雨量和(mm)";
         public static readonly string CS_RawEva = "蒸发器示数(mm)";
+        public static readonly string CS_RawEvaF = "蒸发器换算后示数(mm)";
         public static readonly string CS_RawRain = "雨量筒示数(mm)";
+        public static readonly string CS_RawRainF = "雨量筒换算后示数(mm)";
+        public static readonly string CS_eleNeed = "电测针读数(mm)";
         public static readonly string CS_TimeFormat = "yyy-MM-dd HH:mm:ss";
         public static readonly string CS_RawACT = "排注水操作";
         #endregion  ///<STATIC_STRING
@@ -83,9 +86,9 @@ namespace Hydrology.CControls
             // 设定标题栏,默认有个隐藏列,默认非编辑模式
             this.Header = new string[]
             {
-                CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain ,CS_Temp, CS_Voltage, CS_DH
+                CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain ,CS_Temp, CS_Voltage
             };
-
+            //base.HideColomns = new int[] { 7 };
 
             // 设置一页的数量
             this.PageRowCount = CDBParams.GetInstance().UIPageRowCount;
@@ -213,8 +216,8 @@ namespace Hydrology.CControls
                         listEva[i].Eva.ToString(), /*蒸发*/
                         listEva[i].Rain.ToString(), /*雨量*/
                         listEva[i].Temperature.ToString(), /*温度*/
-                        listEva[i].Voltage.ToString(), /*电压*/
-                        listEva[i].DH.ToString() /*高度差*/
+                        listEva[i].Voltage.ToString() /*电压*/
+                        //listEva[i].DH.ToString() /*高度差*/
                         };
 
                         newRows.Add(newRow);
@@ -246,8 +249,8 @@ namespace Hydrology.CControls
                         listEva[i].Eva.ToString(), /*蒸发*/
                         listEva[i].Rain.ToString(), /*雨量*/
                         listEva[i].Temperature.ToString(), /*温度*/
-                        listEva[i].Voltage.ToString(), /*电压*/
-                        listEva[i].DH.ToString() /*高度差*/
+                        listEva[i].Voltage.ToString() /*电压*/
+                        //listEva[i].DH.ToString() /*高度差*/
                         };
 
                         newRows.Add(newRow);
@@ -355,6 +358,9 @@ namespace Hydrology.CControls
                         strStationName = station.StationName;
                         strStationId = station.StationID;
                     }
+                    decimal? evaF = listEva[i].Eva * station.DWaterMax;
+                    decimal? rainF = listEva[i].Rain * station.DWaterMin;
+                    decimal? neddF = listEva[i].Eva - station.DWaterChange;
                     string act = "--";
                     if (listEva[i] != null)
                     {
@@ -381,7 +387,10 @@ namespace Hydrology.CControls
                         strStationName,/*站名*/
                         listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
                         listEva[i].Eva.ToString(), /*蒸发*/
+                        Math.Round((Double)evaF,2).ToString(),
                         listEva[i].Rain.ToString(), /*雨量*/
+                        Math.Round((Double)rainF,2).ToString(),
+                        Math.Round((Double)neddF,2).ToString("0.00"),
                         listEva[i].Temperature.ToString(), /*温度*/
                         //listEva[i].Voltage.ToString(), /*电压*/
                         act /*蒸发模式*/
@@ -460,8 +469,6 @@ namespace Hydrology.CControls
                     return true;
                 }
             }
-
-
         }
 
         // 添加电压记录
@@ -576,7 +583,7 @@ namespace Hydrology.CControls
             {
                 this.Header = new string[]
                 {
-                    CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage, CS_DH
+                    CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage
                 };
 
                 //开启编辑模式,设置可编辑列
@@ -655,8 +662,10 @@ namespace Hydrology.CControls
                     //  是原始蒸发表
                     this.Header = new string[]
                     {
-                        CS_StationID,CS_StationName,CS_TimeCollected, CS_RawEva, CS_RawRain, CS_Temp, CS_RawACT
+                        CS_StationID,CS_StationName,CS_TimeCollected, CS_RawEva,CS_RawEvaF, CS_RawRain,CS_RawRainF,CS_eleNeed, CS_Temp, CS_RawACT
+
                     };
+                    //base.HideColomns = new int[] { };
                 }
             }
             
@@ -761,15 +770,17 @@ namespace Hydrology.CControls
                     //  是日蒸发表
                     this.Header = new string[]
                     {
-                        CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage, CS_DH
+                        CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage
                     };
+                    //base.HideColomns = new int[] { 7 };
                 }
                 else
                 {
                     this.Header = new string[]
                     {
-                        CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage, CS_DH
+                        CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage
                     };
+                    //base.HideColomns = new int[] { };
 
                     //开启编辑模式,设置可编辑列
 
