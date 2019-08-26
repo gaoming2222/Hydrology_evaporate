@@ -138,7 +138,7 @@ namespace Hydrology.CControls
 
 
             }
-            if (Evas.Count >= 3)
+            if (Evas.Count > 3)
             {
                 // 蒸发和降雨最大值和最小值
                 decimal offset = 0;
@@ -153,6 +153,8 @@ namespace Hydrology.CControls
                     // 如果相等的话
                     offset = (decimal)m_dMaxEva * (decimal)0.1;
                 }
+                //m_chartAreaDefault.AxisX.Minimum = Convert.ToDouble(m_minDateTime.Value.AddHours(-1));
+                //m_chartAreaDefault.AxisX.Maximum = Convert.ToDouble(m_maxDateTime.Value.AddHours(1));
                 m_chartAreaDefault.AxisY.Maximum = (double)(m_dMaxEva + offset);
                 m_chartAreaDefault.AxisY.Minimum = (double)(m_dMinEva - offset);
                 m_chartAreaDefault.AxisY.Minimum = m_chartAreaDefault.AxisY.Minimum >= 0 ? m_chartAreaDefault.AxisY.Minimum : 0;

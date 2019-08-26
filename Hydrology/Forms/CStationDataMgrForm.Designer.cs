@@ -85,7 +85,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1147, 624);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1629, 624);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // statusStrip1
@@ -95,7 +95,7 @@
             this.m_statusLable});
             this.statusStrip1.Location = new System.Drawing.Point(0, 602);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1147, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1629, 22);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -113,7 +113,7 @@
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Margin = new System.Windows.Forms.Padding(0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1147, 599);
+            this.panel1.Size = new System.Drawing.Size(1629, 599);
             this.panel1.TabIndex = 1;
             // 
             // tableLayoutPanel
@@ -135,7 +135,7 @@
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 648F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 648F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 648F));
-            this.tableLayoutPanel.Size = new System.Drawing.Size(1147, 599);
+            this.tableLayoutPanel.Size = new System.Drawing.Size(1629, 599);
             this.tableLayoutPanel.TabIndex = 2;
             // 
             // panelLeft
@@ -371,7 +371,7 @@
             this.panelRight.Location = new System.Drawing.Point(200, 0);
             this.panelRight.Margin = new System.Windows.Forms.Padding(0);
             this.panelRight.Name = "panelRight";
-            this.panelRight.Size = new System.Drawing.Size(947, 599);
+            this.panelRight.Size = new System.Drawing.Size(1429, 599);
             this.panelRight.TabIndex = 11;
             // 
             // tLayoutRight
@@ -387,7 +387,7 @@
             this.tLayoutRight.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tLayoutRight.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tLayoutRight.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tLayoutRight.Size = new System.Drawing.Size(947, 599);
+            this.tLayoutRight.Size = new System.Drawing.Size(1429, 599);
             this.tLayoutRight.TabIndex = 2;
             // 
             // panelBottom
@@ -399,13 +399,13 @@
             this.panelBottom.Location = new System.Drawing.Point(0, 574);
             this.panelBottom.Margin = new System.Windows.Forms.Padding(0);
             this.panelBottom.Name = "panelBottom";
-            this.panelBottom.Size = new System.Drawing.Size(947, 25);
+            this.panelBottom.Size = new System.Drawing.Size(1429, 25);
             this.panelBottom.TabIndex = 0;
             // 
             // m_lableRowCount
             // 
             this.m_lableRowCount.Dock = System.Windows.Forms.DockStyle.Right;
-            this.m_lableRowCount.Location = new System.Drawing.Point(847, 0);
+            this.m_lableRowCount.Location = new System.Drawing.Point(1329, 0);
             this.m_lableRowCount.Name = "m_lableRowCount";
             this.m_lableRowCount.Size = new System.Drawing.Size(100, 25);
             this.m_lableRowCount.TabIndex = 1;
@@ -427,7 +427,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1147, 624);
+            this.ClientSize = new System.Drawing.Size(1629, 624);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -461,13 +461,13 @@
         private System.Windows.Forms.Label labelInfoSelect;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button btnQuery;
+        public  System.Windows.Forms.Button btnQuery;
         //public System.Windows.Forms.ComboBox cmbStation;
         public Hydrology.CControls.CStationComboBox_1 cmbStation;
-        private System.Windows.Forms.DateTimePicker dptTimeEnd;
+        public System.Windows.Forms.DateTimePicker dptTimeEnd;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.DateTimePicker dptTimeStart;
+        public System.Windows.Forms.DateTimePicker dptTimeStart;
         public System.Windows.Forms.ComboBox cmbQueryInfo;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Panel panelRight;
@@ -475,7 +475,7 @@
         private System.Windows.Forms.Button btnNewRecord;
         private System.Windows.Forms.Button btnApply;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.ComboBox cmb_ViewStyle;
+        public  System.Windows.Forms.ComboBox cmb_ViewStyle;
         private System.Windows.Forms.TableLayoutPanel tLayoutRight;
         private System.Windows.Forms.Panel panelBottom;
         private System.Windows.Forms.Label m_lableRowCount;
@@ -484,7 +484,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ComboBox cmb_SubCenter;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.ComboBox cmb_TimeSelect;
+        public System.Windows.Forms.ComboBox cmb_TimeSelect;
         private System.Windows.Forms.Label label9;
     }
 }

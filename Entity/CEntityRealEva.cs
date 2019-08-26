@@ -105,6 +105,13 @@ namespace Hydrology.Entity
         /// </summary>
         public string act { get; set; }
 
+
+        /// <summary>
+        /// 蒸发桶排水
+        /// </summary>
+        public string evaPZ { get; set; }
+
+
         /// <summary>
         /// 接收信道
         /// </summary>

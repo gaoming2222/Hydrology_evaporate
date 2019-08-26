@@ -171,6 +171,12 @@ namespace Hydrology.Entity
         [XmlElement("lldtrain")]
         public Nullable<Decimal> LLastDayTotalRain { get; set; }
 
+        [XmlElement("deva")]
+        public Nullable<Decimal> LastDayEva { get; set; }
+
+        [XmlElement("drain")]
+        public Nullable<Decimal> LastDayRain { get; set; }
+
         /// <summary>
         /// 最近一天有雨量记录的时间
         /// </summary>

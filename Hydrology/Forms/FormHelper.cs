@@ -211,7 +211,7 @@ namespace Hydrology.Forms
                     break;
                 //gm 1203
                 case "关于":
-                    MessageBox.Show("水文蒸发自动监测系统" + "\r\n" + "湖北一方科技发展有限责任公司");
+                    MessageBox.Show("水文蒸发自动监测系统" + "\r\n" + "水利部长江水利委员会水文局");
                     break;
                 case "帮助":
                     System.Diagnostics.Process.Start(Application.StartupPath.ToString() + "\\help.pdf");

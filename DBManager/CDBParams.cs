@@ -33,7 +33,7 @@ namespace Hydrology.DBManager
         private CDBParams()
         {
             // 读取配置文件
-            m_iAddToDBDelay = 60 * 1000;
+            m_iAddToDBDelay = 6 * 1000;
             m_iPageRowCount = 1000;
             m_iAddBufferMax = 1000;
             m_iUIPageRowCount = 1000;

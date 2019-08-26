@@ -21,6 +21,8 @@ namespace Hydrology.DBManager.DB.SQLServer
         public static readonly string CN_Rain = "P";  //降雨
         public static readonly string CN_Rain8 = "P8";   //8点到20点的降雨之和
         public static readonly string CN_Rain20 = "P20";   //20点到8点的降雨之和
+        //public static readonly string CN_dayPChange = "dayPChange";
+        public static readonly string CN_dayEChange = "dayEChange";
         #endregion
 
         #region 成员变量
@@ -64,6 +66,8 @@ namespace Hydrology.DBManager.DB.SQLServer
             m_tableDataAdded.Columns.Add(CN_Rain);
             m_tableDataAdded.Columns.Add(CN_Rain8);
             m_tableDataAdded.Columns.Add(CN_Rain20);
+            //m_tableDataAdded.Columns.Add(CN_dayPChange);
+            m_tableDataAdded.Columns.Add(CN_dayEChange);
 
             //m_tableDataAdded.Columns.Add(CN_TransType);
 
@@ -127,6 +131,8 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
                     bulkCopy.ColumnMappings.Add(CN_Rain8, CN_Rain8);
                     bulkCopy.ColumnMappings.Add(CN_Rain20, CN_Rain20);
+                    //bulkCopy.ColumnMappings.Add(CN_dayPChange, CN_dayPChange);
+                    bulkCopy.ColumnMappings.Add(CN_dayEChange, CN_dayEChange);
 
                     try
                     {
@@ -183,18 +189,22 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_Rain] = Eva.Rain;
                 row[CN_Rain8] = Eva.P8;
                 row[CN_Rain20] = Eva.P20;
+                //row[CN_dayPChange] = Eva.dayPChange;
+                row[CN_dayEChange] = Eva.dayEChange;
                 m_tableDataAdded.Rows.Add(row);
             }
-            if (m_tableDataAdded.Rows.Count >= CDBParams.GetInstance().AddBufferMax)
-            {
-                // 如果超过最大值，写入数据库
-                NewTask(() => { InsertSqlBulk(m_tableDataAdded); });
-            }
-            else
-            {
-                // 没有超过缓存最大值，开启定时器进行检测,多次调用Start()会导致重新计数
-                m_addTimer_1.Start();
-            }
+            //TODO
+            NewTask(() => { InsertSqlBulk(m_tableDataAdded); });
+            //if (m_tableDataAdded.Rows.Count >= CDBParams.GetInstance().AddBufferMax)
+            //{
+            //    // 如果超过最大值，写入数据库
+            //    NewTask(() => { InsertSqlBulk(m_tableDataAdded); });
+            //}
+            //else
+            //{
+            //    // 没有超过缓存最大值，开启定时器进行检测,多次调用Start()会导致重新计数
+            //    m_addTimer_1.Start();
+            //}
             m_mutexDataTable.ReleaseMutex();
         }
 
@@ -212,6 +222,8 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_Rain] = Eva.Rain;
                 row[CN_Rain8] = Eva.P8;
                 row[CN_Rain20] = Eva.P20;
+                //row[CN_dayPChange] = Eva.P20;
+                row[CN_dayEChange] = Eva.dayEChange;
                 m_tableDataAdded.Rows.Add(row);
 
             }
@@ -337,6 +349,14 @@ namespace Hydrology.DBManager.DB.SQLServer
                 if (!table.Rows[startRow][CN_Rain20].ToString().Equals(""))
                 {
                     Eva.P20 = Decimal.Parse(table.Rows[startRow][CN_Rain20].ToString());
+                }
+                //if (!table.Rows[startRow][CN_dayPChange].ToString().Equals(""))
+                //{
+                //    Eva.dayPChange = Decimal.Parse(table.Rows[startRow][CN_dayPChange].ToString());
+                //}
+                if (!table.Rows[startRow][CN_dayEChange].ToString().Equals(""))
+                {
+                    Eva.dayEChange = Decimal.Parse(table.Rows[startRow][CN_dayEChange].ToString());
                 }
                 result.Add(Eva);
             }
@@ -503,7 +523,7 @@ namespace Hydrology.DBManager.DB.SQLServer
         public List<CEntityEva> getEvabyTime(string stationid, DateTime start, DateTime end)
         {
             List<CEntityEva> evaList = new List<CEntityEva>();
-            String sql = "select * from " + CT_TableName + " where STCD=" + stationid + " and DT between '" + start + "'and '" + end + "';";
+            String sql = "select * from " + CT_TableName + " where STCD=" + stationid + " and DT between '" + start + "'and '" + end + "' order by DT;";
             SqlDataAdapter adapter = new SqlDataAdapter(sql, CDBManager.GetInstacne().GetConnection());
             DataTable dataTableTemp = new DataTable();
             adapter.Fill(dataTableTemp);
@@ -550,6 +570,15 @@ namespace Hydrology.DBManager.DB.SQLServer
                     else
                     {
                         eva.P20 = null;
+                    }
+
+                    if (dataTableTemp.Rows[rowid][CN_dayEChange] != null && dataTableTemp.Rows[rowid][CN_dayEChange].ToString() != "")
+                    {
+                        eva.dayEChange = decimal.Parse(dataTableTemp.Rows[rowid][CN_dayEChange].ToString());
+                    }
+                    else
+                    {
+                        eva.dayEChange = null;
                     }
                     evaList.Add(eva);
                 }

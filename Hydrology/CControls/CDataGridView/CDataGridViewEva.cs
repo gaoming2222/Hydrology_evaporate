@@ -25,6 +25,7 @@ namespace Hydrology.CControls
         public static readonly string CS_Rain = "雨量(mm)";
         public static readonly string CS_Voltage = "电压(V)";
         public static readonly string CS_Temp = "温度值(℃)";
+        public static readonly string CS_EvaPZ = "蒸发桶排注水(mm)";
         public static readonly string CS_DH = "蒸发器水面高度(mm)";
         public static readonly string CS_P8 = "8点-20点雨量和(mm)";
         public static readonly string CS_P20 = "20点-8点雨量和(mm)";
@@ -134,62 +135,7 @@ namespace Hydrology.CControls
             // 判断状态值
             List<string[]> newRows = new List<string[]>();
             List<EDataState> states = new List<EDataState>();
-            //if (m_isREva)
-            //{
-            //    if (!m_bIsEditable)
-            //    {
-            //        string[] newRow;
-            //        // 只读模式
-            //        for (int i = 0; i < listEva.Count; ++i)
-            //        {
-            //            EDataState state = EDataState.ENormal; //默认所有数据都是正常的
-            //            string strStationName = "";
-            //            string strStationId = "";
-            //            CEntityStation station = CDBDataMgr.Instance.GetStationById(listEva[i].StationID);
-            //            if (null != station)
-            //            {
-
-            //                strStationName = station.StationName;
-            //                strStationId = station.StationID;
-            //            }
-            //            string act = "--";
-            //            if (listEva[i] != null)
-            //            {
-            //                if (listEva[i].ToString().Contains("PP")){
-            //                    act = "雨量筒排水";
-            //                }
-            //                if (listEva[i].ToString().Contains("PE"))
-            //                {
-            //                    act = "蒸发器排水"; 
-            //                }
-            //                if (listEva[i].ToString().Contains("ZE"))
-            //                {
-            //                    act = "蒸发器补水";
-            //                }
-            //                if (listEva[i].ToString().Contains("ER"))
-            //                {
-            //                    act = "异常扰动";
-            //                }
-            //            }
-            //            newRow = new string[]
-            //            {
-            //            strStationId,
-            //            strStationName,/*站名*/
-            //            listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
-            //            listEva[i].Eva.ToString(), /*蒸发*/
-            //            listEva[i].Rain.ToString(), /*雨量*/
-            //            listEva[i].Temperature.ToString(), /*温度*/
-            //            //listEva[i].Voltage.ToString(), /*电压*/
-            //            act /*排注水操作*/
-            //            };
-            //            newRows.Add(newRow);
-            //            states.Add(state);
-            //        }
-            //        // 添加到集合的数据表中
-            //        base.AddRowRange(newRows, states);
-            //    }
-
-            //}
+            
             if (m_bIsHEva)
             {
                 if (!m_bIsEditable)
@@ -283,12 +229,13 @@ namespace Hydrology.CControls
                         {
                         strStationId,
                         strStationName,/*站名*/
-                        listEva[i].TimeCollect.Year.ToString() + "年" + listEva[i].TimeCollect.Month.ToString() + "月"  + (listEva[i].TimeCollect.Day-1).ToString() + "日",
+                        listEva[i].TimeCollect.AddDays(-1).Year.ToString() + "年" + listEva[i].TimeCollect.AddDays(-1).Month.ToString() + "月"  + (listEva[i].TimeCollect.AddDays(-1).Day).ToString() + "日",
                         listEva[i].Eva.ToString(), /*蒸发*/
                         listEva[i].Rain.ToString(), /*雨量*/
                         listEva[i].Temperature.ToString(), /*温度*/
                         listEva[i].P8.ToString(), /*8-20*/
-                        listEva[i].P20.ToString() /*20-8*/
+                        listEva[i].P20.ToString(), /*20-8*/
+                        listEva[i].dayEChange.ToString()
                         };
 
                         newRows.Add(newRow);
@@ -317,12 +264,13 @@ namespace Hydrology.CControls
                         m_strStaionId,
                         strStationName,/*站名*/
                         //listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
-                        listEva[i].TimeCollect.Year.ToString() + "年" + listEva[i].TimeCollect.Month.ToString() + "月"  + (listEva[i].TimeCollect.Day-1).ToString() + "日",
+                        listEva[i].TimeCollect.AddDays(-1).Year.ToString() + "年" + listEva[i].TimeCollect.AddDays(-1).Month.ToString() + "月"  + (listEva[i].TimeCollect.AddDays(-1).Day).ToString() + "日",
                         listEva[i].Eva.ToString(), /*蒸发*/
                         listEva[i].Rain.ToString(), /*雨量*/
                         listEva[i].Temperature.ToString(), /*温度*/
                         listEva[i].P8.ToString(), /*8-20*/
-                        listEva[i].P20.ToString() /*20-8*/
+                        listEva[i].P20.ToString(), /*20-8*/
+                        listEva[i].dayEChange.ToString()
                         };
 
                         newRows.Add(newRow);
@@ -682,14 +630,14 @@ namespace Hydrology.CControls
                     //  是日蒸发表
                     this.Header = new string[]
                     {
-                        CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_P8, CS_P20
+                        CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_P8, CS_P20,CS_EvaPZ
                     };
                 }
                 else
                 {
                     this.Header = new string[]
                     {
-                        CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_P8, CS_P20
+                        CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_P8, CS_P20,CS_EvaPZ
                     };
 
                     //开启编辑模式,设置可编辑列

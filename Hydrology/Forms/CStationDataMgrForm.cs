@@ -182,7 +182,7 @@ namespace Hydrology.Forms
             // 初始化测站
             // 初始化查询信息类型
             this.SuspendLayout();
-            cmbQueryInfo.Items.AddRange(new string[] { CS_CMB_Eva, CS_CMB_Rain, CS_CMB_Water, CS_CMB_Voltage,  CS_CMB_Temp });
+            cmbQueryInfo.Items.AddRange(new string[] { CS_CMB_Eva,CS_CMB_Voltage,CS_CMB_Temp });
 
             cmb_RainShape.Items.AddRange(new string[] { CS_CMB_RainShape_Periodrain, CS_CMB_RainShape_Differencerain, CS_CMB_ViewStyle_Dayrain });
 
@@ -717,6 +717,11 @@ namespace Hydrology.Forms
         // 根据设定的条件查询数据表
         private void btnQuery_Click(object sender, EventArgs e)
         {
+            queryData();
+
+        }
+        public void queryData()
+        {
             // 获取站点ID
             // 获取起始日期
             // 获取结束日期
@@ -910,7 +915,7 @@ namespace Hydrology.Forms
                     }
                 }
                 bool updateData = false;
-                if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value,isRawData))
+                if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, isRawData))
                 {
                     if (!isRawData)
                     {
@@ -951,7 +956,7 @@ namespace Hydrology.Forms
                     }
                 }
                 bool updateData = false;
-                if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value,isRawData))
+                if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, isRawData))
                 {
                     updateData = m_chartTemp.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, TimeSelect);
                 }
@@ -960,7 +965,6 @@ namespace Hydrology.Forms
             }
             this.Enabled = true;
             m_statusLable.Text = "查询已成功完成";
-
         }
 
 

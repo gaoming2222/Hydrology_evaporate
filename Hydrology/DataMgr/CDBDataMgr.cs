@@ -113,7 +113,8 @@ namespace Hydrology.DataMgr
         private Dictionary<string, List<CEntityWaterFlowMap>> m_mapStationWaterFlow; //站点的水位流量线条
         private Dictionary<string, CEntityRealTime> m_mapStationRTD;        //站点实时数据
         private Dictionary<string, CEntityRealEva> m_mapStationRTS;        //站点实时数据
-
+        private Dictionary<string, decimal?> m_mapStationEva;
+        private Dictionary<string, decimal?> m_mapStationRain;
         public Dictionary<string, CEntityStation> m_mapGprsStation;    //站点gprs和站点映射
 
         // 好像没有用了，因为采集时间都是整点的，也就是刚好8点就okay. 
@@ -184,6 +185,9 @@ namespace Hydrology.DataMgr
 
             m_mapStation = new Dictionary<string, CEntityStation>();
 
+            m_mapStationEva = new Dictionary<string, decimal?>();
+            m_mapStationRain = new Dictionary<string, decimal?>();
+
             m_mapGprsStation = new Dictionary<string, CEntityStation>();
 
             // 读取所有的站点，以及分中心，还有串口
@@ -203,18 +207,42 @@ namespace Hydrology.DataMgr
                 }
                 try
                 {
+                    //初始化gprs
                     if (entity.GPRS != "")
                     {
                         m_mapGprsStation.Add(entity.GPRS, entity);
                     }
+                    //初始化今日蒸发和今日降雨
+                    Decimal? totalEva = 0;
+                    Decimal? totalRain = 0;
+                    List<CEntityEva> results = m_proxyHEva.QueryForDayEvaList(entity.StationID);
+                    if(results != null)
+                    {
+                        for (int i = 0; i < results.Count; i++)
+                        {
+                            totalEva = totalEva + results[i].Eva;
+                            totalRain = totalRain + results[i].Rain;
+                        }
+                    }
+                    
+                    m_mapStationEva[entity.StationID] = totalEva;
+                    m_mapStationRain[entity.StationID] = totalRain;
+
                 }
 #pragma warning disable CS0168 // 声明了变量“e”，但从未使用过
                 catch (Exception e)
 #pragma warning restore CS0168 // 声明了变量“e”，但从未使用过
                 {
-                    MessageBox.Show("站点" + entity.StationID + "GPRS号码" + entity.GPRS + "重复");
+                    MessageBox.Show("站点" + entity.StationID + "GPRS号码" + entity.GPRS + " ");
                 }
             }
+
+            //查询当前的蒸发量
+            //try
+            //{
+            //    List<CEntityEva> results = new List<CEntityEva>();
+            //    results = m_proxyHEva.QueryForDayEvaList()
+            //}
             resetTxt();
             //CreateTable();
             ReadRTDXml();
@@ -1148,29 +1176,9 @@ namespace Hydrology.DataMgr
                         if (flag == 0)
                         {
                             flag = 1;
-                            //MessageBoxButtons messButton = MessageBoxButtons.OKCancel;
-                            // DialogResult dr = MessageBox.Show(info + " ，是否关闭报警声音?", "雨量报警", messButton, MessageBoxOptions.DefaultDesktopOnly);
-                            // MessageBox.Show("ok1", "ok2", MessageBoxButtons.OKCancel,
-                            //MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                            //if (dr == DialogResult.OK)
-                            //{
-                            //    CVoicePlayer.Instance.Stop();
-                            //    flag = 0;
-                            //}
-                            //MessageBoxForm mbForm = new MessageBoxForm();
+                            
                             info = rain.TimeCollect.ToString() + "\r\n" + "\r\n" + info + "\r\n" + "\r\n" + "是否关闭报警声音？" + "\r\n";
-                            //Thread t = new Thread(new ParameterizedThreadStart(MessageShow));
-                            //t.Start(info);
-                            //string str1 = "雨量报警";
-                            //string str2 = info + " ，是否关闭报警声音?";
-                            ////MessageBoxForm mbForm = new MessageBoxForm();
-                            ////mbForm.StartPosition = FormStartPosition.CenterParent;
-                            ////mbForm.Text = "雨量报警";
-                            ////mbForm.label3.Text = rain.TimeCollect.ToString();
-                            ////mbForm.label1.Text = info;
-                            ////mbForm.label2.Text = "，是否关闭报警声音?";
-                            ////mbForm.TopMost = true;
-                            ////mbForm.ShowDialog();
+                            
                         }
                     }
                     rtdState = ERTDDataState.EError; // 超过预警值
@@ -1225,72 +1233,7 @@ namespace Hydrology.DataMgr
 
         }
 
-        //        private void MessageShow(Object str)
-        //        {
-        //            try
-        //            {
-        //                MessageBoxForm mbForm = new MessageBoxForm();
-        //                string info = str.ToString();
-        //                mbForm.StartPosition = FormStartPosition.CenterParent;
-        //                mbForm.Text = "雨量报警";
-
-        //                mbForm.label1.Text = info;
-
-        //                mbForm.TopMost = true;
-        //                mbForm.ShowDialog();
-        //            }
-        //#pragma warning disable CS0168 // 声明了变量“e”，但从未使用过
-        //            catch (Exception e)
-        //#pragma warning restore CS0168 // 声明了变量“e”，但从未使用过
-        //            {
-
-        //            }
-
-        //        }
-        //        private void MessageShow_2(Object str)
-        //        {
-        //            try
-        //            {
-        //                MessageBoxForm mbForm = new MessageBoxForm();
-        //                string info = str.ToString();
-        //                mbForm.StartPosition = FormStartPosition.CenterParent;
-        //                mbForm.Text = "水位报警";
-
-        //                mbForm.label1.Text = info;
-
-        //                mbForm.TopMost = true;
-        //                mbForm.ShowDialog();
-        //            }
-        //#pragma warning disable CS0168 // 声明了变量“e”，但从未使用过
-        //            catch (Exception e)
-        //#pragma warning restore CS0168 // 声明了变量“e”，但从未使用过
-        //            {
-
-        //            }
-
-        //        }
-        //        private void MessageShow_3(Object str)
-        //        {
-        //            try
-        //            {
-        //                MessageBoxForm mbForm = new MessageBoxForm();
-        //                string info = str.ToString();
-        //                mbForm.StartPosition = FormStartPosition.CenterParent;
-        //                mbForm.Text = "电压报警";
-
-        //                mbForm.label1.Text = info;
-
-        //                mbForm.TopMost = true;
-        //                mbForm.ShowDialog();
-        //            }
-        //#pragma warning disable CS0168 // 声明了变量“e”，但从未使用过
-        //            catch (Exception e)
-        //#pragma warning restore CS0168 // 声明了变量“e”，但从未使用过
-        //            {
-
-        //            }
-
-        //        }
+        
         /// <summary>
         /// 判断水位值的状态
         /// </summary>
@@ -2549,8 +2492,9 @@ namespace Hydrology.DataMgr
                             Eva.Temperature = decimal.Parse(cDic["hourT"]);
                             Eva.Voltage = decimal.Parse(cDic["hourU"]);
                             Eva.DH = decimal.Parse(cDic["dH"]);
-                            DayEva = DayEva + decimal.Parse(cDic["hourE"]);
-                            DayRain = DayRain + decimal.Parse(cDic["hourP"]);
+                            Eva.hourEChange = decimal.Parse(cDic["hourEChange"]);
+                            m_mapStationEva[args.StrStationID] = m_mapStationEva[args.StrStationID] + decimal.Parse(cDic["hourE"]);
+                            m_mapStationRain[args.StrStationID] = m_mapStationRain[args.StrStationID] + decimal.Parse(cDic["hourP"]);
                             HEvas.Add(Eva);
                         }
                     }
@@ -2563,10 +2507,13 @@ namespace Hydrology.DataMgr
                             DEva.Temperature = decimal.Parse(cDic["dayT"]);
                             DEva.P8 = decimal.Parse(cDic["P8"]);
                             DEva.P20 = decimal.Parse(cDic["P20"]);
-                            DayEva = 0;
-                            DayRain = 0;
+                            DEva.dayEChange = decimal.Parse(cDic["dayEChange"]);
+                            m_mapStationEva[args.StrStationID] = 0;
+                            m_mapStationRain[args.StrStationID] = 0;
                             lastDayEva = decimal.Parse(cDic["dayE"]);
                             lastDayRain = decimal.Parse(cDic["dayP"]);
+                            station.LastDayEva = decimal.Parse(cDic["dayE"]);
+                            station.LastDayRain = decimal.Parse(cDic["dayP"]); 
 
                             DEvas.Add(DEva);
                         }
@@ -2617,13 +2564,16 @@ namespace Hydrology.DataMgr
                     realtime.RawRain = args.Datas[tmpDataCount - 1].TotalRain;
                     realtime.RawVoltage = args.Datas[tmpDataCount - 1].Voltage;
 
-                    realtime.LastDayRain = lastDayRain;
-                    realtime.LastDayEva = lastDayEva;
-                    realtime.DayRain = DayRain;
-                    realtime.DayEva = DayEva;
+                    //realtime.LastDayRain = lastDayRain;
+                    //realtime.LastDayEva = lastDayEva;
+                    realtime.LastDayRain = station.LastDayRain;
+                    realtime.LastDayEva = station.LastDayEva;
+                    realtime.DayRain = m_mapStationRain[args.StrStationID];
+                    realtime.DayEva = m_mapStationEva[args.StrStationID];
                     if(args.Datas[tmpDataCount - 1].EvpType != null && (args.Datas[tmpDataCount - 1].EvpType.ToString().Length >= 2)){
                         realtime.act = args.Datas[tmpDataCount - 1].EvpType;
                     }
+                    realtime.evaPZ = "-";
                     //realtime.act = args.Datas[tmpDataCount - 1].EvpType;
 
                     // 发消息，通知界面更新
@@ -2642,10 +2592,12 @@ namespace Hydrology.DataMgr
                     realtime.StationType = station.StationType;
                     realtime.StrStationName = station.StationName;
                     //TODO
-                    realtime.LastDayRain = lastDayRain;
-                    realtime.LastDayEva = lastDayEva ;
-                    realtime.DayRain = DayRain;
-                    realtime.DayEva = DayEva;
+                    //realtime.LastDayRain = lastDayRain;
+                    //realtime.LastDayEva = lastDayEva;
+                    realtime.LastDayRain = station.LastDayRain;
+                    realtime.LastDayEva = station.LastDayEva;
+                    realtime.DayRain = m_mapStationRain[args.StrStationID]; 
+                    realtime.DayEva = m_mapStationEva[args.StrStationID];
                     //realtime.EIChannelType = args.EChannelType;
                     realtime.Eva = Decimal.Parse(cDic["hourE"]);
                     realtime.Rain = Decimal.Parse(cDic["hourP"]);
@@ -2658,7 +2610,15 @@ namespace Hydrology.DataMgr
                     realtime.RawRain = args.Datas[tmpDataCount - 1].TotalRain;
                     realtime.RawVoltage = args.Datas[tmpDataCount - 1].Voltage;
                     realtime.act = args.Datas[tmpDataCount - 1].EvpType;
-
+                    if (cDic.ContainsKey("dayEChange") && (cDic["dayEChange"] != ""))
+                    {
+                        realtime.evaPZ = cDic["dayEChange"];
+                    }
+                    else
+                    {
+                        realtime.evaPZ = "-";
+                    }
+                   
                     // 发消息，通知界面更新
                     if (RecvedRTD_Eva != null)
                     {
@@ -3516,6 +3476,19 @@ namespace Hydrology.DataMgr
             results = m_proxyDEva.getEvabyTime(station, start, end);
             return results;
         }
+        /// <summary>
+        /// 获取小时表数据
+        /// </summary>
+        /// <param name="station"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        public List<CEntityEva> QueryForHourEvaList4Table(string station, DateTime start, DateTime end)
+        {
+            List<CEntityEva> results = new List<CEntityEva>();
+            results = m_proxyHEva.QueryForHourEvaList4Table(station, start, end);
+            return results;
+        }
 
         public List<CEntityEva> getSpEvaByTime(string station, DateTime start, DateTime end)
         {
@@ -3597,10 +3570,56 @@ namespace Hydrology.DataMgr
         //        }
         private void atimer_Tick(object sender, EventArgs e)
         {
-            if (DateTime.Now.Hour == 8 && DateTime.Now.Minute == 30)
+           if (DateTime.Now.Hour == 8 && DateTime.Now.Minute == 30)
             {
-                //定时调用
-                cal.Timing();
+                //1.获取所有站点ID
+                List<String> stationIds = new List<string>();
+                if (m_listStations != null && m_listStations.Count > 0)
+                {
+                    for (int i = 0; i < m_listStations.Count; i++)
+                    {
+                        if (m_listStations[i].StationType == EStationType.EEva)
+                        {
+                            stationIds.Add(m_listStations[i].StationID);
+                        }
+                    }
+                }
+                //2.定时调用
+                for (int i = 0; i <stationIds.Count; i++)
+                {
+                    Dictionary<string, string> ret = cal.Timing(stationIds[i]);
+                    List<CEntityEva> dEvaList = new List<CEntityEva>(); 
+                    if(ret == null || ret.Count == 0)
+                    {
+                        continue;
+                    }
+                    if (ret.ContainsKey("dayE"))
+                    {
+                        if (ret["dayE"] != "")
+                        {
+                            CEntityEva DEva = new CEntityEva();
+                            DEva.StationID = stationIds[i];
+                            DEva.TimeCollect = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 8, 0, 0);
+                            DEva.Eva = decimal.Parse(ret["dayE"]);
+                            DEva.Rain = decimal.Parse(ret["dayP"]);
+                            DEva.Temperature = decimal.Parse(ret["dayT"]);
+                            DEva.P8 = decimal.Parse(ret["P8"]);
+                            DEva.P20 = decimal.Parse(ret["P20"]);
+                            DEva.dayPChange = decimal.Parse(ret["dayPChange"]);
+                            DEva.dayEChange = decimal.Parse(ret["dayEChange"]);
+                            dEvaList.Add(DEva);
+                        }
+                    }
+                    //3.初始化并保存
+                    if (dEvaList.Count > 0)
+                    {
+                        m_proxyDEva.AddNewRows(dEvaList);
+                    }
+                }
+                
+                
+            
+
             }
         }
 

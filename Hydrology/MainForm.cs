@@ -138,7 +138,7 @@ namespace Hydrology
                 m_timer.Tick += new EventHandler(EH_Timer);
                 // m_timer_gsm.Tick += new EventHandler(EH_Timer_gsm);
 
-                this.CopyRightLabel.Text = "版权所有:湖北一方科技发展有限责任公司 V1.0 - YD    GSM数据接收：" + num1 + "    BeiDou数据接收：" + num2;
+                this.CopyRightLabel.Text = "版权所有:水利部长江水利委员会水文局 V1.0";
                 // this.CopyRightLabel.Text = Thread.CurrentThread.ManagedThreadId.ToString();
                 this.lblSysTimer.Alignment = ToolStripItemAlignment.Right;
                 //  初始化系统时间定时器
@@ -512,7 +512,7 @@ namespace Hydrology
             sr.Close();
             sr2.Close();
 
-            this.CopyRightLabel.Text = "版权所有:湖北一方科技发展有限责任公司 V1.0 - YD   GSM数据接收：" + gsmnum + "    BeiDou数据接收：" + bdnum;
+            this.CopyRightLabel.Text = "版权所有:水利部长江水利委员会水文局 V1.0";
         }
         #endregion
 
@@ -525,6 +525,7 @@ namespace Hydrology
             //m_dataGridLatestData.DataGrid = new CDataGridViewRTD();
             m_formRTD = new CRTDForm() { Title = "实时水情数据", BTabRectClosable = false, MdiParent = this };
             m_formRTD.Dock = DockStyle.Fill;
+            m_formRTD.Hide();
 
             m_formEvaRTD = new CRTDEvaForm() { Title = "实时蒸发数据", BTabRectClosable = false, MdiParent = this };
             m_formEvaRTD.Dock = DockStyle.Fill;
@@ -559,12 +560,12 @@ namespace Hydrology
 
             m_tabControlUp = new CExTabControl();
             m_tabControlUp.SuspendLayout();
-            m_tabControlUp.AddPage(m_formRTD);
+            //m_tabControlUp.AddPage(m_formRTD);
             if (XMLEvaInfo.Instance.DeSerialize_FormShow())
             {
                 m_tabControlUp.AddPage(m_formEvaRTD);
             }
-            m_tabControlUp.AddPage(m_formStationState);
+            //m_tabControlUp.AddPage(m_formStationState);
             //m_tabControlUp.AddPage(m_formSoilRTD);
             splitContainer2.Panel1.Controls.Add(m_tabControlUp);
             m_tabControlUp.ResumeLayout(false);

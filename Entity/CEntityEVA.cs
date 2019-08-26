@@ -85,6 +85,13 @@ namespace Hydrology.Entity
         /// </summary>
         public string act { get; set; }
 
+        public decimal? pChange { get; set; }//原始表雨量桶排水
+        public decimal? eChange { get; set; }//原始表蒸发桶排水
+        public decimal? dayPChange { get; set; }//日表雨量桶排水
+        public decimal? dayEChange { get; set; }//日表蒸发桶排水
+        public decimal? hourPChange { get; set; }//小时表雨量桶排水
+        public decimal? hourEChange { get; set; }//小时表蒸发桶排水
+
 
         //********************参数部分*****************
         public decimal? kp { get; set; }  //降雨转换系数

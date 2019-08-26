@@ -33,6 +33,7 @@ namespace Hydrology.CControls
         //public static readonly string CS_RawT = "蒸发器水温";
         public static readonly string CS_RawV = "电池电压(V)";
         public static readonly string CS_ACT = "排注水操作";
+        public static readonly string CS_evaPZ = "蒸发桶排水(mm)";
         public static readonly string CS_DH = "高度差(mm)";
         public static readonly string CS_NullUIStr = "---";
         #endregion ///<STATIC_STRING
@@ -55,11 +56,11 @@ namespace Hydrology.CControls
                 CS_StationName,  CS_StationID,CS_StationType, CS_TimeCollected,
                 CS_TimeReceived,CS_LastDayRain,CS_LastDayEva,CS_DayRain,CS_DayEva,
                 CS_Eva, CS_Rain, CS_Temp,
-                CS_RawE,CS_RawP,CS_RawV,CS_ACT,
+                CS_RawE,CS_RawP,CS_RawV,CS_ACT,CS_evaPZ,
                 CS_DH
             };
             // 隐藏延迟列，串口列
-            base.HideColomns = new int[] { 2,4,5,6,7,8,16 };
+            base.HideColomns = new int[] { 2,4,16,17 };
             // 设置一页的数量
             this.PageRowCount = CDBParams.GetInstance().UIPageRowCount;
             //this.PageRowCount = 300;   //  默认一页显示数量
@@ -262,7 +263,8 @@ namespace Hydrology.CControls
             {
                 if (e.ColumnIndex >= 0 && e.RowIndex >= 0)
                 {
-                    if (base.m_arrayStrHeader[e.ColumnIndex] == CS_StationID || base.m_arrayStrHeader[e.ColumnIndex] == CS_StationName)
+                    if (base.m_arrayStrHeader[e.ColumnIndex] == CS_StationID || base.m_arrayStrHeader[e.ColumnIndex] == CS_StationName ||
+                        base.m_arrayStrHeader[e.ColumnIndex] == CS_Rain || base.m_arrayStrHeader[e.ColumnIndex] == CS_Eva)
                     {
 
                         //获取当前单元格的行号和列号
@@ -276,7 +278,110 @@ namespace Hydrology.CControls
                         if (form != null)
                         {
                             form.cmbStation.Text = string.Format("({0,-8}|{1})", stationid, stationname);
-                            form.cmbQueryInfo.SelectedIndex = 3;
+                            form.cmbQueryInfo.SelectedIndex = 0;
+                            form.cmb_TimeSelect.SelectedIndex = 0;
+                            form.dptTimeStart.Value = DateTime.Now.AddDays(-1);
+                            form.dptTimeEnd.Value = DateTime.Now;
+                            //form.btnQuery.PerformClick();
+                            form.queryData();
+                            form.ShowDialog();
+                        }
+                    }
+                    if (base.m_arrayStrHeader[e.ColumnIndex] == CS_DayEva || base.m_arrayStrHeader[e.ColumnIndex] == CS_DayRain ||
+                        base.m_arrayStrHeader[e.ColumnIndex] == CS_LastDayEva || base.m_arrayStrHeader[e.ColumnIndex] == CS_LastDayRain)
+                    {
+
+                        //获取当前单元格的行号和列号
+                        int rowIndex = e.RowIndex;
+                        string stationid = this.Rows[rowIndex].Cells[CS_StationID].Value.ToString();
+                        string stationname = this.Rows[rowIndex].Cells[CS_StationName].Value.ToString();
+                        CStationDataMgrForm form = new CStationDataMgrForm()
+                        {
+                            Editable = false
+                        };
+                        if (form != null)
+                        {
+                            form.cmbStation.Text = string.Format("({0,-8}|{1})", stationid, stationname);
+                            form.cmbQueryInfo.SelectedIndex = 0;
+                            form.cmb_TimeSelect.SelectedIndex = 1;
+                            form.dptTimeStart.Value = DateTime.Now.AddDays(-30);
+                            form.dptTimeEnd.Value = DateTime.Now;
+                            //form.btnQuery.PerformClick();
+                            form.queryData();
+                            form.ShowDialog();
+                        }
+                    }
+                    //双击进入水温查询
+                    if (base.m_arrayStrHeader[e.ColumnIndex] == CS_Temp)
+                    {
+
+                        //获取当前单元格的行号和列号
+                        int rowIndex = e.RowIndex;
+                        string stationid = this.Rows[rowIndex].Cells[CS_StationID].Value.ToString();
+                        string stationname = this.Rows[rowIndex].Cells[CS_StationName].Value.ToString();
+                        CStationDataMgrForm form = new CStationDataMgrForm()
+                        {
+                            Editable = false
+                        };
+                        if (form != null)
+                        {
+                            form.cmbStation.Text = string.Format("({0,-8}|{1})", stationid, stationname);
+                            form.cmbQueryInfo.SelectedIndex = 2;
+                            form.cmb_TimeSelect.SelectedIndex = 0;
+                            form.dptTimeStart.Value = DateTime.Now.AddDays(-1);
+                            form.dptTimeEnd.Value = DateTime.Now;
+                            //form.btnQuery.PerformClick();
+                            form.queryData();
+                            form.ShowDialog();
+                        }
+                    }
+
+                    //双击进入电压查询
+                    if (base.m_arrayStrHeader[e.ColumnIndex] == CS_RawV)
+                    {
+
+                        //获取当前单元格的行号和列号
+                        int rowIndex = e.RowIndex;
+                        string stationid = this.Rows[rowIndex].Cells[CS_StationID].Value.ToString();
+                        string stationname = this.Rows[rowIndex].Cells[CS_StationName].Value.ToString();
+                        CStationDataMgrForm form = new CStationDataMgrForm()
+                        {
+                            Editable = false
+                        };
+                        if (form != null)
+                        {
+                            form.cmbStation.Text = string.Format("({0,-8}|{1})", stationid, stationname);
+                            form.cmbQueryInfo.SelectedIndex = 1;
+                            form.cmb_TimeSelect.SelectedIndex = 0;
+                            form.dptTimeStart.Value = DateTime.Now.AddDays(-1);
+                            form.dptTimeEnd.Value = DateTime.Now;
+                            //form.btnQuery.PerformClick();
+                            form.queryData();
+                            form.ShowDialog();
+                        }
+                    }
+                    //双击进入原始数据查询
+                    if(base.m_arrayStrHeader[e.ColumnIndex] == CS_RawE 
+                        || base.m_arrayStrHeader[e.ColumnIndex] == CS_RawP)
+                    {
+                        //获取当前单元格的行号和列号
+                        int rowIndex = e.RowIndex;
+                        string stationid = this.Rows[rowIndex].Cells[CS_StationID].Value.ToString();
+                        string stationname = this.Rows[rowIndex].Cells[CS_StationName].Value.ToString();
+                        CStationDataMgrForm form = new CStationDataMgrForm()
+                        {
+                            Editable = false
+                        };
+                        if (form != null)
+                        {
+                            form.cmbStation.Text = string.Format("({0,-8}|{1})", stationid, stationname);
+                            form.cmbQueryInfo.SelectedIndex = 0;
+                            form.cmb_ViewStyle.SelectedIndex = 2;
+                            form.cmb_TimeSelect.SelectedIndex = 2;
+                            form.dptTimeStart.Value = DateTime.Now.AddDays(-1);
+                            form.dptTimeEnd.Value = DateTime.Now;
+                            //form.btnQuery.PerformClick();
+                            form.queryData();
                             form.ShowDialog();
                         }
                     }
@@ -482,6 +587,14 @@ namespace Hydrology.CControls
             else
             {
                 result.Add(CS_NullUIStr);
+            }
+            if(entity.evaPZ != null && entity.evaPZ != "")
+            {
+                result.Add(entity.evaPZ.ToString());
+            }
+            else
+            {
+                result.Add("-");
             }
             result.Add(entity.DH.HasValue ? entity.DH.ToString() : CS_NullUIStr);
             return result;

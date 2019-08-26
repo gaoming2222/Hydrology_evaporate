@@ -41,5 +41,10 @@ namespace Hydrology.DBManager.Interface
         List<CEntityEva> GetPageData(int pageIndex,bool irefresh);
 
         bool UpdateRows(DateTime sTime, DateTime eTime, decimal comP);
+
+
+        List<CEntityEva> QueryForDayEvaList(string StationId);
+
+        List<CEntityEva> QueryForHourEvaList4Table(string StationId, DateTime strtTime, DateTime endTime);
     }
 }

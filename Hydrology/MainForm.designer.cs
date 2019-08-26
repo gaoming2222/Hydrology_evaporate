@@ -217,6 +217,7 @@
             this.MI_Beidou.Size = new System.Drawing.Size(201, 22);
             this.MI_Beidou.Tag = "北斗卫星";
             this.MI_Beidou.Text = "北斗卫星终端(普通)...";
+            this.MI_Beidou.Visible = false;
             // 
             // MI_Beidou500
             // 
@@ -224,6 +225,7 @@
             this.MI_Beidou500.Size = new System.Drawing.Size(201, 22);
             this.MI_Beidou500.Tag = "北斗卫星指挥机终端配置";
             this.MI_Beidou500.Text = "北斗卫星终端(指挥机)...";
+            this.MI_Beidou500.Visible = false;
             // 
             // MI_DatabaseConfig
             // 
@@ -238,6 +240,7 @@
             this.MI_VoiceConfig.Size = new System.Drawing.Size(161, 22);
             this.MI_VoiceConfig.Tag = "声音配置";
             this.MI_VoiceConfig.Text = "声音配置...";
+            this.MI_VoiceConfig.Visible = false;
             // 
             // MI_EvaSet
             // 
@@ -363,6 +366,7 @@
             this.HistoryDataAdjust.Size = new System.Drawing.Size(189, 22);
             this.HistoryDataAdjust.Tag = "历史数据校正";
             this.HistoryDataAdjust.Text = "数据校正...";
+            this.HistoryDataAdjust.Visible = false;
             // 
             // MI_WarningInfoQuery
             // 
@@ -370,6 +374,7 @@
             this.MI_WarningInfoQuery.Size = new System.Drawing.Size(189, 22);
             this.MI_WarningInfoQuery.Tag = "告警信息查询";
             this.MI_WarningInfoQuery.Text = "告警信息查询...";
+            this.MI_WarningInfoQuery.Visible = false;
             // 
             // toolStripSeparator5
             // 
@@ -382,6 +387,7 @@
             this.MI_StageFlowMapMgr.Size = new System.Drawing.Size(189, 22);
             this.MI_StageFlowMapMgr.Tag = "水位流量管理";
             this.MI_StageFlowMapMgr.Text = "水位流量(库容)管理...";
+            this.MI_StageFlowMapMgr.Visible = false;
             // 
             // I_searchDebug
             // 
@@ -389,6 +395,7 @@
             this.I_searchDebug.Size = new System.Drawing.Size(189, 22);
             this.I_searchDebug.Tag = "调试信息查询";
             this.I_searchDebug.Text = "调试信息查询...";
+            this.I_searchDebug.Visible = false;
             // 
             // toolsMenu
             // 
@@ -403,23 +410,25 @@
             // ReadAndSetting
             // 
             this.ReadAndSetting.Name = "ReadAndSetting";
-            this.ReadAndSetting.Size = new System.Drawing.Size(133, 22);
+            this.ReadAndSetting.Size = new System.Drawing.Size(180, 22);
             this.ReadAndSetting.Tag = "读取与设置";
             this.ReadAndSetting.Text = "参数配置...";
             // 
             // BatchTransmit
             // 
             this.BatchTransmit.Name = "BatchTransmit";
-            this.BatchTransmit.Size = new System.Drawing.Size(133, 22);
+            this.BatchTransmit.Size = new System.Drawing.Size(180, 22);
             this.BatchTransmit.Tag = "批量传输";
             this.BatchTransmit.Text = "批量传输...";
+            this.BatchTransmit.Visible = false;
             // 
             // MI_SysTimerAdjust
             // 
             this.MI_SysTimerAdjust.Name = "MI_SysTimerAdjust";
-            this.MI_SysTimerAdjust.Size = new System.Drawing.Size(133, 22);
+            this.MI_SysTimerAdjust.Size = new System.Drawing.Size(180, 22);
             this.MI_SysTimerAdjust.Tag = "系统对时";
             this.MI_SysTimerAdjust.Text = "批量远程...";
+            this.MI_SysTimerAdjust.Visible = false;
             // 
             // 帮助ToolStripMenuItem
             // 
@@ -437,42 +446,47 @@
             // OneStationMonth
             // 
             this.OneStationMonth.Name = "OneStationMonth";
-            this.OneStationMonth.Size = new System.Drawing.Size(180, 22);
+            this.OneStationMonth.Size = new System.Drawing.Size(148, 22);
             this.OneStationMonth.Tag = "单站月";
             this.OneStationMonth.Text = "单站月报表...";
+            this.OneStationMonth.Visible = false;
             // 
             // MoreStationMonth
             // 
             this.MoreStationMonth.Name = "MoreStationMonth";
-            this.MoreStationMonth.Size = new System.Drawing.Size(180, 22);
+            this.MoreStationMonth.Size = new System.Drawing.Size(148, 22);
             this.MoreStationMonth.Tag = "多站月";
             this.MoreStationMonth.Text = "多站月报表...";
+            this.MoreStationMonth.Visible = false;
             // 
             // MoreStationDay
             // 
             this.MoreStationDay.Name = "MoreStationDay";
-            this.MoreStationDay.Size = new System.Drawing.Size(180, 22);
+            this.MoreStationDay.Size = new System.Drawing.Size(148, 22);
             this.MoreStationDay.Tag = "多站日";
             this.MoreStationDay.Text = "多站日报表...";
+            this.MoreStationDay.Visible = false;
             // 
             // Communicate
             // 
             this.Communicate.Name = "Communicate";
-            this.Communicate.Size = new System.Drawing.Size(180, 22);
+            this.Communicate.Size = new System.Drawing.Size(148, 22);
             this.Communicate.Tag = "畅通率";
             this.Communicate.Text = "畅通率报表...";
+            this.Communicate.Visible = false;
             // 
             // OneStationYear
             // 
             this.OneStationYear.Name = "OneStationYear";
-            this.OneStationYear.Size = new System.Drawing.Size(180, 22);
+            this.OneStationYear.Size = new System.Drawing.Size(148, 22);
             this.OneStationYear.Tag = "单站年";
             this.OneStationYear.Text = "单站年报表...";
+            this.OneStationYear.Visible = false;
             // 
             // EvaCount
             // 
             this.EvaCount.Name = "EvaCount";
-            this.EvaCount.Size = new System.Drawing.Size(180, 22);
+            this.EvaCount.Size = new System.Drawing.Size(148, 22);
             this.EvaCount.Tag = "蒸发统计";
             this.EvaCount.Text = "蒸发统计报表";
             // 
@@ -499,7 +513,7 @@
             this.MI_ToolBar.Checked = true;
             this.MI_ToolBar.CheckState = System.Windows.Forms.CheckState.Checked;
             this.MI_ToolBar.Name = "MI_ToolBar";
-            this.MI_ToolBar.Size = new System.Drawing.Size(180, 22);
+            this.MI_ToolBar.Size = new System.Drawing.Size(148, 22);
             this.MI_ToolBar.Tag = "工具栏";
             this.MI_ToolBar.Text = "工具栏";
             // 
@@ -508,22 +522,23 @@
             this.MI_StatusBar.Checked = true;
             this.MI_StatusBar.CheckState = System.Windows.Forms.CheckState.Checked;
             this.MI_StatusBar.Name = "MI_StatusBar";
-            this.MI_StatusBar.Size = new System.Drawing.Size(180, 22);
+            this.MI_StatusBar.Size = new System.Drawing.Size(148, 22);
             this.MI_StatusBar.Tag = "状态栏";
             this.MI_StatusBar.Text = "状态栏";
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(145, 6);
             // 
             // toolBarToolStripMenuItem
             // 
             this.toolBarToolStripMenuItem.CheckOnClick = true;
             this.toolBarToolStripMenuItem.Name = "toolBarToolStripMenuItem";
-            this.toolBarToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.toolBarToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             this.toolBarToolStripMenuItem.Tag = "最新实时数据";
             this.toolBarToolStripMenuItem.Text = "实时水情数据";
+            this.toolBarToolStripMenuItem.Visible = false;
             // 
             // MI_RealEva
             // 
@@ -532,36 +547,34 @@
             this.MI_RealEva.CheckState = System.Windows.Forms.CheckState.Checked;
             this.MI_RealEva.Enabled = false;
             this.MI_RealEva.Name = "MI_RealEva";
-            this.MI_RealEva.Size = new System.Drawing.Size(180, 22);
+            this.MI_RealEva.Size = new System.Drawing.Size(148, 22);
             this.MI_RealEva.Text = "实时数据";
             // 
             // MI_StationStatus
             // 
-            this.MI_StationStatus.Checked = true;
-            this.MI_StationStatus.CheckState = System.Windows.Forms.CheckState.Checked;
             this.MI_StationStatus.Name = "MI_StationStatus";
-            this.MI_StationStatus.Size = new System.Drawing.Size(180, 22);
+            this.MI_StationStatus.Size = new System.Drawing.Size(148, 22);
             this.MI_StationStatus.Tag = "站点实时状态";
             this.MI_StationStatus.Text = "站点状态";
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(145, 6);
             // 
             // MI_ComPortState
             // 
             this.MI_ComPortState.Checked = true;
             this.MI_ComPortState.CheckState = System.Windows.Forms.CheckState.Checked;
             this.MI_ComPortState.Name = "MI_ComPortState";
-            this.MI_ComPortState.Size = new System.Drawing.Size(180, 22);
+            this.MI_ComPortState.Size = new System.Drawing.Size(148, 22);
             this.MI_ComPortState.Tag = "通讯口状态";
             this.MI_ComPortState.Text = "串口状态";
             // 
             // toolStripSeparator10
             // 
             this.toolStripSeparator10.Name = "toolStripSeparator10";
-            this.toolStripSeparator10.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator10.Size = new System.Drawing.Size(145, 6);
             // 
             // toolStripMenuItem8
             // 
@@ -569,16 +582,14 @@
             this.toolStripMenuItem8.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toolStripMenuItem8.Enabled = false;
             this.toolStripMenuItem8.Name = "toolStripMenuItem8";
-            this.toolStripMenuItem8.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem8.Size = new System.Drawing.Size(148, 22);
             this.toolStripMenuItem8.Tag = "系统日志";
             this.toolStripMenuItem8.Text = "运行日志";
             // 
             // MI_WarningInfo
             // 
-            this.MI_WarningInfo.Checked = true;
-            this.MI_WarningInfo.CheckState = System.Windows.Forms.CheckState.Checked;
             this.MI_WarningInfo.Name = "MI_WarningInfo";
-            this.MI_WarningInfo.Size = new System.Drawing.Size(180, 22);
+            this.MI_WarningInfo.Size = new System.Drawing.Size(148, 22);
             this.MI_WarningInfo.Tag = "告警日志";
             this.MI_WarningInfo.Text = "告警信息";
             // 
@@ -699,6 +710,7 @@
             this.MITool_BeiDouConfig.Size = new System.Drawing.Size(23, 22);
             this.MITool_BeiDouConfig.Tag = "北斗卫星";
             this.MITool_BeiDouConfig.Text = "北斗卫星终端(普通)";
+            this.MITool_BeiDouConfig.Visible = false;
             // 
             // MITool_BeiDouConfig500
             // 
@@ -709,6 +721,7 @@
             this.MITool_BeiDouConfig500.Size = new System.Drawing.Size(23, 22);
             this.MITool_BeiDouConfig500.Tag = "北斗卫星指挥机终端配置";
             this.MITool_BeiDouConfig500.Text = "北斗卫星终端(指挥机)";
+            this.MITool_BeiDouConfig500.Visible = false;
             // 
             // MITool_DBConfig
             // 
@@ -729,6 +742,7 @@
             this.MITool_VoiceConfig.Size = new System.Drawing.Size(23, 22);
             this.MITool_VoiceConfig.Tag = "声音配置";
             this.MITool_VoiceConfig.Text = "声音配置";
+            this.MITool_VoiceConfig.Visible = false;
             // 
             // toolStripSeparator1
             // 
@@ -754,6 +768,7 @@
             this.MITool_StationMgr.Size = new System.Drawing.Size(23, 22);
             this.MITool_StationMgr.Tag = "测站管理";
             this.MITool_StationMgr.Text = "水情测站管理";
+            this.MITool_StationMgr.ToolTipText = "蒸发站管理";
             // 
             // toolStripSeparator9
             // 
@@ -779,6 +794,7 @@
             this.MITool_DataAdjust.Size = new System.Drawing.Size(23, 22);
             this.MITool_DataAdjust.Tag = "历史数据校正";
             this.MITool_DataAdjust.Text = "数据校正";
+            this.MITool_DataAdjust.Visible = false;
             // 
             // MITool_WarnningInfoQuery
             // 
@@ -789,6 +805,7 @@
             this.MITool_WarnningInfoQuery.Size = new System.Drawing.Size(23, 22);
             this.MITool_WarnningInfoQuery.Tag = "告警信息查询";
             this.MITool_WarnningInfoQuery.Text = "告警信息查询";
+            this.MITool_WarnningInfoQuery.Visible = false;
             // 
             // MITool_StageFlowMapMgr
             // 
@@ -799,6 +816,7 @@
             this.MITool_StageFlowMapMgr.Size = new System.Drawing.Size(23, 22);
             this.MITool_StageFlowMapMgr.Tag = "水位流量管理";
             this.MITool_StageFlowMapMgr.Text = "水位流量(库容)管理";
+            this.MITool_StageFlowMapMgr.Visible = false;
             // 
             // toolStripSeparator2
             // 
@@ -814,6 +832,7 @@
             this.MITool_ReadAndSetting.Size = new System.Drawing.Size(23, 22);
             this.MITool_ReadAndSetting.Tag = "读取与设置";
             this.MITool_ReadAndSetting.Text = "参数配置";
+            this.MITool_ReadAndSetting.Visible = false;
             // 
             // MITool_Flash
             // 
@@ -824,6 +843,7 @@
             this.MITool_Flash.Size = new System.Drawing.Size(23, 22);
             this.MITool_Flash.Tag = "批量传输";
             this.MITool_Flash.Text = "批量传输";
+            this.MITool_Flash.Visible = false;
             // 
             // MITool_Exit
             // 
@@ -844,6 +864,7 @@
             this.MITool_Remote.Size = new System.Drawing.Size(23, 22);
             this.MITool_Remote.Tag = "批量远程";
             this.MITool_Remote.Text = "批量远程";
+            this.MITool_Remote.Visible = false;
             // 
             // m_statusStrip
             // 
@@ -903,7 +924,7 @@
             this.splitContainer1.Panel2.BackgroundImage = global::Hydrology.Properties.Resources.WhiteSpace;
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
             this.splitContainer1.Size = new System.Drawing.Size(814, 346);
-            this.splitContainer1.SplitterDistance = 150;
+            this.splitContainer1.SplitterDistance = 103;
             this.splitContainer1.TabIndex = 4;
             // 
             // splitContainer2
@@ -922,8 +943,8 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.splitContainer2_Panel2_MouseClick);
-            this.splitContainer2.Size = new System.Drawing.Size(660, 346);
-            this.splitContainer2.SplitterDistance = 215;
+            this.splitContainer2.Size = new System.Drawing.Size(707, 346);
+            this.splitContainer2.SplitterDistance = 193;
             this.splitContainer2.TabIndex = 0;
             // 
             // MainForm
@@ -942,7 +963,7 @@
             this.IsMdiContainer = true;
             this.MainMenuStrip = this.menuStrip;
             this.Name = "MainForm";
-            this.Text = "水文多要素自动监测管理系统——湖北一方科技发展有限责任公司 V1.0 - YD";
+            this.Text = "自动蒸发监测管理系统——水利部长江水利委员会水文局 V1.0";
             this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.MainForm_MouseClick);
             this.MouseEnter += new System.EventHandler(this.MainForm_MouseEnter);
             this.menuStrip.ResumeLayout(false);

@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Hydrology.DBManager.DB.SQLServer
 {
-    public class CSQLHEva : CSQLBase, IHEvaProxy 
+    public class CSQLHEva : CSQLBase, IHEvaProxy
     {
         #region 静态常量
         private const string CT_EntityName = "CEntityEva";   //  数据库表Eva实体类
@@ -21,6 +21,7 @@ namespace Hydrology.DBManager.DB.SQLServer
         public static readonly string CN_Rain = "P";  //降雨
         public static readonly string CN_Voltage = "U";  //电压
         public static readonly string CN_DH = "DH";  //高度差
+        public static readonly string CN_hourEChange = "hourEChange";  //高度差
         #endregion
 
         #region 成员变量
@@ -64,7 +65,7 @@ namespace Hydrology.DBManager.DB.SQLServer
             m_tableDataAdded.Columns.Add(CN_Rain);
             m_tableDataAdded.Columns.Add(CN_Voltage);
             m_tableDataAdded.Columns.Add(CN_DH);
-          
+            m_tableDataAdded.Columns.Add(CN_hourEChange);
             // 分页查询相关
             m_strStaionId = null;
 
@@ -125,6 +126,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
                     bulkCopy.ColumnMappings.Add(CN_Voltage, CN_Voltage);
                     bulkCopy.ColumnMappings.Add(CN_DH, CN_DH);
+                    bulkCopy.ColumnMappings.Add(CN_hourEChange, CN_hourEChange);
 
                     try
                     {
@@ -181,18 +183,20 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_Rain] = Eva.Rain;
                 row[CN_Voltage] = Eva.Voltage;
                 row[CN_DH] = Eva.DH;
+                row[CN_hourEChange] = Eva.hourEChange;
                 m_tableDataAdded.Rows.Add(row);
             }
-            if (m_tableDataAdded.Rows.Count >= CDBParams.GetInstance().AddBufferMax)
-            {
-                // 如果超过最大值，写入数据库
-                NewTask(() => { InsertSqlBulk(m_tableDataAdded); });
-            }
-            else
-            {
-                // 没有超过缓存最大值，开启定时器进行检测,多次调用Start()会导致重新计数
-                m_addTimer_1.Start();
-            }
+            NewTask(() => { InsertSqlBulk(m_tableDataAdded); });
+            //if (m_tableDataAdded.Rows.Count >= CDBParams.GetInstance().AddBufferMax)
+            //{
+            //    // 如果超过最大值，写入数据库
+            //    NewTask(() => { InsertSqlBulk(m_tableDataAdded); });
+            //}
+            //else
+            //{
+            //    // 没有超过缓存最大值，开启定时器进行检测,多次调用Start()会导致重新计数
+            //    m_addTimer_1.Start();
+            //}
             m_mutexDataTable.ReleaseMutex();
         }
 
@@ -210,6 +214,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_Rain] = Eva.Rain;
                 row[CN_Voltage] = Eva.Voltage;
                 row[CN_DH] = Eva.DH;
+                row[CN_hourEChange] = Eva.hourEChange;
                 m_tableDataAdded.Rows.Add(row);
 
             }
@@ -336,6 +341,10 @@ namespace Hydrology.DBManager.DB.SQLServer
                 {
                     Eva.DH = Decimal.Parse(table.Rows[startRow][CN_DH].ToString());
                 }
+                if (!table.Rows[startRow][CN_hourEChange].ToString().Equals(""))
+                {
+                    Eva.hourEChange = Decimal.Parse(table.Rows[startRow][CN_hourEChange].ToString());
+                }
                 result.Add(Eva);
             }
             return result;
@@ -433,6 +442,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
                     bulkCopy.ColumnMappings.Add(CN_Voltage, CN_Voltage);
                     bulkCopy.ColumnMappings.Add(CN_DH, CN_DH);
+                    bulkCopy.ColumnMappings.Add(CN_hourEChange, CN_hourEChange);
 
                     try
                     {
@@ -510,5 +520,115 @@ namespace Hydrology.DBManager.DB.SQLServer
             ResetAll();
             return true;
         }
+
+
+        public List<CEntityEva> QueryForDayEvaList(string StationId)
+        {
+            DateTime endTime = DateTime.Now;
+            DateTime strtTime = new DateTime(endTime.Year, endTime.Month, endTime.Day, 8, 0, 0);
+            string sql = "select * from " + CT_TableName + " where DT >='" + strtTime + "' and DT <='" + endTime + "' and STCD ='" + StationId + "';";
+
+            List<CEntityEva> results = new List<CEntityEva>();
+            //string sql = "select * from HydrologytestDB.dbo.Rain where DataTime= '" + startTime + "' and StationID="  + StationId + ";";
+            SqlDataAdapter adapter = new SqlDataAdapter(sql, CDBManager.GetInstacne().GetConnection());
+            DataTable dataTableTemp = new DataTable();
+            adapter.Fill(dataTableTemp);
+            int flag = dataTableTemp.Rows.Count;
+            if (flag == 0)
+            {
+                return null;
+            }
+            else
+            {
+                for (int rowid = 0; rowid < dataTableTemp.Rows.Count; ++rowid)
+                {
+                    CEntityEva eva = new CEntityEva();
+                    eva.StationID = dataTableTemp.Rows[rowid][CN_StationId].ToString();
+                    eva.TimeCollect = DateTime.Parse(dataTableTemp.Rows[rowid][CN_DataTime].ToString());
+                    if (dataTableTemp.Rows[rowid][CN_Eva].ToString() != "")
+                    {
+                        eva.Eva = decimal.Parse(dataTableTemp.Rows[rowid][CN_Eva].ToString());
+                    }
+                    else
+                    {
+                        eva.Eva = 0;
+                    }
+
+                    if (dataTableTemp.Rows[rowid][CN_Rain].ToString() != "")
+                    {
+                        eva.Rain = decimal.Parse(dataTableTemp.Rows[rowid][CN_Rain].ToString());
+                    }
+                    else
+                    {
+                        eva.Rain = 0;
+                    }
+
+                    results.Add(eva);
+                }
+            }
+            return results;
+        }
+
+
+        public List<CEntityEva> QueryForHourEvaList4Table(string StationId,DateTime strtTime,DateTime  endTime)
+        {
+            
+            string sql = "select * from " + CT_TableName + " where DT >='" + strtTime + "' and DT <='" + endTime + "' and STCD ='" + StationId + "' order by DT;";
+
+            List<CEntityEva> results = new List<CEntityEva>();
+            //string sql = "select * from HydrologytestDB.dbo.Rain where DataTime= '" + startTime + "' and StationID="  + StationId + ";";
+            SqlDataAdapter adapter = new SqlDataAdapter(sql, CDBManager.GetInstacne().GetConnection());
+            DataTable dataTableTemp = new DataTable();
+            adapter.Fill(dataTableTemp);
+            int flag = dataTableTemp.Rows.Count;
+            if (flag == 0)
+            {
+                return null;
+            }
+            else
+            {
+                for (int rowid = 0; rowid < dataTableTemp.Rows.Count; ++rowid)
+                {
+                    CEntityEva eva = new CEntityEva();
+                    eva.StationID = dataTableTemp.Rows[rowid][CN_StationId].ToString();
+                    eva.TimeCollect = DateTime.Parse(dataTableTemp.Rows[rowid][CN_DataTime].ToString());
+                    if(eva.TimeCollect.Hour != 8)
+                    {
+                        continue;
+                    }
+                    if (dataTableTemp.Rows[rowid][CN_Eva].ToString() != "")
+                    {
+                        eva.Eva = decimal.Parse(dataTableTemp.Rows[rowid][CN_Eva].ToString());
+                    }
+                    else
+                    {
+                        eva.Eva = 0;
+                    }
+
+                    if (dataTableTemp.Rows[rowid][CN_Rain].ToString() != "")
+                    {
+                        eva.Rain = decimal.Parse(dataTableTemp.Rows[rowid][CN_Rain].ToString());
+                    }
+                    else
+                    {
+                        eva.Rain = 0;
+                    }
+
+                    if (dataTableTemp.Rows[rowid][CN_DH].ToString() != "")
+                    {
+                        eva.DH = decimal.Parse(dataTableTemp.Rows[rowid][CN_DH].ToString());
+                    }
+                    else
+                    {
+                        eva.DH = null;
+                    }
+
+                    results.Add(eva);
+                }
+            }
+            return results;
+        }
+
+
     }
 }

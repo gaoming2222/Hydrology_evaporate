@@ -402,7 +402,7 @@ namespace Hydrology.CControls
                       CS_Maintran,CS_Subtran, CS_Dataprotocol ,CS_Watersensor,
                       CS_Rainsensor,CS_Reportinterval
                 };
-                    this.HideColomns = new int[] {18, 19, 20 };
+                    this.HideColomns = new int[] {13,14,18, 19, 20 };
                     List<string> listHeader = new List<string>(this.Header);
                     ////开启编辑模式,设置可编辑列
                     DataGridViewCheckBoxColumn deleteCol = new DataGridViewCheckBoxColumn();
@@ -417,9 +417,9 @@ namespace Hydrology.CControls
                     cmb_StationType.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
 
                     //// 初始化站点类型
-                    cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.ERainFall));
-                    cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.ERiverWater));
-                    cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.EHydrology));
+                    //cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.ERainFall));
+                    //cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.ERiverWater));
+                    //cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.EHydrology));
                     cmb_StationType.Items.Add(CEnumHelper.StationTypeToUIStr(EStationType.EEva));
                     base.SetColumnEditStyle(listHeader.IndexOf(CS_Stationtype), cmb_StationType);
 

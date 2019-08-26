@@ -23,6 +23,8 @@ namespace Hydrology.DBManager.DB.SQLServer
         public static readonly string CN_Rain = "P";  //降雨
         public static readonly string CN_TRain = "TP";  //转换后的降雨
         public static readonly string CN_ACT = "ACT";    //蒸发模式
+        public static readonly string CN_PChange = "PChange";    //蒸发模式
+        public static readonly string CN_EChange = "EChange";    //蒸发模式
         //public static readonly string CN_State = "state";
         #endregion
 
@@ -70,9 +72,8 @@ namespace Hydrology.DBManager.DB.SQLServer
             m_tableDataAdded.Columns.Add(CN_TEva);
             m_tableDataAdded.Columns.Add(CN_TRain);
 
-            //m_tableDataAdded.Columns.Add(CN_TransType);
-
             m_tableDataAdded.Columns.Add(CN_ACT);
+            m_tableDataAdded.Columns.Add(CN_EChange);
             // 分页查询相关
             m_strStaionId = null;
 
@@ -133,6 +134,8 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_Voltage, CN_Voltage);
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
                     bulkCopy.ColumnMappings.Add(CN_ACT, CN_ACT);
+                    //bulkCopy.ColumnMappings.Add(CN_PChange, CN_PChange);
+                    bulkCopy.ColumnMappings.Add(CN_EChange, CN_EChange);
 
                     try
                     {
@@ -184,7 +187,8 @@ namespace Hydrology.DBManager.DB.SQLServer
             row[CN_Eva] = Eva.Eva;
             row[CN_Voltage] = Eva.Voltage;
             row[CN_Rain] = Eva.Rain;
-            row[CN_ACT] = Eva.type; 
+            row[CN_ACT] = Eva.type;
+            row[CN_EChange] = Eva.eChange;
             row[CN_TEva] = Eva.TE;
             row[CN_TRain] = Eva.TP;
             m_tableDataAdded.Rows.Add(row);
@@ -226,7 +230,8 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_Eva] = Eva.Eva;
                 row[CN_Voltage] = Eva.Voltage;
                 row[CN_Rain] = Eva.Rain;
-                row[CN_ACT] = Eva.type; ;
+                row[CN_ACT] = Eva.type;
+                row[CN_EChange] = Eva.eChange;
                 m_tableDataAdded.Rows.Add(row);
             }
             if (m_tableDataAdded.Rows.Count >= CDBParams.GetInstance().AddBufferMax)
@@ -256,6 +261,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_Voltage] = Eva.Voltage;
                 row[CN_Rain] = Eva.Rain;
                 row[CN_ACT] = Eva.type;
+                row[CN_EChange] = Eva.eChange;
                 //row[CN_TransType] = CEnumHelper.ChannelTypeToDBStr(Eva.ChannelType);
                 m_tableDataAdded.Rows.Add(row);
 
@@ -380,7 +386,11 @@ namespace Hydrology.DBManager.DB.SQLServer
                     Eva.Rain = Decimal.Parse(table.Rows[startRow][CN_Rain].ToString());
                 }
                 Eva.type = table.Rows[startRow][CN_ACT].ToString(); 
-                Eva.act = table.Rows[startRow][CN_ACT].ToString(); 
+                Eva.act = table.Rows[startRow][CN_ACT].ToString();
+                if (!table.Rows[startRow][CN_EChange].ToString().Equals(""))
+                {
+                    Eva.eChange = Decimal.Parse(table.Rows[startRow][CN_EChange].ToString());
+                }
                 result.Add(Eva);
             }
             return result;
@@ -482,6 +492,8 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_ACT, CN_ACT);
                     bulkCopy.ColumnMappings.Add(CN_TRain, CN_TRain);
                     bulkCopy.ColumnMappings.Add(CN_TEva, CN_TEva);
+                    bulkCopy.ColumnMappings.Add(CN_EChange, CN_EChange);
+
 
                     try
                     {
@@ -544,7 +556,7 @@ namespace Hydrology.DBManager.DB.SQLServer
         public List<CEntityEva> getEvabyTime(string stationid, DateTime start, DateTime end)
         {
             List<CEntityEva> evaList = new List<CEntityEva>();
-            String sql = "select * from " + CT_TableName + " where STCD=" + stationid + " and  ACT != null" + " and DT between '" + start + "'and '" + end + "';";
+            String sql = "select * from " + CT_TableName + " where STCD=" + stationid + " and  ACT != null" + " and DT between '" + start + "'and '" + end + "' order by DT;";
             SqlDataAdapter adapter = new SqlDataAdapter(sql, CDBManager.GetInstacne().GetConnection());
             DataTable dataTableTemp = new DataTable();
             adapter.Fill(dataTableTemp);
@@ -560,6 +572,14 @@ namespace Hydrology.DBManager.DB.SQLServer
                     CEntityEva eva = new CEntityEva();
                     eva.StationID = dataTableTemp.Rows[rowid][CN_StationId].ToString();
                     eva.TimeCollect = DateTime.Parse(dataTableTemp.Rows[rowid][CN_DataTime].ToString());
+                    if (dataTableTemp.Rows[rowid][CN_ACT] != null && dataTableTemp.Rows[rowid][CN_ACT].ToString() != "")
+                    {
+                        eva.act = dataTableTemp.Rows[rowid][CN_Temp].ToString();
+                    }
+                    if (!eva.act.Contains("ER"))
+                    {
+                        continue;
+                    }
                     if (dataTableTemp.Rows[rowid][CN_Voltage] != null && dataTableTemp.Rows[rowid][CN_Voltage].ToString() != "")
                     {
                         eva.Voltage = decimal.Parse(dataTableTemp.Rows[rowid][CN_Voltage].ToString());
@@ -596,7 +616,7 @@ namespace Hydrology.DBManager.DB.SQLServer
 
                     if (dataTableTemp.Rows[rowid][CN_ACT] != null && dataTableTemp.Rows[rowid][CN_ACT].ToString() != "")
                     {
-                        eva.act= dataTableTemp.Rows[rowid][CN_Temp].ToString();
+                        eva.act = dataTableTemp.Rows[rowid][CN_Temp].ToString();
                     }
                     else
                     {
