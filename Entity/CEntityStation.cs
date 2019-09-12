@@ -136,6 +136,10 @@ namespace Hydrology.Entity
         [XmlElement("rinterval")]
         public string Reportinterval { get; set; }
 
+        //报讯段次
+        [XmlElement("act")]
+        public string act { get; set; }
+
 
 
         //////////////////////////////////////////////////////////////////////////

@@ -366,7 +366,6 @@
             this.HistoryDataAdjust.Size = new System.Drawing.Size(189, 22);
             this.HistoryDataAdjust.Tag = "历史数据校正";
             this.HistoryDataAdjust.Text = "数据校正...";
-            this.HistoryDataAdjust.Visible = false;
             // 
             // MI_WarningInfoQuery
             // 
@@ -446,7 +445,7 @@
             // OneStationMonth
             // 
             this.OneStationMonth.Name = "OneStationMonth";
-            this.OneStationMonth.Size = new System.Drawing.Size(148, 22);
+            this.OneStationMonth.Size = new System.Drawing.Size(180, 22);
             this.OneStationMonth.Tag = "单站月";
             this.OneStationMonth.Text = "单站月报表...";
             this.OneStationMonth.Visible = false;
@@ -454,7 +453,7 @@
             // MoreStationMonth
             // 
             this.MoreStationMonth.Name = "MoreStationMonth";
-            this.MoreStationMonth.Size = new System.Drawing.Size(148, 22);
+            this.MoreStationMonth.Size = new System.Drawing.Size(180, 22);
             this.MoreStationMonth.Tag = "多站月";
             this.MoreStationMonth.Text = "多站月报表...";
             this.MoreStationMonth.Visible = false;
@@ -462,7 +461,7 @@
             // MoreStationDay
             // 
             this.MoreStationDay.Name = "MoreStationDay";
-            this.MoreStationDay.Size = new System.Drawing.Size(148, 22);
+            this.MoreStationDay.Size = new System.Drawing.Size(180, 22);
             this.MoreStationDay.Tag = "多站日";
             this.MoreStationDay.Text = "多站日报表...";
             this.MoreStationDay.Visible = false;
@@ -470,7 +469,7 @@
             // Communicate
             // 
             this.Communicate.Name = "Communicate";
-            this.Communicate.Size = new System.Drawing.Size(148, 22);
+            this.Communicate.Size = new System.Drawing.Size(180, 22);
             this.Communicate.Tag = "畅通率";
             this.Communicate.Text = "畅通率报表...";
             this.Communicate.Visible = false;
@@ -478,7 +477,7 @@
             // OneStationYear
             // 
             this.OneStationYear.Name = "OneStationYear";
-            this.OneStationYear.Size = new System.Drawing.Size(148, 22);
+            this.OneStationYear.Size = new System.Drawing.Size(180, 22);
             this.OneStationYear.Tag = "单站年";
             this.OneStationYear.Text = "单站年报表...";
             this.OneStationYear.Visible = false;
@@ -486,7 +485,7 @@
             // EvaCount
             // 
             this.EvaCount.Name = "EvaCount";
-            this.EvaCount.Size = new System.Drawing.Size(148, 22);
+            this.EvaCount.Size = new System.Drawing.Size(180, 22);
             this.EvaCount.Tag = "蒸发统计";
             this.EvaCount.Text = "蒸发统计报表";
             // 

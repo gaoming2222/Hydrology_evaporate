@@ -129,7 +129,7 @@ namespace Hydrology.DataMgr
         private static int dayInterval;
         private static int hourInterval;
         private readonly string CONFIG_PATH = "Config/RainIntervalConfig.xml";
-
+        //private string actStr = "";
 
         Nullable<decimal> lastDayRain = 0;
         Nullable<decimal> DayRain = 0;
@@ -1130,24 +1130,71 @@ namespace Hydrology.DataMgr
             m_mapStationRTS = new Dictionary<string, CEntityRealEva>();
             // 读取数据库,初始化实时蒸发数据表
             List<CEntityRealEva> listRTS = m_proxyRealEva.QueryAll();
-            if (null == listRTS)
+            List<CEntityEva> evaList = m_proxyEva.get4InitEva();
+            Dictionary<String, CEntityEva> evaDic = new Dictionary<string, CEntityEva>();
+            List<CEntityEva> hEvaList = m_proxyHEva.get4InitEva();
+            Dictionary<String, CEntityEva> hEvaDic = new Dictionary<string, CEntityEva>();
+            List<CEntityEva> dEvaList = m_proxyDEva.get4InitEva();
+            Dictionary<String, CEntityEva> dEvaDic = new Dictionary<string, CEntityEva>();
+            foreach (CEntityEva eva in evaList)
             {
-                return;
+                evaDic[eva.StationID] = eva;
             }
-            for (int i = 0; i < listRTS.Count; ++i)
+            foreach (CEntityEva eva in hEvaList)
             {
-                if (m_mapStation.ContainsKey(listRTS[i].StrStationID))
-                {
-                    // 通知界面
-                    m_mapStationRTS.Add(listRTS[i].StrStationID, listRTS[i]);
-                }
-                else
-                {
-                    // 位置站点，读取实时蒸发数据文件不匹配
-                    CSystemInfoMgr.Instance.AddInfo(string.Format("实时蒸发数据中站点\"{0}\"在数据库中匹配失败", listRTS[i].StrStationID));
-                }
+                hEvaDic[eva.StationID] = eva;
             }
-
+            foreach (CEntityEva eva in dEvaList)
+            {
+                dEvaDic[eva.StationID] = eva;
+            }
+            for(int i = 0;i< evaList.Count; i++)
+            {
+                CEntityRealEva realEva = new CEntityRealEva();
+                realEva.StrStationID = evaList[i].StationID;
+                if (!m_mapStation.ContainsKey(evaList[i].StationID))
+                {
+                    return;
+                }
+                realEva.StrStationName = m_mapStation[evaList[i].StationID].StationName;
+                if (evaDic.ContainsKey(evaList[i].StationID))
+                {
+                    realEva.TimeDeviceGained = evaDic[realEva.StrStationID].TimeCollect;
+                    realEva.Temperature = evaDic[realEva.StrStationID].Temperature;
+                    realEva.RawEva = evaDic[realEva.StrStationID].Eva;
+                    realEva.RawRain = evaDic[realEva.StrStationID].Rain;
+                    realEva.RawVoltage = evaDic[realEva.StrStationID].Voltage;
+                }
+                if (hEvaDic.ContainsKey(evaList[i].StationID))
+                {
+                    realEva.Eva = hEvaDic[realEva.StrStationID].Eva;
+                    realEva.Rain = hEvaDic[realEva.StrStationID].Rain;
+                }
+                if (dEvaDic.ContainsKey(evaList[i].StationID)){
+                    realEva.LastDayEva = dEvaDic[realEva.StrStationID].E;
+                    realEva.LastDayRain = dEvaDic[realEva.StrStationID].P;
+                }
+                m_mapStationRTS.Add(realEva.StrStationID, realEva);
+                m_mapStation[evaList[i].StationID].LastDayRain = realEva.LastDayRain;
+                m_mapStation[evaList[i].StationID].LastDayEva = realEva.LastDayEva;
+            }
+            //if (null == listRTS)
+            //{
+            //    return;
+            //}
+            //for (int i = 0; i < listRTS.Count; ++i)
+            //{
+            //    if (m_mapStation.ContainsKey(listRTS[i].StrStationID))
+            //    {
+            //        // 通知界面
+            //        m_mapStationRTS.Add(listRTS[i].StrStationID, listRTS[i]);
+            //    }
+            //    else
+            //    {
+            //        // 位置站点，读取实时蒸发数据文件不匹配
+            //        CSystemInfoMgr.Instance.AddInfo(string.Format("实时蒸发数据中站点\"{0}\"在数据库中匹配失败", listRTS[i].StrStationID));
+            //    }
+            //}
         }
 
         /// <summary>
@@ -2463,8 +2510,6 @@ namespace Hydrology.DataMgr
                     Eva.ke = station.DWaterMax;
                     Eva.dh = station.DWaterChange;
                     Eva.comP = 0;
-                    
-
 
                     CEntityEva DEva = new CEntityEva();
                     DEva.StationID = args.StrStationID;
@@ -2540,6 +2585,12 @@ namespace Hydrology.DataMgr
                 #endregion
 
                 #region 实时蒸发表
+                if(args.Datas[tmpDataCount - 1].EvpType != null 
+                    && args.Datas[tmpDataCount - 1].EvpType != ""
+                    && args.Datas[tmpDataCount - 1].EvpType.ToString().Length >= 2)
+                {
+                    station.act = args.Datas[tmpDataCount - 1].EvpType;
+                }
                 CEntityRealEva realtime = new CEntityRealEva();
                 if (!cDic.ContainsKey("hourE"))
                 {
@@ -2570,9 +2621,10 @@ namespace Hydrology.DataMgr
                     realtime.LastDayEva = station.LastDayEva;
                     realtime.DayRain = m_mapStationRain[args.StrStationID];
                     realtime.DayEva = m_mapStationEva[args.StrStationID];
-                    if(args.Datas[tmpDataCount - 1].EvpType != null && (args.Datas[tmpDataCount - 1].EvpType.ToString().Length >= 2)){
-                        realtime.act = args.Datas[tmpDataCount - 1].EvpType;
-                    }
+                    //if(args.Datas[tmpDataCount - 1].EvpType != null && (args.Datas[tmpDataCount - 1].EvpType.ToString().Length >= 2)){
+                    //    realtime.act = args.Datas[tmpDataCount - 1].EvpType;
+                    //}
+                    realtime.act = station.act;
                     realtime.evaPZ = "-";
                     //realtime.act = args.Datas[tmpDataCount - 1].EvpType;
 
@@ -2584,7 +2636,7 @@ namespace Hydrology.DataMgr
 
                     m_mapStationRTS[station.StationID] = realtime;
 
-                    m_proxyRealEva.AddNewRow(realtime);
+                    //m_proxyRealEva.AddNewRow(realtime);
                 }
                 else
                 {
@@ -2609,7 +2661,8 @@ namespace Hydrology.DataMgr
                     realtime.RawEva = args.Datas[tmpDataCount - 1].Eva;
                     realtime.RawRain = args.Datas[tmpDataCount - 1].TotalRain;
                     realtime.RawVoltage = args.Datas[tmpDataCount - 1].Voltage;
-                    realtime.act = args.Datas[tmpDataCount - 1].EvpType;
+                    //realtime.act = args.Datas[tmpDataCount - 1].EvpType;
+                    realtime.act = station.act;
                     if (cDic.ContainsKey("dayEChange") && (cDic["dayEChange"] != ""))
                     {
                         realtime.evaPZ = cDic["dayEChange"];
@@ -3570,8 +3623,10 @@ namespace Hydrology.DataMgr
         //        }
         private void atimer_Tick(object sender, EventArgs e)
         {
-           if (DateTime.Now.Hour == 8 && DateTime.Now.Minute == 30)
+            if (DateTime.Now.Hour == 8 && DateTime.Now.Minute == 30)
+            //if (true)
             {
+                CSystemInfoMgr.Instance.AddInfo("8：00数据缺失，人工计算日量");
                 //1.获取所有站点ID
                 List<String> stationIds = new List<string>();
                 if (m_listStations != null && m_listStations.Count > 0)

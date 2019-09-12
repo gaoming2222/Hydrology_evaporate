@@ -219,6 +219,11 @@ namespace Hydrology.CControls
                         string strStationName = "";
                         string strStationId = "";
                         CEntityStation station = CDBDataMgr.Instance.GetStationById(listEva[i].StationID);
+                        String evaF = "--";
+                        if (listEva[i].E.HasValue)
+                        {
+                            evaF = ((Decimal)(listEva[i].E.Value * station.DWaterMax)).ToString("0.00");
+                        }
                         if (null != station)
                         {
 
@@ -231,7 +236,9 @@ namespace Hydrology.CControls
                         strStationName,/*站名*/
                         listEva[i].TimeCollect.AddDays(-1).Year.ToString() + "年" + listEva[i].TimeCollect.AddDays(-1).Month.ToString() + "月"  + (listEva[i].TimeCollect.AddDays(-1).Day).ToString() + "日",
                         listEva[i].Eva.ToString(), /*蒸发*/
+                        evaF,
                         listEva[i].Rain.ToString(), /*雨量*/
+
                         listEva[i].Temperature.ToString(), /*温度*/
                         listEva[i].P8.ToString(), /*8-20*/
                         listEva[i].P20.ToString(), /*20-8*/
@@ -253,6 +260,11 @@ namespace Hydrology.CControls
                         EDataState state = EDataState.ENormal; //默认所有数据都是正常的
                         string strStationName = "";
                         CEntityStation station = CDBDataMgr.Instance.GetStationById(listEva[i].StationID);
+                        String evaF = "--";
+                        if (listEva[i].E.HasValue)
+                        {
+                            evaF = ((Decimal)(listEva[i].E.Value * station.DWaterMax)).ToString("0.00");
+                        }
                         if (null != station)
                         {
                             strStationName = station.StationName;
@@ -266,6 +278,7 @@ namespace Hydrology.CControls
                         //listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
                         listEva[i].TimeCollect.AddDays(-1).Year.ToString() + "年" + listEva[i].TimeCollect.AddDays(-1).Month.ToString() + "月"  + (listEva[i].TimeCollect.AddDays(-1).Day).ToString() + "日",
                         listEva[i].Eva.ToString(), /*蒸发*/
+                        evaF,
                         listEva[i].Rain.ToString(), /*雨量*/
                         listEva[i].Temperature.ToString(), /*温度*/
                         listEva[i].P8.ToString(), /*8-20*/
@@ -326,7 +339,7 @@ namespace Hydrology.CControls
                         }
                         if (listEva[i].act.ToString().Contains("ER"))
                         {
-                            act = "异常扰动";
+                            act = "人工维护";
                         }
                     }
                     newRow = new string[]
@@ -401,6 +414,7 @@ namespace Hydrology.CControls
             else
             {
                 m_proxyDEva.SetFilter(strStationId, timeStart, timeEnd);
+                m_proxyEva.SetFilter(strStationId, timeStart, timeEnd,true);
                 if (-1 == m_proxyDEva.GetPageCount())
                 {
                     // 查询失败
@@ -413,7 +427,22 @@ namespace Hydrology.CControls
                     this.OnMenuFirstPage(this, null);
                     base.TotalPageCount = m_proxyDEva.GetPageCount();
                     base.TotalRowCount = m_proxyDEva.GetRowCount();
-                    SetEva(m_proxyDEva.GetPageData(1, false));
+                    List<CEntityEva> dEvaList = m_proxyDEva.GetPageData(1, false);
+                    List<CEntityEva> evaList = m_proxyEva.GetPageData(1, false);
+                    for(int i = 0;i< dEvaList.Count; i++)
+                    {
+                        for(int j = 0;j< evaList.Count; j++)
+                        {
+                            Console.WriteLine("!!!" + i + "!!!" + j);
+                            if (evaList[j].TimeCollect.Equals(dEvaList[i].TimeCollect)){
+                                dEvaList[i].E = evaList[j].Eva;
+                                break;
+                            }
+                            
+                        }
+                    }
+                    //SetEva(m_proxyDEva.GetPageData(1, false));
+                    SetEva(dEvaList);
                     return true;
                 }
             }
@@ -630,14 +659,14 @@ namespace Hydrology.CControls
                     //  是日蒸发表
                     this.Header = new string[]
                     {
-                        CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_P8, CS_P20,CS_EvaPZ
+                        CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva,CS_RawEvaF,CS_Rain, CS_Temp, CS_P8, CS_P20,CS_EvaPZ
                     };
                 }
                 else
                 {
                     this.Header = new string[]
                     {
-                        CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_P8, CS_P20,CS_EvaPZ
+                        CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva,CS_RawEvaF, CS_Rain, CS_Temp, CS_P8, CS_P20,CS_EvaPZ
                     };
 
                     //开启编辑模式,设置可编辑列

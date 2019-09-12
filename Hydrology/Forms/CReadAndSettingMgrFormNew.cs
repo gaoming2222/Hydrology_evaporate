@@ -1828,7 +1828,7 @@ namespace Hydrology.Forms
             CSystemInfoMgr.Instance.AddInfo(logMsg);
             AddLog(logMsg);
 
-            CPortDataMgr.Instance.SendMsg(gprsNum, sid, cmd, this.m_channelType);
+            CPortDataMgr.Instance.SendHDMsg(gprsNum, sid, cmd, this.m_channelType);
         }
         private void btn_ClearAll_Click(object sender, EventArgs e)
         {

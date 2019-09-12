@@ -1,5 +1,4 @@
-﻿
-using Hydrology.DBManager;
+﻿using Hydrology.DBManager;
 using Hydrology.DBManager.Interface;
 using Hydrology.Entity;
 using Hydrology.Entity.Utils;
@@ -204,7 +203,7 @@ namespace Hydrology.DataMgr
                     }
 
                     //如果小时雨量筒变化为-1.5mm以下，小时蒸发大于1.5mm或者小于-1.5mm。将ACT设置为“err”,并修改原始数据库中的ACT的值
-                    if (hourP <= -1.5d || hourE > 1.5d || hourE < -1.5d)
+                    if ((hourP <= -1.5d || hourE > 1.5d || hourE < -1.5d) && (eva.type != "" || eva.type == null))
                     {
                         eva.type = "ERR";
                         string updateSql = "update rawdata set act = 'ER" + errE.ToString("0.00") + "' where stcd = '" + rawDataNew[0] + "' and dt = '" + rawDataNew[1] + "'";
@@ -546,7 +545,7 @@ namespace Hydrology.DataMgr
                     #endregion
 
                     //如果小时雨量筒变化为-1.5mm以下，小时蒸发大于1.5mm或者小于-1.5mm。将ACT设置为“err”，并将原始数据库中的ACT修改过来
-                    if (hourP <= -1.5d || hourE > 1.5d || hourE < -1.5d)
+                    if ((hourP <= -1.5d || hourE > 1.5d || hourE < -1.5d) && (eva.type != "" || eva.type == null))
                     {
                         eva.type = "ERR";
                         string updateSql = "update rawdata set act = 'ER" + errE.ToString("0.00") + "' where stcd = '" + rawDataNew[0] + "' and dt = '" + rawDataNew[1] + "'";

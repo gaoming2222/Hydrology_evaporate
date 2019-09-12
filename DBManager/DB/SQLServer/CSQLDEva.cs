@@ -585,5 +585,47 @@ namespace Hydrology.DBManager.DB.SQLServer
             }
             return evaList;
         }
+
+        public List<CEntityEva> get4InitEva()
+        {
+            List<CEntityEva> result = new List<CEntityEva>();
+            String sql = "select t.* from (select DayData.*, row_number() over(partition by stcd order by dt desc) rn from DayData) t where rn <= 1; ";
+            SqlDataAdapter adapter = new SqlDataAdapter(sql, CDBManager.GetInstacne().GetConnection());
+            DataTable dataTableTemp = new DataTable();
+            adapter.Fill(dataTableTemp);
+            int flag = dataTableTemp.Rows.Count;
+            if (flag == 0)
+            {
+                return null;
+            }
+            else
+            {
+                for (int rowid = 0; rowid < dataTableTemp.Rows.Count; ++rowid)
+                {
+                    CEntityEva eva = new CEntityEva();
+                    eva.StationID = dataTableTemp.Rows[rowid][CN_StationId].ToString();
+                    eva.TimeCollect = DateTime.Parse(dataTableTemp.Rows[rowid][CN_DataTime].ToString());
+                    if (dataTableTemp.Rows[rowid][CN_Eva] != null && dataTableTemp.Rows[rowid][CN_Eva].ToString() != "")
+                    {
+                        eva.E = decimal.Parse(dataTableTemp.Rows[rowid][CN_Eva].ToString());
+                    }
+                    else
+                    {
+                        eva.E = null;
+                    }
+                    if (dataTableTemp.Rows[rowid][CN_Rain] != null && dataTableTemp.Rows[rowid][CN_Rain].ToString() != "")
+                    {
+                        eva.P = decimal.Parse(dataTableTemp.Rows[rowid][CN_Rain].ToString());
+                    }
+                    else
+                    {
+                        eva.P = null;
+                    }
+                    result.Add(eva);
+                }
+            }
+
+            return result;
+        }
     }
 }

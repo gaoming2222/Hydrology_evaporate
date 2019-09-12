@@ -566,7 +566,7 @@ namespace Hydrology.CControls
             result.Add(entity.RawEva >= 0 ? entity.RawEva.Value.ToString() : CS_NullUIStr);
             result.Add(entity.RawRain >= 0 ? entity.RawRain.Value.ToString() : CS_NullUIStr);
             result.Add(entity.RawVoltage >= 0 ? entity.RawVoltage.Value.ToString() : CS_NullUIStr);
-            if(entity.act == null)
+            if(entity.act == null || entity.act.ToString() == "")
             {
                 result.Add(CS_NullUIStr);
             }
@@ -582,7 +582,7 @@ namespace Hydrology.CControls
             }
             else if (entity.act.Contains("ER"))
             {
-                result.Add("异常扰动" + entity.TimeDeviceGained.ToString());
+                result.Add("人工维护" + entity.TimeDeviceGained.ToString());
             }
             else
             {

@@ -41,5 +41,7 @@ namespace Hydrology.DBManager.Interface
         List<CEntityEva> GetPageData(int pageIndex,bool irefresh);
 
         List<CEntityEva> getEvabyTime(string stationid, DateTime start, DateTime end);
+
+        List<CEntityEva> get4InitEva();
     }
 }

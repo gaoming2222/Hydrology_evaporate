@@ -196,7 +196,7 @@ namespace Hydrology.DBManager.DB.SQLServer
             // 如果超过最大值，写入数据库
             NewTask(() => { AddDataToDB(); });
 
-           //m_mutexDataTable.ReleaseMutex();
+            //m_mutexDataTable.ReleaseMutex();
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace Hydrology.DBManager.DB.SQLServer
         /// <returns></returns>
         public bool UpdateRows(string sqlStr)
         {
-           
+
             // 更新数据库
             if (!this.ExecuteSQLCommand(sqlStr.ToString()))
             {
@@ -322,7 +322,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     "select top " + topcount.ToString() + " row_number() over( order by " + CN_DataTime + " ) as " + CN_RowId + ",* " +
                     "from " + CT_TableName + " " +
                     "where " + CN_StationId + "=" + m_strStaionId.ToString() + " " +
-                    "and "  + CN_DataTime + " between " + DateTimeToDBStr(m_startTime) +
+                    "and " + CN_DataTime + " between " + DateTimeToDBStr(m_startTime) +
                     "and " + DateTimeToDBStr(m_endTime) +
                     ") as tmp1 " +
                     "where " + CN_RowId + ">" + rowidmim.ToString() +
@@ -385,7 +385,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 {
                     Eva.Rain = Decimal.Parse(table.Rows[startRow][CN_Rain].ToString());
                 }
-                Eva.type = table.Rows[startRow][CN_ACT].ToString(); 
+                Eva.type = table.Rows[startRow][CN_ACT].ToString();
                 Eva.act = table.Rows[startRow][CN_ACT].ToString();
                 if (!table.Rows[startRow][CN_EChange].ToString().Equals(""))
                 {
@@ -590,7 +590,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     }
                     if (dataTableTemp.Rows[rowid][CN_Rain] != null && dataTableTemp.Rows[rowid][CN_Rain].ToString() != "")
                     {
-                        eva.Rain= decimal.Parse(dataTableTemp.Rows[rowid][CN_Rain].ToString());
+                        eva.Rain = decimal.Parse(dataTableTemp.Rows[rowid][CN_Rain].ToString());
                     }
                     else
                     {
@@ -627,6 +627,63 @@ namespace Hydrology.DBManager.DB.SQLServer
                 }
             }
             return evaList;
+        }
+        public List<CEntityEva> get4InitEva()
+        {
+            List<CEntityEva> result = new List<CEntityEva>();
+            String sql = "select t.* from (select RawData.*, row_number() over(partition by stcd order by dt desc) rn from RawData) t where rn <= 1; ";
+            SqlDataAdapter adapter = new SqlDataAdapter(sql, CDBManager.GetInstacne().GetConnection());
+            DataTable dataTableTemp = new DataTable();
+            adapter.Fill(dataTableTemp);
+            int flag = dataTableTemp.Rows.Count;
+            if (flag == 0)
+            {
+                return null;
+            }
+            else
+            {
+                for (int rowid = 0; rowid < dataTableTemp.Rows.Count; ++rowid)
+                {
+                    CEntityEva eva = new CEntityEva();
+                    eva.StationID = dataTableTemp.Rows[rowid][CN_StationId].ToString();
+                    eva.TimeCollect = DateTime.Parse(dataTableTemp.Rows[rowid][CN_DataTime].ToString());
+                    if (dataTableTemp.Rows[rowid][CN_Voltage] != null && dataTableTemp.Rows[rowid][CN_Voltage].ToString() != "")
+                    {
+                        eva.Voltage = decimal.Parse(dataTableTemp.Rows[rowid][CN_Voltage].ToString());
+                    }
+                    else
+                    {
+                        eva.Voltage = null;
+                    }
+                    if (dataTableTemp.Rows[rowid][CN_Rain] != null && dataTableTemp.Rows[rowid][CN_Rain].ToString() != "")
+                    {
+                        eva.Rain = decimal.Parse(dataTableTemp.Rows[rowid][CN_Rain].ToString());
+                    }
+                    else
+                    {
+                        eva.Rain = null;
+                    }
+                    if (dataTableTemp.Rows[rowid][CN_Eva] != null && dataTableTemp.Rows[rowid][CN_Eva].ToString() != "")
+                    {
+                        eva.Eva = decimal.Parse(dataTableTemp.Rows[rowid][CN_Eva].ToString());
+                    }
+                    else
+                    {
+                        eva.Eva = null;
+                    }
+
+                    if (dataTableTemp.Rows[rowid][CN_Temp] != null && dataTableTemp.Rows[rowid][CN_Temp].ToString() != "")
+                    {
+                        eva.Temperature = decimal.Parse(dataTableTemp.Rows[rowid][CN_Temp].ToString());
+                    }
+                    else
+                    {
+                        eva.Temperature = null;
+                    }
+                    result.Add(eva);
+                }
+                return result;
+            }
         }
     }
 }

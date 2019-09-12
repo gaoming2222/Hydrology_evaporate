@@ -46,5 +46,7 @@ namespace Hydrology.DBManager.Interface
         List<CEntityEva> QueryForDayEvaList(string StationId);
 
         List<CEntityEva> QueryForHourEvaList4Table(string StationId, DateTime strtTime, DateTime endTime);
+
+        List<CEntityEva> get4InitEva();
     }
 }
