@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Hydrology.CControls;
+using Hydrology.DBManager.DB.SQLServer;
+using Hydrology.DBManager.Interface;
 using Hydrology.Entity;
 
 namespace Hydrology.Forms
@@ -20,7 +22,7 @@ namespace Hydrology.Forms
         #endregion 常量定义
 
         #region 数据成员
-
+        private IDEvaProxy m_proxyDEva;
         /// <summary>
         ///  当前站点
         /// </summary>
@@ -29,6 +31,7 @@ namespace Hydrology.Forms
         private CEntityRain m_entityRain;
         private CEntityVoltage m_entityVoltage;
         private CEntityWater m_entityWater;
+        private CEntityEva  m_entityEva;
         #endregion 数据成员
 
         #region 公共方法
@@ -39,6 +42,11 @@ namespace Hydrology.Forms
         public CEntityRain GetAddedRain()
         {
             return m_entityRain;
+        }
+
+        public CEntityEva GetAddedEva()
+        {
+            return m_entityEva;
         }
 
         public CEntityWater GetAddedWater()
@@ -62,9 +70,10 @@ namespace Hydrology.Forms
 
             m_currentStation = null;
             m_entityRain = null;
+            m_entityEva = null;
             m_entityVoltage = null;
             m_entityWater = null;
-
+            m_proxyDEva = new CSQLDEva();
             FormHelper.InitUserModeEvent(this);
         }
         #region 事件响应
@@ -257,12 +266,13 @@ namespace Hydrology.Forms
             this.groupBox1.Controls.Add(this.cmb_StationId);
 
             // 接受时间和采集时间
-            dtp_CollectTime.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, 0, 0);
+            dtp_CollectTime.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 8, 0, 0);
             dtp_TimeReceived.Value = DateTime.Now;
 
             // 数据协议
             cmb_DataType.Items.Add(CEnumHelper.MessageTypeToUIStr(EMessageType.ETimed));
             cmb_DataType.Items.Add(CEnumHelper.MessageTypeToUIStr(EMessageType.EAdditional));
+            cmb_DataType.SelectedIndex = 0;
 
             // 信道协议
             //cmb_ChannelType.Items.Add(CEnumHelper.ChannelTypeToUIStr(EChannelType.None));
@@ -275,16 +285,16 @@ namespace Hydrology.Forms
             cmb_ChannelType.Enabled = false; //只能为无
 
             // 数值都是不可编辑的
-            number_Voltage.Enabled = false; //电压
+            number_Voltage.Enabled = true; //电压
 
-            number_PeriodRain.Enabled = false;
-            number_DayRain.Enabled = false;
-            number_TotalRain.Enabled = false;
+            number_PeriodRain.Enabled = true;
+            number_DayRain.Enabled = true;
+            number_TotalRain.Enabled = true;
 
-            number_WaterStage.Enabled = false;
-            number_WaterFlow.Enabled = false;
+            number_WaterStage.Enabled = true;
+            number_WaterFlow.Enabled = true;
 
-            cmb_AddDataType.Visible = false;    // 不可见，已经废弃
+            //cmb_AddDataType.Visible = true;    // 不可见，已经废弃
 
             // 绑定消息
             chk_Rain.CheckedChanged += new EventHandler(EHRainChecked);
@@ -315,11 +325,11 @@ namespace Hydrology.Forms
                 return false;
             }
             // 数据类型不能为空
-            if (chk_Rain.CheckState != CheckState.Checked && chk_Voltage.CheckState != CheckState.Checked && chk_Water.CheckState != CheckState.Checked)
-            {
-                MessageBox.Show("请选择要添加的数据");
-                return false;
-            }
+            //if (chk_Rain.CheckState != CheckState.Checked && chk_Voltage.CheckState != CheckState.Checked && chk_Water.CheckState != CheckState.Checked)
+            //{
+            //    MessageBox.Show("请选择要添加的数据");
+            //    return false;
+            //}
             // 协议类型不能为空
             //if (cmb_ChannelType.Text.Equals(""))
             //{
@@ -340,45 +350,55 @@ namespace Hydrology.Forms
         /// </summary>
         private void GenerateAdddedDate()
         {
-            if (chk_Rain.CheckState == CheckState.Checked)
-            {
-                // 新建雨量记录
-                m_entityRain = new CEntityRain();
-                m_entityRain.StationID = m_currentStation.StationID;
-                m_entityRain.TimeCollect = dtp_CollectTime.Value;
-                m_entityRain.TimeRecieved = dtp_TimeReceived.Value;
-                m_entityRain.MessageType = CEnumHelper.UIStrToMesssageType(cmb_DataType.Text);
-                m_entityRain.ChannelType = CEnumHelper.UIStrToChannelType(cmb_ChannelType.Text);
-                //m_entityRain.PeriodRain = number_PeriodRain.Value;
-                //m_entityRain.DayRain = number_DayRain.Value;
-                m_entityRain.TotalRain = number_TotalRain.Value;
-                m_entityRain.BState = 1;//默认是正常的
-            }
-            if (chk_Water.CheckState == CheckState.Checked)
-            {
-                // 新建水位记录
-                m_entityWater = new CEntityWater();
-                m_entityWater.StationID = m_currentStation.StationID;
-                m_entityWater.TimeCollect = dtp_CollectTime.Value;
-                m_entityWater.TimeRecieved = dtp_TimeReceived.Value;
-                m_entityWater.MessageType = CEnumHelper.UIStrToMesssageType(cmb_DataType.Text);
-                m_entityWater.ChannelType = CEnumHelper.UIStrToChannelType(cmb_ChannelType.Text);
-                m_entityWater.WaterStage = number_WaterStage.Value;
-                m_entityWater.WaterFlow = number_WaterFlow.Value;
-                m_entityWater.state = 1;
-            }
-            if (chk_Voltage.CheckState == CheckState.Checked)
-            {
-                // 新建电压记录
-                m_entityVoltage = new CEntityVoltage();
-                m_entityVoltage.StationID = m_currentStation.StationID;
-                m_entityVoltage.TimeCollect = dtp_CollectTime.Value;
-                m_entityVoltage.TimeRecieved = dtp_TimeReceived.Value;
-                m_entityVoltage.MessageType = CEnumHelper.UIStrToMesssageType(cmb_DataType.Text);
-                m_entityVoltage.ChannelType = CEnumHelper.UIStrToChannelType(cmb_ChannelType.Text);
-                m_entityVoltage.Voltage = number_Voltage.Value;
-                m_entityVoltage.state = 1;
-            }
+            List<CEntityEva> evaList = new List<CEntityEva>();
+            m_entityEva = new CEntityEva();
+            m_entityEva.StationID = m_currentStation.StationID;
+            m_entityEva.TimeCollect = dtp_CollectTime.Value;
+            m_entityEva.Rain = number_DayRain.Value;
+            m_entityEva.Eva = number_PeriodRain.Value;
+            m_entityEva.Temperature = number_TotalRain.Value;
+            m_entityEva.dayEChange = 0;
+            evaList.Add(m_entityEva);
+            m_proxyDEva.AddNewRows(evaList);
+            //if (chk_Rain.CheckState == CheckState.Checked)
+            //{
+            //    // 新建雨量记录
+            //    m_entityRain = new CEntityRain();
+            //    m_entityRain.StationID = m_currentStation.StationID;
+            //    m_entityRain.TimeCollect = dtp_CollectTime.Value;
+            //    m_entityRain.TimeRecieved = dtp_TimeReceived.Value;
+            //    m_entityRain.MessageType = CEnumHelper.UIStrToMesssageType(cmb_DataType.Text);
+            //    m_entityRain.ChannelType = CEnumHelper.UIStrToChannelType(cmb_ChannelType.Text);
+            //    //m_entityRain.PeriodRain = number_PeriodRain.Value;
+            //    //m_entityRain.DayRain = number_DayRain.Value;
+            //    m_entityRain.TotalRain = number_TotalRain.Value;
+            //    m_entityRain.BState = 1;//默认是正常的
+            //}
+            //if (chk_Water.CheckState == CheckState.Checked)
+            //{
+            //    // 新建水位记录
+            //    m_entityWater = new CEntityWater();
+            //    m_entityWater.StationID = m_currentStation.StationID;
+            //    m_entityWater.TimeCollect = dtp_CollectTime.Value;
+            //    m_entityWater.TimeRecieved = dtp_TimeReceived.Value;
+            //    m_entityWater.MessageType = CEnumHelper.UIStrToMesssageType(cmb_DataType.Text);
+            //    m_entityWater.ChannelType = CEnumHelper.UIStrToChannelType(cmb_ChannelType.Text);
+            //    m_entityWater.WaterStage = number_WaterStage.Value;
+            //    m_entityWater.WaterFlow = number_WaterFlow.Value;
+            //    m_entityWater.state = 1;
+            //}
+            //if (chk_Voltage.CheckState == CheckState.Checked)
+            //{
+            //    // 新建电压记录
+            //    m_entityVoltage = new CEntityVoltage();
+            //    m_entityVoltage.StationID = m_currentStation.StationID;
+            //    m_entityVoltage.TimeCollect = dtp_CollectTime.Value;
+            //    m_entityVoltage.TimeRecieved = dtp_TimeReceived.Value;
+            //    m_entityVoltage.MessageType = CEnumHelper.UIStrToMesssageType(cmb_DataType.Text);
+            //    m_entityVoltage.ChannelType = CEnumHelper.UIStrToChannelType(cmb_ChannelType.Text);
+            //    m_entityVoltage.Voltage = number_Voltage.Value;
+            //    m_entityVoltage.state = 1;
+            //}
         }
         #endregion 帮助方法
 

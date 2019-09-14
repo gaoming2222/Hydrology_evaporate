@@ -278,12 +278,12 @@ namespace Hydrology.CControls
                         //listEva[i].TimeCollect.ToString(CS_TimeFormat), /*采集时间*/
                         listEva[i].TimeCollect.AddDays(-1).Year.ToString() + "年" + listEva[i].TimeCollect.AddDays(-1).Month.ToString() + "月"  + (listEva[i].TimeCollect.AddDays(-1).Day).ToString() + "日",
                         listEva[i].Eva.ToString(), /*蒸发*/
-                        evaF,
+                        //evaF,
                         listEva[i].Rain.ToString(), /*雨量*/
-                        listEva[i].Temperature.ToString(), /*温度*/
-                        listEva[i].P8.ToString(), /*8-20*/
-                        listEva[i].P20.ToString(), /*20-8*/
-                        listEva[i].dayEChange.ToString()
+                        //listEva[i].Temperature.ToString(), /*温度*/
+                        //listEva[i].P8.ToString(), /*8-20*/
+                        //listEva[i].P20.ToString(), /*20-8*/
+                        //listEva[i].dayEChange.ToString()
                         };
 
                         newRows.Add(newRow);
@@ -492,7 +492,7 @@ namespace Hydrology.CControls
                     }
                     else
                     {
-                        m_proxyDEva.AddNewRows_DataModify(m_listUpdated);
+                        m_proxyDEva.UpdateRows(m_listUpdated);
 
                     }
                     m_listUpdated.Clear();
@@ -558,9 +558,13 @@ namespace Hydrology.CControls
             m_bIsEditable = bEditable;
             if (m_bIsEditable)
             {
+                //this.Header = new string[]
+                //{
+                //    CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage
+                //};
                 this.Header = new string[]
                 {
-                    CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage
+                     CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva,CS_Rain
                 };
 
                 //开启编辑模式,设置可编辑列
@@ -568,9 +572,6 @@ namespace Hydrology.CControls
                 DataGridViewCheckBoxColumn deleteCol = new DataGridViewCheckBoxColumn();
                 base.SetColumnEditStyle(0, deleteCol);
 
-                //// 设置采集时间编辑列
-                //CalendarColumn collectionCol = new CalendarColumn();
-                //base.SetColumnEditStyle(2, collectionCol);
 
                 // 蒸发编辑列
                 DataGridViewNumericUpDownColumn Eva = new DataGridViewNumericUpDownColumn()
@@ -582,7 +583,6 @@ namespace Hydrology.CControls
                 };
                 base.SetColumnEditStyle(4, Eva);
 
-                // 雨量编辑列
                 DataGridViewNumericUpDownColumn Rain = new DataGridViewNumericUpDownColumn()
                 {
                     Minimum = 0,
@@ -591,36 +591,45 @@ namespace Hydrology.CControls
 
                 };
                 base.SetColumnEditStyle(5, Rain);
+                //// 雨量编辑列
+                //DataGridViewNumericUpDownColumn Rain = new DataGridViewNumericUpDownColumn()
+                //{
+                //    Minimum = 0,
+                //    Maximum = 65537,
+                //    DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
 
-                // 温度编辑列
-                DataGridViewNumericUpDownColumn Temp = new DataGridViewNumericUpDownColumn()
-                {
-                    Minimum = 0,
-                    Maximum = 65537,
-                    DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+                //};
+                //base.SetColumnEditStyle(5, Rain);
 
-                };
-                base.SetColumnEditStyle(6, Temp);
+                //// 温度编辑列
+                //DataGridViewNumericUpDownColumn Temp = new DataGridViewNumericUpDownColumn()
+                //{
+                //    Minimum = 0,
+                //    Maximum = 65537,
+                //    DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
 
-                // 电压编辑列
-                DataGridViewNumericUpDownColumn Vol = new DataGridViewNumericUpDownColumn()
-                {
-                    Minimum = 0,
-                    Maximum = 65537,
-                    DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+                //};
+                //base.SetColumnEditStyle(6, Temp);
 
-                };
-                base.SetColumnEditStyle(7, Vol);
+                //// 电压编辑列
+                //DataGridViewNumericUpDownColumn Vol = new DataGridViewNumericUpDownColumn()
+                //{
+                //    Minimum = 0,
+                //    Maximum = 65537,
+                //    DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
 
-                // 高度差编辑列
-                DataGridViewNumericUpDownColumn DH = new DataGridViewNumericUpDownColumn()
-                {
-                    Minimum = 0,
-                    Maximum = 65537,
-                    DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+                //};
+                //base.SetColumnEditStyle(7, Vol);
 
-                };
-                base.SetColumnEditStyle(8, DH);
+                //// 高度差编辑列
+                //DataGridViewNumericUpDownColumn DH = new DataGridViewNumericUpDownColumn()
+                //{
+                //    Minimum = 0,
+                //    Maximum = 65537,
+                //    DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                //};
+                //base.SetColumnEditStyle(8, DH);
 
             }
             else
@@ -664,9 +673,10 @@ namespace Hydrology.CControls
                 }
                 else
                 {
+                    
                     this.Header = new string[]
                     {
-                        CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva,CS_RawEvaF, CS_Rain, CS_Temp, CS_P8, CS_P20,CS_EvaPZ
+                        CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_EvaPZ
                     };
 
                     //开启编辑模式,设置可编辑列
@@ -1347,20 +1357,20 @@ namespace Hydrology.CControls
             {
                 CEntityEva Eva = new CEntityEva();
                 Eva.StationID = m_strStaionId;
-                Eva.TimeCollect = DateTime.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_TimeCollected].Value.ToString());
+                Eva.TimeCollect = DateTime.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_TimeCollected].Value.ToString()).AddDays(1).AddHours(8);
                 Eva.Rain = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Rain].Value.ToString());
                 Eva.Eva = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Eva].Value.ToString());
-                Eva.Temperature = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Temp].Value.ToString());
-                if (m_bIsHEva)
-                {
-                    Eva.Voltage = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Voltage].Value.ToString());
-                    Eva.DH = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_DH].Value.ToString());
-                }
-                else
-                {
-                    Eva.P8 = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_P8].Value.ToString());
-                    Eva.P20 = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_P20].Value.ToString());
-                }
+                //Eva.Temperature = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Temp].Value.ToString());
+                //if (m_bIsHEva)
+                //{
+                //    Eva.Voltage = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Voltage].Value.ToString());
+                //    Eva.DH = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_DH].Value.ToString());
+                //}
+                //else
+                //{
+                //    Eva.P8 = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_P8].Value.ToString());
+                //    Eva.P20 = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_P20].Value.ToString());
+                //}
 
                 m_listUpdated.Add(Eva);
             }
@@ -1368,9 +1378,10 @@ namespace Hydrology.CControls
             for (int i = 0; i < base.m_listMaskedDeletedRows.Count; ++i)
             {
                 // m_listDeleteSanilities.Add(long.Parse(base.Rows[m_listMaskedDeletedRows[i]].Cells[CS_EvaID].Value.ToString()));
-
+                DateTime tmp = DateTime.Parse(base.Rows[m_listMaskedDeletedRows[i]].Cells[CS_TimeCollected].Value.ToString()).AddDays(1).AddHours(8);
+             
                 m_listDeleteSanilities_StationId.Add(base.Rows[m_listMaskedDeletedRows[i]].Cells[CS_StationID].Value.ToString());
-                m_listDeleteSanilities_StationDate.Add(base.Rows[m_listMaskedDeletedRows[i]].Cells[CS_TimeCollected].Value.ToString());
+                m_listDeleteSanilities_StationDate.Add(tmp.ToString());
             }
             m_listEditedRows.Clear();   //清空此次记录
             m_listMaskedDeletedRows.Clear(); //清空标记为删除的记录

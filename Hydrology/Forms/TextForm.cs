@@ -307,7 +307,7 @@ namespace Hydrology.Forms
                 {
                     string stationName = stationSelected[i].Split('|')[1].Trim();
                     string stationid = stationSelected[i].Split('|')[0].Trim() ;
-                    string prefixName = stationSelected[i].Split('|')[1] + stationSelected[i].Split('|')[0] + "站" + dte + "降水量、蒸发量月报表.xls";
+                    string prefixName = stationSelected[i].Split('|')[1] + stationSelected[i].Split('|')[0] + "站" + dte.Substring(0,5) + "降水量、蒸发量月报表.xls";
                     string fileName = "ZfExcels/" + prefixName;
                      //string targetPath = @"ZfExcels/" + stationSelected[i].Split('|')[0] + stationSelected[i].Split('|')[1] + ExlTimeTmp.ToString() + "降水量、蒸发量月报表.xls";
                     string targetPath = @fileName;
@@ -350,252 +350,40 @@ namespace Hydrology.Forms
                     }
                 }
             }
-           
-                
+            if (models.Text == "蒸发观测记录表.xls")
+            {
 
+            }
+            if (models.Text == "蒸发观测记录表.txt")
+            {
+                string errMsg = "";
+                for (int i = 0; i < stationSelected.Count; i++)
+                {
+                    DateTime strtTime = new DateTime(ExlTimeTmp.Year, 1, 2, 0, 0, 0);
+                    DateTime endTime = new DateTime(ExlTimeTmp.Year+1, 1, 2, 0, 0, 0);
+                    string stationName = stationSelected[i].Split('|')[1].Trim();
+                    string stationid = stationSelected[i].Split('|')[0].Trim();
+                    string prefixName = stationSelected[i].Split('|')[1] + stationSelected[i].Split('|')[0] + "站" + dte + "南方片年数据.txt";
+                    string fileName = "ZfExcels/" + prefixName;
+                    //string targetPath = @"ZfExcels/" + stationSelected[i].Split('|')[0] + stationSelected[i].Split('|')[1] + ExlTimeTmp.ToString() + "降水量、蒸发量月报表.xls";
+                    string targetPath = @fileName;
+                    Dictionary<String, Object> result = setYearTxtZf(sourcePath, targetPath, stationid, stationName, dte, strtTime, endTime);
+                    if (result["ERR"].ToString() != "0")
+                    {
+                        errMsg = errMsg + result["ID"].ToString() + result["ERR"].ToString() + "/r/n";
+                    }
+                }
+                if (errMsg != "" && errMsg.Length > 0)
+                {
+                    MessageBox.Show(errMsg);
+                }
+                else
+                {
+                    MessageBox.Show("Excel导出成功！");
+                }
+            }
             #endregion
-            //#region 雨量数据
-            //if (type.Equals("雨  量"))
-            //{
-            //    CMessageBox box = new CMessageBox();
-            //    box.MessageInfo = "正在导出雨量数据";
-            //    box.ShowDialog(this);
-            //    try
-            //    {
-            //        for (int i = 0; i < stationSelected.Count; i++)
-            //        {
-            //            string stationid = stationSelected[i].Split('|')[0];
-            //            List<CEntityRain> rainList = new List<CEntityRain>();
-            //            List<string> rainInfoText = new List<string>();
-            //            rainList = CDBDataMgr.GetInstance().getListRainByTime(stationid, startTime, endTime);
-            //            for (int j = 0; j < rainList.Count; j++)
-            //            {
-            //                DateTime dataAndTime = rainList[j].TimeCollect;
-            //                string rainInfo = string.Empty;
-            //                rainInfo = rainInfo + "\"";
-            //                string tmp = dataAndTime.ToString("d").Substring(2);
-            //                string year = dataAndTime.Year.ToString().Substring(2);
-            //                rainInfo = rainInfo + year + "/";
-            //                string month = dataAndTime.Month.ToString();
-            //                if(month.Length < 2)
-            //                {
-            //                    month = "0" + month;
-            //                }
-            //                rainInfo = rainInfo + month + "/";
-            //                string day = dataAndTime.Day.ToString();
-            //                if(day.Length < 2)
-            //                {
-            //                    day = "0" + day;
-            //                }
-            //                rainInfo = rainInfo + day + " ";
-            //                string hour = dataAndTime.Hour.ToString();
-            //                if(hour.Length <2)
-            //                {
-            //                    hour = "0" + hour;
-            //                }
-            //                rainInfo = rainInfo + hour;
-            //                string minute = dataAndTime.Minute.ToString();
-            //                if(minute.Length < 2)
-            //                {
-            //                    minute = "0" + minute;
-            //                }
-            //                rainInfo = rainInfo + ":" + minute;
-                            
-            //                rainInfo = rainInfo + " ";
-            //                string rain = rainList[j].TotalRain.ToString();
-            //                for (int k = 0; k < 6 - rain.Length; k++)
-            //                {
-            //                    rainInfo = rainInfo + "0";
-            //                }
-            //                rainInfo = rainInfo + rain;
-            //                rainInfo = rainInfo + "\"";
-            //                rainInfoText.Add(rainInfo);
-            //            }
-            //            if (rainInfoText != null && rainInfoText.Count > 1)
-            //            {
-            //                string fileName = "rainData" + "\\" + stationid + "站" + startTime.ToString("D") + "到" + endTime.ToString("D") + "雨量.txt";
-            //                exportTxt(rainInfoText, fileName);
-            //            }
-                            
-            //        }
-            //        box.CloseDialog();
-            //        MessageBox.Show("导出雨量数据成功");
-            //    }
-            //    catch(Exception e1)
-            //    {
-            //        box.CloseDialog();
-            //        MessageBox.Show("导出水位数据失败");
-            //    }
-            //}
-            //#endregion
-
-            //#region 水位数据
-            //if (type.Equals("水  位"))
-            //{
-
-
-            //    CMessageBox box = new CMessageBox();
-            //    box.MessageInfo = "正在导出水位数据";
-            //    box.ShowDialog(this);
-            //    try
-            //    {
-            //        for (int i = 0; i < stationSelected.Count; i++)
-            //        {
-            //            List<CEntityWater> waterList = new List<CEntityWater>();
-            //            string stationid = stationSelected[i].Split('|')[0];
-            //            List<string> waterInfoText = new List<string>();
-                       //CDBDataMgr.GetInstance().GetWaterByTime(stationid, startTime, endTime);
-            //            for (int j = 0; j < waterList.Count; j++)
-            //            {
-
-            //                DateTime dataAndTime = waterList[j].TimeCollect;
-            //                string waterInfo = string.Empty;
-            //                waterInfo = waterInfo + "\"";
-            //                string year = dataAndTime.Year.ToString().Substring(2);
-            //                waterInfo = waterInfo + year + "/";
-            //                string month = dataAndTime.Month.ToString();
-            //                if (month.Length < 2)
-            //                {
-            //                    month = "0" + month;
-            //                }
-            //                waterInfo = waterInfo + month + "/";
-            //                string day = dataAndTime.Day.ToString();
-            //                if (day.Length < 2)
-            //                {
-            //                    day = "0" + day;
-            //                }
-            //                waterInfo = waterInfo + day + " ";
-            //                string hour = dataAndTime.Hour.ToString();
-            //                if (hour.Length < 2)
-            //                {
-            //                    hour = "0" + hour;
-            //                }
-            //                waterInfo = waterInfo + hour;
-            //                string minute = dataAndTime.Minute.ToString();
-            //                if (minute.Length < 2)
-            //                {
-            //                    minute = "0" + minute;
-            //                }
-            //                waterInfo = waterInfo + ":" + minute;
-
-            //                waterInfo = waterInfo + " ";
-            //                decimal waterd = waterList[j].WaterStage;
-                            
-            //                string water = ((int)(waterd*100)).ToString();
-            //                for (int k = 0; k < 6 - water.Length; k++)
-            //                {
-            //                    waterInfo = waterInfo + "0";
-            //                }
-            //                waterInfo = waterInfo + water;
-            //                waterInfo = waterInfo + "\"";
-            //                waterInfoText.Add(waterInfo);
-            //            }
-            //            if(waterInfoText != null && waterInfoText.Count > 1)
-            //            {
-            //                string fileName = "waterData" + "\\" + stationid + "站" + startTime.ToString("D") + "到" + endTime.ToString("D") +  "水位.txt";
-            //                exportTxt(waterInfoText, fileName);
-            //            }
-                        
-            //        }
-            //        box.CloseDialog();
-            //        MessageBox.Show("导出水位数据成功");
-            //    }
-            //    catch(Exception e2)
-            //    {
-            //        box.CloseDialog();
-            //        MessageBox.Show("导出水位数据失败");
-                    
-            //    }
                 
-
-            //}
-            //#endregion
-
-            //#region 中澳格式数据
-            //if (type.Equals("中澳格式"))
-            //{
-            //    CMessageBox box = new CMessageBox();
-            //    box.MessageInfo = "正在导出中澳格式数据";
-            //    box.ShowDialog(this);
-            //    try
-            //    {
-            //        for (int i = 0; i < stationSelected.Count; i++)
-            //        {
-            //            List<CEntityRainAndWater> rainWaterList = new List<CEntityRainAndWater>();
-
-            //            string stationid = stationSelected[i].Split('|')[0];
-            //            List<string> hydroInfoText = new List<string>();
-                        //CDBDataMgr.GetInstance().getRainAndWaterList(stationid, startTime, endTime);
-            //            if (rainWaterList == null || rainWaterList.Count == 0)
-            //            {
-            //                continue;
-            //            }
-                       
-            //            for (int j = 0; j < rainWaterList.Count; j++)
-            //            {
-            //                DateTime dataAndTime = DateTime.Now; ;
-            //                if (rainWaterList[j].rainTimeCollect <= DateTime.Now)
-            //                {
-            //                    dataAndTime = rainWaterList[j].rainTimeCollect;
-            //                }else if(rainWaterList[j].waterTimeCollect <= DateTime.Now)
-            //                {
-            //                    dataAndTime = rainWaterList[j].waterTimeCollect;
-            //                }else
-            //                {
-            //                    continue;
-            //                }
-            //                string hydroInfo = string.Empty;
-            //                hydroInfo = hydroInfo + "1,";
-            //                hydroInfo = hydroInfo + dataAndTime.Year.ToString() + ",";
-            //                hydroInfo = hydroInfo + getDayOfYear(dataAndTime).ToString() + ",";
-            //                string hour = dataAndTime.Hour.ToString();
-            //                if (hour.Length < 2)
-            //                {
-            //                    hour = "0" + hour;
-            //                }
-            //                string minute = dataAndTime.Minute.ToString();
-            //                if (minute.Length < 2)
-            //                {
-            //                    minute = "0" + minute;
-            //                }
-            //                hydroInfo = hydroInfo + hour + minute + ",";
-            //                hydroInfo = hydroInfo  + stationid.ToString() + ",";
-            //                if(rainWaterList[j].WaterStage != -9999)
-            //                {
-            //                    hydroInfo = hydroInfo + rainWaterList[j].WaterStage.ToString() + ",";
-            //                }else
-            //                {
-            //                    hydroInfo = hydroInfo + ",";
-            //                }
-            //                if(rainWaterList[j].TotalRain != -9999)
-            //                {
-            //                    hydroInfo = hydroInfo + rainWaterList[j].TotalRain.ToString() + ",";
-            //                }else
-            //                {
-            //                    hydroInfo = hydroInfo + ",";
-            //                }
-            //                hydroInfo = hydroInfo + "12.85";
-            //                hydroInfoText.Add(hydroInfo);
-            //            }
-            //            if (hydroInfoText != null && hydroInfoText.Count > 1)
-            //            {
-            //                string fileName = "specData" + "\\" + stationid + "站" + startTime.ToString("D") + "到" + endTime.ToString("D") + "数据.txt";
-            //                exportTxt(hydroInfoText, fileName);
-            //            }
-
-            //        }
-            //        box.CloseDialog();
-            //        MessageBox.Show("导出中澳数据成功");
-            //    }
-            //    catch (Exception e2)
-            //    {
-            //        box.CloseDialog();
-            //        MessageBox.Show("导出中澳数据失败");
-
-            //    }
-            //}
-            //    #endregion
-            //    this.Focus();
         }
 
         private void center_SelectedIndexChanged(object sender, EventArgs e)
@@ -1266,6 +1054,76 @@ namespace Hydrology.Forms
             return result;
 
         }
+
+
+        public Dictionary<String, Object> setYearTxtZf(String sourcePath, String resultPaht, string stationid, string stationName, string dte, DateTime strtTime, DateTime endTime)
+        {
+            Dictionary<String, Object> result = new Dictionary<string, object>();
+            result["ERR"] = "0";
+            //查询获取所需数据
+            List<CEntityEva> evaList = new List<CEntityEva>();
+            evaList = CDBDataMgr.GetInstance().getEvaByTime(stationid, strtTime, endTime);
+            if (evaList == null || evaList.Count == 0)
+            {
+                result["ERR"] = "数据库无数据";
+                result["ID"] = stationid;
+                return result;
+            }
+            FileStream fs;
+            StreamWriter sw;
+            try
+            {
+                
+                //1.判断文件是否存在，如果存在则直接写入，不存在则先创建文件
+                if (!System.IO.File.Exists(resultPaht))
+                {
+                    //没有则创建这个文件
+                    fs = new FileStream(resultPaht, FileMode.Create, FileAccess.Write);//创建写入文件                //设置文件属性为隐藏
+                    sw = new StreamWriter(fs);
+                }
+                else
+                {
+                    fs = new FileStream(resultPaht, FileMode.Open, FileAccess.Write);
+                    sw = new StreamWriter(fs);
+                }
+                //2.遍历获取到的蒸发数据
+                Dictionary<int, CEntityEva> evaDic = new Dictionary<int, CEntityEva>();
+                List<CEntityEva> allData = new List<CEntityEva>();
+                DateTime time1 = new DateTime(strtTime.Year, 1, 2, 8, 0, 0);
+                DateTime time2 = new DateTime(strtTime.Year + 1, 1, 1, 8, 0, 0);
+                //2.1将list放入Dic,方便查找
+                for (int i = 0;i< evaList.Count; i++)
+                {
+                    
+                    evaDic.Add((evaList[i].TimeCollect.Month * 31 + evaList[i].TimeCollect.Day), evaList[i]);
+                }
+                //变量1-31日，变量1-12月，在DIC中查找相关值
+                for(int day = 1;day <= 31; day++)
+                {
+                    StringBuilder data = new StringBuilder( day.ToString() + ",");
+                    for(int month = 1;month <= 12; month++)
+                    {
+                        if(evaDic.ContainsKey(month * 31 + day) && evaDic[month * 31 + day].E.HasValue)
+                        {
+                            data.Append(evaDic[month * 31 + day].E.Value.ToString("0.0"));
+                        }
+                        data.Append(",,");
+                    }
+                    data.Append(",");
+                    sw.WriteLine(data.ToString());//开始写入值
+                }
+                
+                //2.3
+                sw.Close();
+                fs.Close();
+            }
+            catch(Exception e)
+            {
+
+            }
+            return result;
+        }
+
         public List<String> getNameInFile(String sourcePath)
         {
             List<String> result = new List<string>();

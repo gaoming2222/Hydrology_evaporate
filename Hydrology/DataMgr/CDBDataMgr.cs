@@ -1136,25 +1136,37 @@ namespace Hydrology.DataMgr
             Dictionary<String, CEntityEva> hEvaDic = new Dictionary<string, CEntityEva>();
             List<CEntityEva> dEvaList = m_proxyDEva.get4InitEva();
             Dictionary<String, CEntityEva> dEvaDic = new Dictionary<string, CEntityEva>();
+            if(evaList == null || evaList.Count == 0)
+            {
+                return;
+            }
+           
             foreach (CEntityEva eva in evaList)
             {
                 evaDic[eva.StationID] = eva;
             }
-            foreach (CEntityEva eva in hEvaList)
+            if(hEvaList != null && hEvaList.Count > 0)
             {
-                hEvaDic[eva.StationID] = eva;
+                foreach (CEntityEva eva in hEvaList)
+                {
+                    hEvaDic[eva.StationID] = eva;
+                }
             }
-            foreach (CEntityEva eva in dEvaList)
+            if(dEvaList != null && dEvaList.Count > 0)
             {
-                dEvaDic[eva.StationID] = eva;
+                foreach (CEntityEva eva in dEvaList)
+                {
+                    dEvaDic[eva.StationID] = eva;
+                }
             }
+            
             for(int i = 0;i< evaList.Count; i++)
             {
                 CEntityRealEva realEva = new CEntityRealEva();
                 realEva.StrStationID = evaList[i].StationID;
                 if (!m_mapStation.ContainsKey(evaList[i].StationID))
                 {
-                    return;
+                    continue;
                 }
                 realEva.StrStationName = m_mapStation[evaList[i].StationID].StationName;
                 if (evaDic.ContainsKey(evaList[i].StationID))
@@ -2477,6 +2489,7 @@ namespace Hydrology.DataMgr
                     Debug.WriteLine("站点配置不正确，数据库没有站点{0}的配置", args.StrStationID);
                     return;
                 }
+                
 
                 #region 蒸发表
                 List<CEntityEva> HEvas = new List<CEntityEva>();
@@ -2485,10 +2498,16 @@ namespace Hydrology.DataMgr
                 foreach (CSingleStationData data in args.Datas)
                 {
                     // 是否和上一条时间一致, 就丢失当条数据
+                 
                     if (m_mapStationRTD[station.StationID].TimeDeviceGained == data.DataTime)
                     {
                         Debug.WriteLine("drop");
                         continue;
+                    }
+
+                    if (args.Datas.Count != 1)
+                    {
+                        m_mapStationRTD[station.StationID].TimeDeviceGained = data.DataTime;
                     }
 
                     if (data.Eva == null || data.Temp == null)
@@ -3642,6 +3661,7 @@ namespace Hydrology.DataMgr
                 //2.定时调用
                 for (int i = 0; i <stationIds.Count; i++)
                 {
+                    CEntityStation station = GetStationById(stationIds[i]);
                     Dictionary<string, string> ret = cal.Timing(stationIds[i]);
                     List<CEntityEva> dEvaList = new List<CEntityEva>(); 
                     if(ret == null || ret.Count == 0)
@@ -3652,6 +3672,11 @@ namespace Hydrology.DataMgr
                     {
                         if (ret["dayE"] != "")
                         {
+                            //更新首页显示缓存数据
+                            m_mapStationEva[stationIds[i]] = 0;
+                            m_mapStationRain[stationIds[i]] = 0;
+                            station.LastDayEva = decimal.Parse(ret["dayE"]);
+                            station.LastDayRain = decimal.Parse(ret["dayP"]);
                             CEntityEva DEva = new CEntityEva();
                             DEva.StationID = stationIds[i];
                             DEva.TimeCollect = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 8, 0, 0);
@@ -3671,7 +3696,7 @@ namespace Hydrology.DataMgr
                         m_proxyDEva.AddNewRows(dEvaList);
                     }
                 }
-                
+                //将昨日降雨更新为最新的
                 
             
 

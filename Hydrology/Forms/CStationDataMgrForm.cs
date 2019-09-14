@@ -100,12 +100,23 @@ namespace Hydrology.Forms
             m_bIsEditable = bEditable;
             if (m_bIsEditable)
             {
+                //cmbQueryInfo
+                cmbQueryInfo.SelectedIndex = 0;
+                cmbQueryInfo.Enabled = false;
+
+                cmb_TimeSelect.SelectedIndex = 0;
+                
+                cmb_TimeSelect.Enabled = false;
+                cmb_TimeSelect.SelectedIndex = 1;
                 // 如果可以编辑，调整位置
                 Point pNewRecord = btnNewRecord.Location;
                 btnNewRecord.Location = btnExit.Location;
                 btnExit.Location = pNewRecord;
                 btnNewRecord.Visible = true;
                 btnApply.Visible = true;
+
+                
+
 
                 //cmbQueryInfo.Items.Add(CS_CMB_SoilData);
 
@@ -121,6 +132,12 @@ namespace Hydrology.Forms
             }
             else
             {
+                cmbQueryInfo.SelectedIndex = 0;
+                cmbQueryInfo.Enabled = true; ;
+
+                cmb_TimeSelect.SelectedIndex = 0;
+                cmb_TimeSelect.Enabled = true;
+
                 //cmbQueryInfo.Items.Add(CS_CMB_SoilData);
                 // 不可以编辑，判断当前的位置
                 m_dgvRain.Editable = false;
@@ -632,6 +649,7 @@ namespace Hydrology.Forms
                 }
                 else
                 {
+                    
                     IsHEva = false;
                     IsREva = false;
                     isRawData = false;

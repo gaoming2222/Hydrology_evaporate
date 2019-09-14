@@ -233,6 +233,45 @@ namespace Hydrology.DBManager.DB.SQLServer
             m_mutexDataTable.ReleaseMutex();
         }
 
+        public bool UpdateRows(List<CEntityEva> evaList)
+        {
+            bool flag = true;
+            StringBuilder sql = new StringBuilder();
+            int currentBatchCount = 0;
+            for (int i = 0; i < evaList.Count; i++)
+            {
+
+                ++currentBatchCount;
+                sql.AppendFormat("update {0} set {1}={2},{3}={4} where {5}={6} and {7}='{8}';",
+                    CT_TableName,
+                    //  CN_DataTime, DateTimeToDBStr(rains[i].TimeCollect),
+                    CN_Eva, evaList[i].Eva.HasValue ? evaList[i].Eva.Value.ToString() : "null",
+                    CN_Rain, evaList[i].Rain.HasValue ? evaList[i].Rain.Value.ToString() : "null",
+                    CN_StationId, evaList[i].StationID,
+                    CN_DataTime, evaList[i].TimeCollect.ToString()
+                );
+                if (currentBatchCount >= CDBParams.GetInstance().UpdateBufferMax)
+                {
+                    // 更新数据库
+                    if (!this.ExecuteSQLCommand(sql.ToString()))
+                    {
+                        // 保存失败
+                        return false;
+                    }
+                    sql.Clear(); //清除以前的所有命令
+                    currentBatchCount = 0;
+                }
+            }
+            // 更新数据库
+            if (!this.ExecuteSQLCommand(sql.ToString()))
+            {
+                return false;
+            }
+            ResetAll();
+            return true;
+
+            return flag;
+        }
         // 根据当前条件查询统计数据
         private void DoCountQuery()
         {
