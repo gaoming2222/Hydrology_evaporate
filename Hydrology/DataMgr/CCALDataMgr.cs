@@ -562,7 +562,7 @@ namespace Hydrology.DataMgr
                     }
                     else
                     {
-                        //未使用
+                        //未使用ffff
                         hourE = hourE;
                     }
 
