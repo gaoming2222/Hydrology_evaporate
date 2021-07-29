@@ -525,8 +525,16 @@ namespace Hydrology.DBManager.DB.SQLServer
         public List<CEntityEva> QueryForDayEvaList(string StationId)
         {
             DateTime endTime = DateTime.Now;
-            DateTime strtTime = new DateTime(endTime.Year, endTime.Month, endTime.Day, 8, 0, 0);
-            string sql = "select * from " + CT_TableName + " where DT >='" + strtTime + "' and DT <='" + endTime + "' and STCD ='" + StationId + "';";
+            DateTime strtTime;
+            if (endTime.Hour < 8)
+            {
+                strtTime = new DateTime(endTime.AddDays(-1).Year, endTime.AddDays(-1).Month, endTime.AddDays(-1).Day, 8, 0, 0);
+            }
+            else
+            {
+                strtTime = new DateTime(endTime.Year, endTime.Month, endTime.Day, 8, 0, 0);
+            }
+            string sql = "select * from " + CT_TableName + " where DT >'" + strtTime + "' and DT <='" + endTime + "' and STCD ='" + StationId + "';";
 
             List<CEntityEva> results = new List<CEntityEva>();
             //string sql = "select * from HydrologytestDB.dbo.Rain where DataTime= '" + startTime + "' and StationID="  + StationId + ";";

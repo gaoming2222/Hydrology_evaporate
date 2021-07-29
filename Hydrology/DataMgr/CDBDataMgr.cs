@@ -104,8 +104,9 @@ namespace Hydrology.DataMgr
 
         //1009gm
         private ISoilDataProxy m_proxySoilData;
-
+        private DateTime calFlag;
         private CCALDataMgr cal;
+        private DateTime timeFlag;
         private List<CEntityStation> m_listStations;    //所有站点内存副本
         private List<CEntitySubCenter> m_listSubCenter; //所有分中心内存副本
         private List<CEntitySerialPort> m_listSerialPort;   //所有串口的内存副本
@@ -149,6 +150,7 @@ namespace Hydrology.DataMgr
 
         public bool Init()
         {
+            //todo
             aTimer.Tick += new EventHandler(atimer_Tick);
             aTimer.Enabled = true;
             aTimer.Start();
@@ -157,6 +159,8 @@ namespace Hydrology.DataMgr
             {
                 return false;
             }
+            timeFlag = DateTime.Now;
+            calFlag = DateTime.Now;
             // 此处应该考虑根据配置连接不同的数据库，嘿嘿，从长计议，工厂模式啥啥啥的都可以
             m_proxyStation = new CSQLStation();
             m_proxySubCenter = new CSQLSubCenter();
@@ -177,7 +181,7 @@ namespace Hydrology.DataMgr
             m_proxyWarningInfo = new CSQLWarningInfo();
             m_proxyWaterFlowMap = new CSQLWaterFlowMap();
             // m_proxyCommunicationRate = new CSQLCommunicationRate();
-
+            
             cal = new CCALDataMgr();
 
             //1009gm
@@ -393,20 +397,9 @@ namespace Hydrology.DataMgr
 
         public List<CEntityStation> GetAllStationData()
         {
-            //List<CEntityStation> results = new List<CEntityStation>();
-            //foreach (KeyValuePair<string, CEntityStation> pair in m_mapStaion)
-            //{
-            //    results.Add(pair.Value);
-            //}
             m_listStations = m_proxyStation.QueryAll();
-            //if (null == m_listStations)
-            //    return new List<CEntityStation>();
-            //return m_listStations;
             return m_listStations;
-
         }
-
-
 
         public List<CEntitySubCenter> GetAllSubCenter()
         {
@@ -2489,8 +2482,6 @@ namespace Hydrology.DataMgr
                     Debug.WriteLine("站点配置不正确，数据库没有站点{0}的配置", args.StrStationID);
                     return;
                 }
-                
-
                 #region 蒸发表
                 List<CEntityEva> HEvas = new List<CEntityEva>();
                 List<CEntityEva> DEvas = new List<CEntityEva>();
@@ -2505,10 +2496,9 @@ namespace Hydrology.DataMgr
                         continue;
                     }
 
-                    if (args.Datas.Count != 1)
-                    {
-                        m_mapStationRTD[station.StationID].TimeDeviceGained = data.DataTime;
-                    }
+                    //将接收时间更新为最新时间
+                    m_mapStationRTD[station.StationID].TimeDeviceGained = data.DataTime;
+                    
 
                     if (data.Eva == null || data.Temp == null)
                     {
@@ -2528,6 +2518,7 @@ namespace Hydrology.DataMgr
                     Eva.kp = station.DWaterMin;
                     Eva.ke = station.DWaterMax;
                     Eva.dh = station.DWaterChange;
+                    Eva.maxE = station.DRainChange;
                     Eva.comP = 0;
 
                     CEntityEva DEva = new CEntityEva();
@@ -2541,7 +2532,23 @@ namespace Hydrology.DataMgr
                     DEva.Voltage = data.Voltage;
                     DEva.type = data.EvpType;
 
+                    //TimeSpan ts1 = new TimeSpan(DateTime.Now.Ticks);
+                    //TimeSpan ts2 = new TimeSpan(timeFlag.Ticks);
+                    //TimeSpan ts = ts1.Subtract(ts2).Duration();
+                    //int seconds = ts.Seconds;
+                    //if(seconds > 5 || seconds < -5)
+                    //{
+                    //    Thread.Sleep(5 * 1000);
+                    //    CSystemInfoMgr.Instance.AddInfo("调用函数开始前休眠5S！");
+                    //}
+                    CSystemInfoMgr.Instance.AddInfo("调用函数开始！");
+                    if(System.Math.Abs((DateTime.Now.Subtract(calFlag)).Seconds) < 1)
+                    {
+                        CSystemInfoMgr.Instance.AddInfo("延迟1S调用！");
+                        Thread.Sleep(1 * 1000);
+                    }
                     cDic = cal.EvaCal(Eva);
+                    calFlag = DateTime.Now;
                     if (cDic.Count == 0)
                     {
                         continue;
@@ -2582,16 +2589,6 @@ namespace Hydrology.DataMgr
                             DEvas.Add(DEva);
                         }
                     }
-                    if (cDic.ContainsKey("needCover"))
-                    {
-                        if(cDic["needCover"] == "1")
-                        {
-                            DateTime startTime = data.DataTime.AddDays(-1).AddHours(1);
-                            DateTime endTime = data.DataTime.AddHours(-1);
-                            decimal comP = decimal.Parse(cDic["hourComP"]);
-                            m_proxyHEva.UpdateRows(startTime, endTime, comP);
-                        }
-                    }
                 }
                 if (HEvas.Count > 0)
                 {
@@ -2624,7 +2621,15 @@ namespace Hydrology.DataMgr
                     realtime.DayEva = null;
                     realtime.Eva = null;
                     realtime.Rain = null;
-                    realtime.Temperature = null;
+                    if(args.Datas[tmpDataCount - 1].Temp.HasValue)
+                    {
+                        realtime.Temperature = args.Datas[tmpDataCount - 1].Temp.Value;
+                    }
+                    else
+                    {
+                        realtime.Temperature = null;
+                    }
+                    
                     realtime.Voltage =null;
                     realtime.DH =null;
 
@@ -2701,7 +2706,98 @@ namespace Hydrology.DataMgr
 
                     m_proxyRealEva.AddNewRow(realtime);
 
+                    //将今日，昨日，前日数据发送到设备TODO
+                    //1.查询前日和昨日的蒸发和降雨
+                    try
+                    {
+                        List<CEntityEva> evaList = new List<CEntityEva>();
+                        string aaaa = "0000";
+                        string bbbb = "0000";
+                        string cccc = "0000";
+                        string ddd = "000";
+                        string eee = "000";
+                        string fff = "000";
+                        if (realtime.TimeDeviceGained.Hour == 8)
+                        {
+                            DateTime strtTime = new DateTime(realtime.TimeDeviceGained.AddDays(-1).Year, realtime.TimeDeviceGained.AddDays(-1).Month, realtime.TimeDeviceGained.AddDays(-1).Day, 7, 0, 0);
+                            DateTime endTime = new DateTime(realtime.TimeDeviceGained.Year, realtime.TimeDeviceGained.Month, realtime.TimeDeviceGained.Day, 7, 0, 0);
+                            evaList = getEvaByTime(realtime.StrStationID, strtTime, endTime);
+                            if (evaList != null && evaList.Count == 1)
+                            {
+                                aaaa = ((Math.Round(evaList[0].P.Value, 1)) * 10).ToString("0000");
+                                ddd = ((Math.Round(evaList[0].E.Value, 1)) * 10).ToString("000");
+                                bbbb = (Math.Round(realtime.LastDayRain.Value, 1) * 10).ToString("0000");
+                                eee = (Math.Round(realtime.LastDayEva.Value, 1) * 10).ToString("000");
+                                cccc = "0000";
+                                fff = "000";
+                            }
+                        }
+                        else if (DateTime.Now.Hour > 8)
+                        {
+                            DateTime strtTime = new DateTime(realtime.TimeDeviceGained.AddDays(-1).Year, realtime.TimeDeviceGained.AddDays(-1).Month, realtime.TimeDeviceGained.AddDays(-1).Day, 7, 0, 0);
+                            DateTime endTime = new DateTime(realtime.TimeDeviceGained.Year, realtime.TimeDeviceGained.Month, realtime.TimeDeviceGained.Day, 9, 0, 0);
+                            evaList = getEvaByTime(realtime.StrStationID, strtTime, endTime);
+                            if (evaList != null && evaList.Count == 2)
+                            {
+                                //decimal a = Math.Round(evaList[0].Rain.Value, 1);
+                                aaaa = ((Math.Round(evaList[0].P.Value, 1)) * 10).ToString("0000");
+                                ddd = ((Math.Round(evaList[0].E.Value, 1)) * 10).ToString("000");
+                                bbbb = ((Math.Round(evaList[1].P.Value, 1)) * 10).ToString("0000");
+                                eee = ((Math.Round(evaList[1].E.Value, 1)) * 10).ToString("000");
+                                if (realtime.DayRain.HasValue && realtime.DayEva.HasValue)
+                                {
+                                    cccc = (Math.Round(realtime.DayRain.Value, 1) * 10).ToString("0000");
+                                    fff = (Math.Round(realtime.DayEva.Value, 1) * 10).ToString("000");
+                                }
+                                else
+                                {
+                                    cccc = "0000";
+                                    fff = "000";
+                                }
+                            }
+                        }
+                        else if (DateTime.Now.Hour < 8)
+                        {
+                            DateTime strtTime = new DateTime(realtime.TimeDeviceGained.AddDays(-2).Year, realtime.TimeDeviceGained.AddDays(-2).Month, realtime.TimeDeviceGained.AddDays(-2).Day, 7, 0, 0);
+                            DateTime endTime = new DateTime(realtime.TimeDeviceGained.AddDays(-1).Year, realtime.TimeDeviceGained.AddDays(-1).Month, realtime.TimeDeviceGained.AddDays(-1).Day, 7, 0, 0);
+                            evaList = getEvaByTime(realtime.StrStationID, strtTime, endTime);
+                            if (evaList != null && evaList.Count == 2)
+                            {
+                                aaaa = ((Math.Round(evaList[0].P.Value, 1)) * 10).ToString("0000");
+                                ddd = ((Math.Round(evaList[0].E.Value, 1)) * 10).ToString("000");
+                                bbbb = ((Math.Round(evaList[1].P.Value, 1)) * 10).ToString("0000");
+                                eee = ((Math.Round(evaList[1].E.Value, 1)) * 10).ToString("000");
+                                if (realtime.DayRain.HasValue && realtime.DayEva.HasValue)
+                                {
+                                    cccc = (Math.Round(realtime.DayRain.Value, 1) * 10).ToString("0000");
+                                    fff = (Math.Round(realtime.DayEva.Value, 1) * 10).ToString("000");
+                                }
+                                else
+                                {
+                                    cccc = "0000";
+                                    fff = "000";
+                                }
+                            }
+                        }
+                        //at+cpbw=4,”aaaabbbbccccdddeeefff”，129,”nn”
+                        string day = realtime.TimeDeviceGained.Day.ToString("00");
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append("at+");//AT指令头
+                        sb.Append("cpbw=4,\"");
+                        sb.Append(aaaa + bbbb + cccc + ddd + eee + fff);
+                        sb.Append("\",129,");
+                        sb.Append("\"");
+                        sb.Append(day);
+                        sb.Append("\"");
+                        sb.Append("\r\n");
+                        CSystemInfoMgr.Instance.AddInfo(sb.ToString());
+                        CPortDataMgr.Instance.SendHDMsg(station.GPRS, station.StationID, sb.ToString(), EChannelType.GPRS);
+                    }
+                    catch(Exception e) { }
+                    
                 }
+                
+
                 #endregion
             }
             catch (Exception ex)
@@ -3645,7 +3741,7 @@ namespace Hydrology.DataMgr
             if (DateTime.Now.Hour == 8 && DateTime.Now.Minute == 30)
             //if (true)
             {
-                CSystemInfoMgr.Instance.AddInfo("8：00数据缺失，人工计算日量");
+                CSystemInfoMgr.Instance.AddInfo("人工计算日量开始");
                 //1.获取所有站点ID
                 List<String> stationIds = new List<string>();
                 if (m_listStations != null && m_listStations.Count > 0)
@@ -3661,6 +3757,7 @@ namespace Hydrology.DataMgr
                 //2.定时调用
                 for (int i = 0; i <stationIds.Count; i++)
                 {
+                    CSystemInfoMgr.Instance.AddInfo(stationIds[i]);
                     CEntityStation station = GetStationById(stationIds[i]);
                     Dictionary<string, string> ret = cal.Timing(stationIds[i]);
                     List<CEntityEva> dEvaList = new List<CEntityEva>(); 
@@ -3693,6 +3790,7 @@ namespace Hydrology.DataMgr
                     //3.初始化并保存
                     if (dEvaList.Count > 0)
                     {
+                        CSystemInfoMgr.Instance.AddInfo("人工计算日量存储");
                         m_proxyDEva.AddNewRows(dEvaList);
                     }
                 }

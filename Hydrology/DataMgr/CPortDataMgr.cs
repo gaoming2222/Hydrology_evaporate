@@ -520,6 +520,20 @@ namespace Hydrology.DataMgr
             return query;
         }
 
+        public String SendReadEVHDMsg(string id, string stationID, IList<EDownParamEV> cmds, EChannelType ctype)
+        {
+            string query = string.Empty;
+            if (EChannelType.GPRS == ctype)
+            {
+                query = SendHDGprsReadEV(id, stationID, cmds);
+            }
+            else if (EChannelType.GSM == ctype)
+            {
+                query = SendGsmReadEV(id, stationID, cmds);
+            }
+            return query;
+        }
+
         public String SendSetMsg(string id, string stationID, IList<EDownParam> cmds, CDownConf down, EChannelType ctype)
         {
             string query = string.Empty;
@@ -1047,12 +1061,12 @@ namespace Hydrology.DataMgr
                 }
                 else
                 {
-                    MessageBox.Show("gprs不在线！");
+                    //MessageBox.Show("gprs不在线！");
                 }
             }
             else
             {
-                MessageBox.Show("gprs不在线！");
+                //MessageBox.Show("gprs不在线！");
             }
         }
 
@@ -1070,12 +1084,12 @@ namespace Hydrology.DataMgr
                 }
                 else
                 {
-                    MessageBox.Show("gprs不在线！");
+                    //MessageBox.Show("gprs不在线！");
                 }
             }
             else
             {
-                MessageBox.Show("gprs不在线！");
+                //MessageBox.Show("gprs不在线！");
             }
         }
 
@@ -1155,6 +1169,34 @@ namespace Hydrology.DataMgr
 
 
         public String SendHDGprsRead(string userid, string stationID, IList<EDownParam> cmds)
+        {
+            string query = string.Empty;
+            var hdgprs = FindHDGprsByUserid(userid);
+            if (hdgprs != null)
+            {
+                byte[] dtuID = null;
+
+                if (hdgprs.FindByID(userid, out dtuID))
+                {
+                    query = hdgprs.Down.BuildQuery(stationID, cmds, EChannelType.GPRS);
+                    string id = System.Text.Encoding.Default.GetString(dtuID);
+                    hdgprs.SendDataTwice(id, query);
+                }
+                //1109
+                else
+                {
+                    MessageBox.Show("站点" + stationID + "当前不在线！");
+                }
+            }
+            else
+            {
+                MessageBox.Show("站点" + stationID + "当前不在线！");
+            }
+            return query;
+        }
+
+
+        public String SendHDGprsReadEV(string userid, string stationID, IList<EDownParamEV> cmds)
         {
             string query = string.Empty;
             var hdgprs = FindHDGprsByUserid(userid);
@@ -1680,6 +1722,27 @@ namespace Hydrology.DataMgr
         }
 
         private string SendGsmRead(string gsmNum, string stationID, IList<EDownParam> cmds)
+        {
+            string qry = string.Empty;
+            var gsm = FindGsm(stationID);
+            if (gsm != null)
+            {
+                qry = gsm.Down.BuildQuery(stationID, cmds, EChannelType.GSM);
+                Debug.Write(qry);
+                if (!string.IsNullOrEmpty(qry))
+                {
+                    // 写入系统日志
+                    string returnMsg = string.Empty;
+                    gsm.SendMsg(gsmNum, qry);
+                }
+                // 写入系统日志
+                //CSystemInfoMgr.Instance.AddInfo(string.Format("GSM 读取参数：目标站点（{0}） 参数过多，读取失败", stationID));
+                //_lastError = string.Format("如果发送{0}接收数据的长度将大于140个字符,会导致发送数据失败！请重新选择读取项！", qry);
+            }
+            return qry;
+        }
+
+        private string SendGsmReadEV(string gsmNum, string stationID, IList<EDownParamEV> cmds)
         {
             string qry = string.Empty;
             var gsm = FindGsm(stationID);
@@ -2690,8 +2753,10 @@ namespace Hydrology.DataMgr
         public static void BatchDataReceived(object sender, BatchEventArgs e)
         {
             CBatchStruct batch = e.Value;
+            CSystemInfoMgr.Instance.AddInfo("#####111" + "cportdatamgr1");
             if (batch != null && BatchForUI != null)
             {
+                CSystemInfoMgr.Instance.AddInfo("#####111" + "cportdatamgr2");
                 BatchForUI.Invoke(sender, e);
             }
         }

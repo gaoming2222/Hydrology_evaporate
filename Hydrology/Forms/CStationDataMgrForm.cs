@@ -30,6 +30,7 @@ namespace Hydrology.Forms
         private static readonly string CS_CMB_TimeData = "小时数据";
         private static readonly string CS_CMB_DayData = "日数据";
         private static readonly string CS_CMB_RawData = "原始数据";
+        private static readonly string CS_CMB_8Data = "8时数据";
 
         private readonly string CS_All_Station = "所有站点";
         #endregion ///<静态常量
@@ -203,7 +204,7 @@ namespace Hydrology.Forms
 
             cmb_RainShape.Items.AddRange(new string[] { CS_CMB_RainShape_Periodrain, CS_CMB_RainShape_Differencerain, CS_CMB_ViewStyle_Dayrain });
 
-            cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData, CS_CMB_RawData });
+            cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_AllData, CS_CMB_RawData, CS_CMB_8Data });
             // 设置日期
             this.dptTimeStart.Format = DateTimePickerFormat.Custom;
             this.dptTimeEnd.Format = DateTimePickerFormat.Custom;
@@ -594,7 +595,7 @@ namespace Hydrology.Forms
             {
                 //查询蒸发数据
                 cmb_TimeSelect.Items.Clear();
-                cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_DayData, CS_CMB_RawData });
+                cmb_TimeSelect.Items.AddRange(new string[] { CS_CMB_TimeData, CS_CMB_DayData, CS_CMB_RawData, CS_CMB_8Data });
                 cmb_TimeSelect.SelectedIndex = 0;
                 m_dgvRain.Hide();
                 m_dgvWater.Hide();
@@ -646,6 +647,13 @@ namespace Hydrology.Forms
                     IsHEva = false;
                     IsREva = true;
                     dptTimeStart.Value = dptTimeEnd.Value.AddDays(-1);// 减少一天
+                }
+                else if (cmb_TimeSelect.Text.Equals(CS_CMB_8Data))
+                {
+                    isRawData = true;
+                    IsHEva = false;
+                    IsREva = true;
+                    dptTimeStart.Value = dptTimeEnd.Value.AddDays(-10);// 减少一天
                 }
                 else
                 {
@@ -933,7 +941,13 @@ namespace Hydrology.Forms
                     }
                 }
                 bool updateData = false;
-                if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, isRawData))
+                if (cmb_TimeSelect.Text.Equals(CS_CMB_8Data))
+                {
+                    if (m_dgvEva.SetFilter_1(stationId, dptTimeStart.Value, dptTimeEnd.Value, isRawData))
+                    {
+
+                    }
+                }else if (m_dgvEva.SetFilter(stationId, dptTimeStart.Value, dptTimeEnd.Value, isRawData))
                 {
                     if (!isRawData)
                     {

@@ -242,11 +242,11 @@ namespace Hydrology.DBManager.DB.SQLServer
             {
 
                 ++currentBatchCount;
-                sql.AppendFormat("update {0} set {1}={2},{3}={4} where {5}={6} and {7}='{8}';",
+                sql.AppendFormat("update {0} set {1}={2},{3}={4},{5}={6} where {7}={8} and {9}='{10}';",
                     CT_TableName,
-                    //  CN_DataTime, DateTimeToDBStr(rains[i].TimeCollect),
                     CN_Eva, evaList[i].Eva.HasValue ? evaList[i].Eva.Value.ToString() : "null",
                     CN_Rain, evaList[i].Rain.HasValue ? evaList[i].Rain.Value.ToString() : "null",
+                    CN_dayEChange, evaList[i].dayEChange.HasValue ? evaList[i].dayEChange.Value.ToString() : "null",
                     CN_StationId, evaList[i].StationID,
                     CN_DataTime, evaList[i].TimeCollect.ToString()
                 );
@@ -494,6 +494,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
                     bulkCopy.ColumnMappings.Add(CN_Rain8, CN_Rain8);
                     bulkCopy.ColumnMappings.Add(CN_Rain20, CN_Rain20);
+                    bulkCopy.ColumnMappings.Add(CN_dayEChange, CN_dayEChange);
 
                     try
                     {
@@ -623,6 +624,54 @@ namespace Hydrology.DBManager.DB.SQLServer
                 }
             }
             return evaList;
+        }
+
+
+        public CEntityEva GetEva1ByTime(string stationId, DateTime datatime)
+        {
+            CEntityEva result = new CEntityEva();
+            result.StationID = stationId;
+            result.TimeCollect = datatime;
+            string sql = "select top(1) DT,E,P,dayEChange  from " + CT_TableName + " where STCD = " + stationId + " and DT = '" + datatime + "' order by DT desc;";
+            SqlDataAdapter adapter = new SqlDataAdapter(sql, CDBManager.GetInstacne().GetConnection());
+            DataTable dataTableTmp = new DataTable();
+            adapter.Fill(dataTableTmp);
+            if (dataTableTmp.Rows.Count == 1)
+            {
+                try
+                {
+                    if (dataTableTmp.Rows[0][CN_Eva] != null && dataTableTmp.Rows[0][CN_Eva].ToString() != "")
+                    {
+                        result.E = decimal.Parse(dataTableTmp.Rows[0][CN_Eva].ToString());
+                    }
+                    else
+                    {
+                        result.E = null;
+                    }
+                    if (dataTableTmp.Rows[0][CN_Rain] != null && dataTableTmp.Rows[0][CN_Rain].ToString() != "")
+                    {
+                        result.P = decimal.Parse(dataTableTmp.Rows[0][CN_Rain].ToString());
+                    }
+                    else
+                    {
+                        result.P = null;
+                    }
+                    if (dataTableTmp.Rows[0][CN_dayEChange] != null && dataTableTmp.Rows[0][CN_dayEChange].ToString() != "")
+                    {
+                        result.dayEChange = decimal.Parse(dataTableTmp.Rows[0][CN_dayEChange].ToString());
+                    }
+                    else
+                    {
+                        result.dayEChange = 0;
+                    }
+                }
+                catch (Exception e)
+                {
+
+                }
+
+            }
+            return result;
         }
 
         public List<CEntityEva> get4InitEva()

@@ -503,7 +503,7 @@
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(89, 12);
             this.label10.TabIndex = 67;
-            this.label10.Text = "蒸发转换系数：";
+            this.label10.Text = "降雨转换系数：";
             // 
             // textBox_WaterMax
             // 
@@ -520,7 +520,7 @@
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(89, 12);
             this.label13.TabIndex = 65;
-            this.label13.Text = "降雨转换系数：";
+            this.label13.Text = "蒸发转换系数：";
             // 
             // panel2
             // 

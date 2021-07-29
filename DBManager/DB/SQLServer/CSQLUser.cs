@@ -177,11 +177,11 @@ namespace Hydrology.DBManager.DB.SQLServer
         public bool UserLogin(string username, string password, ref bool bAdministrator)
         {
             // 超级管理员
-            if (username.Equals("admin") && password.Equals("admin"))
-            {
-                bAdministrator = true;
-                return true;
-            }
+            //if (username.Equals("admin") && password.Equals("admin"))
+            //{
+            //    bAdministrator = true;
+            //    return true;
+            //}
             string sql = string.Format("select {0} from {1} where {2}='{3}' and {4}='{5}';",
                 CN_Administrator,
                 CT_TableName,

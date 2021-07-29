@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Hydrology.CControls;
+using Hydrology.DataMgr;
 using Hydrology.DBManager.DB.SQLServer;
 using Hydrology.DBManager.Interface;
 using Hydrology.Entity;
@@ -23,6 +24,8 @@ namespace Hydrology.Forms
 
         #region 数据成员
         private IDEvaProxy m_proxyDEva;
+        private IEvaProxy m_proxyEva;
+        private IHEvaProxy m_proxyHEva;
         /// <summary>
         ///  当前站点
         /// </summary>
@@ -74,6 +77,8 @@ namespace Hydrology.Forms
             m_entityVoltage = null;
             m_entityWater = null;
             m_proxyDEva = new CSQLDEva();
+            m_proxyEva = new CSQLEva();
+            m_proxyHEva = new CSQLHEva();
             FormHelper.InitUserModeEvent(this);
         }
         #region 事件响应
@@ -351,6 +356,10 @@ namespace Hydrology.Forms
         private void GenerateAdddedDate()
         {
             List<CEntityEva> evaList = new List<CEntityEva>();
+            List<CEntityEva> evaRList = new List<CEntityEva>();
+            List<CEntityEva> evaHList = new List<CEntityEva>();
+            CEntityEva evaR = new CEntityEva();
+            CEntityEva evaH = new CEntityEva();
             m_entityEva = new CEntityEva();
             m_entityEva.StationID = m_currentStation.StationID;
             m_entityEva.TimeCollect = dtp_CollectTime.Value;
@@ -358,8 +367,43 @@ namespace Hydrology.Forms
             m_entityEva.Eva = number_PeriodRain.Value;
             m_entityEva.Temperature = number_TotalRain.Value;
             m_entityEva.dayEChange = 0;
+            //根据stationid获取
+            CEntityStation station = CDBDataMgr.Instance.GetStationById(m_currentStation.StationID);
+            //原始蒸发数据
+            evaH.StationID = m_currentStation.StationID;
+            evaH.TimeCollect = dtp_CollectTime.Value;
+            //evaH.DH = number_Voltage.Value;
+            evaH.DH = (number_Voltage.Value / station.DWaterMax) - station.DWaterChange;
+            evaR.StationID= m_currentStation.StationID;
+            evaR.TimeCollect = dtp_CollectTime.Value;
+            evaR.TE = number_Voltage.Value;
+            evaR.Eva = number_Voltage.Value / station.DWaterMax;
+            //evaR.Eva = number_Voltage.Value + station.DWaterChange;
+            //evaR.TE = evaR.Eva * station.DWaterMax;
+
+            //m_entityEva.E = number_Voltage.Value + station.DWaterChange;
+            //m_entityEva.TE = m_entityEva.E * station.DWaterMax;
             evaList.Add(m_entityEva);
-            m_proxyDEva.AddNewRows(evaList);
+            evaRList.Add(evaR);
+            evaHList.Add(evaH);
+            try
+            {
+                if (chk_Voltage.Checked)
+                {
+                    m_proxyEva.AddNewRow(evaR);
+                    m_proxyHEva.AddNewRows(evaHList);
+                }
+                if (chk_Rain.Checked)
+                {
+                    m_proxyDEva.AddNewRows(evaList);
+                }
+                MessageBox.Show("数据插入成功！");
+            }catch(Exception e)
+            {
+                
+            }
+            
+            
             //if (chk_Rain.CheckState == CheckState.Checked)
             //{
             //    // 新建雨量记录
@@ -400,11 +444,15 @@ namespace Hydrology.Forms
             //    m_entityVoltage.state = 1;
             //}
         }
+
+
+
+
         #endregion 帮助方法
 
+        private void GroupBox3_Enter(object sender, EventArgs e)
+        {
 
-
-
-
+        }
     }
 }

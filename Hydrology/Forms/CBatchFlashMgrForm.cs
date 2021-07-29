@@ -33,15 +33,14 @@ namespace Hydrology.Forms
         private void Init()
         {
             //   this.Text = "批量传输 - Flash数据";
-            this.Text = "批量传输";
+            this.Text = "远程下载";
             dtp_EndTime.Format = DateTimePickerFormat.Custom;
-            dtp_EndTime.CustomFormat = "yyyy-MM-dd HH";
+            dtp_EndTime.CustomFormat = "yyyy-MM-dd";
             dtp_EndTime.Value = DateTime.Now;
             dtp_StartTime.Format = DateTimePickerFormat.Custom;
-            dtp_StartTime.CustomFormat = "yyyy-MM-dd HH";
+            dtp_StartTime.CustomFormat = "yyyy-MM-dd";
             dtp_StartTime.Value = DateTime.Now.AddDays(-1);
-            radioHour.Checked = true;
-
+            radioDay.Checked = true;
             ReloadComboBox();
             ReloadListView();
 
@@ -106,146 +105,79 @@ namespace Hydrology.Forms
         }
         private void BatchForUI_EventHandler(object sender, BatchEventArgs e)
         {
-            //20170512改动过
-            var result = e.Value;
-            string rawData = e.RawData;
-
-            BatchDataImport m_batchDataImport = new BatchDataImport();
-
-            if (result != null)
+            try
             {
-                if (this.IsHandleCreated)
+                CCALDataMgr cal = new CCALDataMgr();
+
+                //20170512改动过
+                var result = e.Value;
+                string rawData = e.RawData;
+
+                BatchDataImport m_batchDataImport = new BatchDataImport();
+
+                if (result != null)
                 {
-                    //  导入数据库
-                    //BatchDataImport.Import(result);
-                    DateTime DStartTime = new DateTime();
-                    DateTime DEndTime = new DateTime();
-                    if (this.radioHour.Checked == true)
+                    if (this.IsHandleCreated)
                     {
-                        DateTime tmp = this.dtp_StartTime.Value;
-                        //DateTime tmp_1 = this.dtp_EndTime.Value;
-                        DStartTime = new DateTime(tmp.Year, tmp.Month, tmp.Day, tmp.Hour, 0, 0);
-                        DEndTime = this.dtp_EndTime.Value;
-                    }
-                    else if (this.radioDay.Checked == true)
-                    {
-                        DateTime tmp = this.dtp_StartTime.Value;
-                        DateTime tmp_1 = this.dtp_EndTime.Value;
-                        DStartTime = new DateTime(tmp.Year, tmp.Month, tmp.Day, 8, 0, 0);
-                        DEndTime = new DateTime(tmp_1.Year, tmp_1.Month, tmp_1.Day, 23, 59, 59);
-                    }
-                    //DateTime DStartTime = this.dtp_StartTime.Value;
-                    //DateTime DEndTime = this.dtp_EndTime.Value;
-                    if (radioButton2.Checked)
-                    {
-                        m_batchDataImport.Import(result, DStartTime, DEndTime);
-                    }
-                    //m_batchDataImport.Import(result, DStartTime, DEndTime);
-                    if (radioButtonSave.Checked)
-                    {
-                        if (result.StationType == EStationType.ERainFall)
+                        CSystemInfoMgr.Instance.AddInfo("#####" + result.StationID);
+                        //  导入数据库
+                        //BatchDataImport.Import(result);
+                        DateTime DStartTime = new DateTime();
+                        DateTime DEndTime = new DateTime();
+                        if (this.radioHour.Checked == true)
                         {
-                            string filePath = @"BatchData\\Rain.txt";//这里是你的已知文件
-                            string strPath = Path.GetDirectoryName(filePath);
-                            if (!Directory.Exists(strPath))
-                            {
-                                Directory.CreateDirectory(strPath);
-                            }
-                            StreamWriter sw = new StreamWriter(filePath, true, Encoding.GetEncoding("gb2312"));
-                            sw.Write("---------------------------------------------" + "\r\n");
-                            sw.Write("接收数据 : " + rawData + "\r\n");//写你的字符串。
-                            sw.Write("站点ID : " + result.StationID + "\r\n");//写你的字符串。
-                            sw.Write("站点类型: " + "水位" + "\r\n");//写你的字符串。
-                            foreach (var item in result.Datas)
-                            {
-                                try
-                                {
-                                    sw.Write(item.Time.ToString() + "    " + item.Data + "\r\n");
-                                }
-                                catch (Exception exp) { Debug.WriteLine(exp.Message); }
-                            }
-                            sw.Close();
+                            DateTime tmp = this.dtp_StartTime.Value;
+                            //DateTime tmp_1 = this.dtp_EndTime.Value;
+                            DStartTime = new DateTime(tmp.Year, tmp.Month, tmp.Day, tmp.Hour, 0, 0);
+                            DEndTime = this.dtp_EndTime.Value;
                         }
-                        if (result.StationType == EStationType.ERiverWater)
+                        else if (this.radioDay.Checked == true)
                         {
-                            string filePath = "BatchData\\Water.txt";//这里是你的已知文件
-                            string strPath = Path.GetDirectoryName(filePath);
-                            if (!Directory.Exists(strPath))
+                            DateTime tmp = this.dtp_StartTime.Value;
+                            DateTime tmp_1 = this.dtp_EndTime.Value;
+                            DStartTime = new DateTime(tmp.Year, tmp.Month, tmp.Day, 8, 0, 0);
+                            DEndTime = new DateTime(tmp_1.Year, tmp_1.Month, tmp_1.Day, 23, 59, 59);
+                        }
+                        //DateTime DStartTime = this.dtp_StartTime.Value;
+                        //DateTime DEndTime = this.dtp_EndTime.Value;
+                        CEntityEva eva = new CEntityEva();
+                        CEntityStation station = CDBDataMgr.Instance.GetStationById(result.StationID);
+                        //TODO
+                        if (result.Datas.Count == 1)
+                        {
+                            if (result.Cmd == "EVA")
                             {
-                                Directory.CreateDirectory(strPath);
+                                eva.StationID = result.StationID;
+                                eva.TimeCollect = result.Datas[0].Time;
+                                eva.Temperature = result.Datas[0].tmprt;
+                                eva.Rain = result.Datas[0].rain;
+                                eva.Eva = result.Datas[0].eva;
+                                eva.Voltage = (decimal)12.88;
+                                eva.act = "";
+                                eva.kp = station.DWaterMin;
+                                eva.ke = station.DWaterMax;
+                                cal.BuShuCal(eva);
                             }
-                            StreamWriter sw = new StreamWriter(filePath, true, Encoding.GetEncoding("gb2312"));
-                            sw.Write("---------------------------------------------" + "\r\n");
-                            sw.Write("接收数据 : " + rawData + "\r\n");//写你的字符串。
-                            sw.Write("站点ID : " + result.StationID + "\r\n");//写你的字符串。
-                            sw.Write("站点类型: " + "雨量" + "\r\n");//写你的字符串。
-                            foreach (var item in result.Datas)
+                            else if (result.Cmd == "PZ")
                             {
-                                try
-                                {
-                                    sw.Write(item.Time.ToString() + "    " + item.Data + "\r\n");
-                                }
-                                catch (Exception exp) { Debug.WriteLine(exp.Message); }
+                                eva.StationID = result.StationID;
+                                eva.TimeCollect = result.Datas[0].Time;
+                                eva.Temperature = result.Datas[0].tmprt;
+                                eva.Rain = result.Datas[0].rain;
+                                eva.Eva = result.Datas[0].eva;
+                                eva.Voltage = (decimal)12.88;
+                                eva.type = result.Datas[0].act;
+                                eva.kp = station.DWaterMin;
+                                eva.ke = station.DWaterMax;
+                                cal.BuShuPZCal(eva);
                             }
-                            sw.Close();
                         }
                     }
-
-                    //  更新界面
-
-                    this.listView1.Invoke((Action)delegate
-                    {
-                        try
-                        {
-                            this.listView1.Items.Add(new ListViewItem()
-                            {
-                                Text = "接收数据 : " + rawData
-                            });
-
-                        }
-                        catch (Exception exp) { Debug.WriteLine(exp.Message); }
-                        try
-                        {
-                            this.listView1.Items.Add(new ListViewItem()
-                            {
-                                Text = "站点ID : " + result.StationID
-                            });
-                        }
-                        catch (Exception exp) { Debug.WriteLine(exp.Message); }
-                        try
-                        {
-                            if (result.StationType == EStationType.ERiverWater)
-                            {
-                                this.listView1.Items.Add(new ListViewItem()
-                                {
-                                    Text = "站点类型: " + "雨量"
-                                });
-                            }
-                            else if (result.StationType == EStationType.ERainFall)
-                            {
-                                this.listView1.Items.Add(new ListViewItem()
-                                {
-                                    Text = "站点类型: " + "水位"
-                                });
-                            }
-
-
-                        }
-                        catch (Exception exp) { Debug.WriteLine(exp.Message); }
-                        foreach (var item in result.Datas)
-                        {
-                            try
-                            {
-                                this.listView1.Items.Add(new ListViewItem()
-                                {
-                                    Text = item.Time.ToString() + "    " + item.Data
-                                });
-                            }
-                            catch (Exception exp) { Debug.WriteLine(exp.Message); }
-                        }
-                    });
                 }
+            }catch(Exception eee){
+                CSystemInfoMgr.Instance.AddInfo("#####" + eee.Message);
             }
+             
         }
 
         private void BatchSDForUI_EventHandler(object sender, BatchSDEventArgs e)
@@ -338,6 +270,11 @@ namespace Hydrology.Forms
 
             var stype = station.StationType;
             ETrans trans = this.radioHour.Checked ? ETrans.ByHour : ETrans.ByDay;
+            if (this.MonthBtb.Checked)
+            {
+                trans = ETrans.ByMonth;
+            }
+            //trans = ETrans.ByDay;
             DateTime beginTime = new DateTime();
             DateTime endTime = new DateTime();
             if (radioSD.Checked)
@@ -360,11 +297,11 @@ namespace Hydrology.Forms
                 {
                     DateTime tmp = this.dtp_StartTime.Value;
                     DateTime tmp_1 = this.dtp_EndTime.Value;
-                    if (tmp_1.Day != tmp.Day || tmp_1.Year != tmp.Year || tmp_1.Month != tmp.Month)
-                    {
-                        MessageBox.Show("按小时查询不能跨日");
-                        return;
-                    }
+                    //if (tmp_1.Day != tmp.Day || tmp_1.Year != tmp.Year || tmp_1.Month != tmp.Month)
+                    //{
+                    //    MessageBox.Show("按小时查询不能跨日");
+                    //    return;
+                    //}
                     beginTime = new DateTime(tmp.Year, tmp.Month, tmp.Day, tmp.Hour, 0, 0);
                     endTime = this.dtp_EndTime.Value;
                 }
@@ -383,11 +320,17 @@ namespace Hydrology.Forms
 
                 //DateTime beginTime = this.dtp_StartTime.Value;
                 //DateTime endTime = this.dtp_EndTime.Value;
-                if (beginTime > endTime)
+                if (beginTime.AddMinutes(15) > DateTime.Now)
                 {
-                    MessageBox.Show("起始时间不能大于结束时间!");
+                    MessageBox.Show("起始日期不能大于当前日期!");
                     return;
                 }
+
+                //if(beginTime.Year != DateTime.Now.Year || beginTime.Month != DateTime.Now.Month)
+                //{
+                //    MessageBox.Show("只能补数当月的数据！");
+                //    return;
+                //}
                 //if (radioBoard.Checked)
                 //{
                 //    //station.StationType = radioRain.Checked ? EStationType.ERainFall : EStationType.EHydrology;
@@ -423,7 +366,8 @@ namespace Hydrology.Forms
         }
         private void RadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            if (radioSD.Checked)
+            //if (radioSD.Checked)
+            if (false)
             {
                 radioDay.Enabled = false;
                 dtp_EndTime.Enabled = false;
@@ -436,19 +380,28 @@ namespace Hydrology.Forms
                 if (radioHour.Checked)
                 {
                     // 小时选择模式
-                    dtp_StartTime.CustomFormat = "yyyy-MM-dd HH";
-                    dtp_EndTime.CustomFormat = "yyyy-MM-dd HH";
+                    dtp_StartTime.CustomFormat = "yyyy-MM-dd";
+                    dtp_EndTime.CustomFormat = "yyyy-MM-dd";
+                    dtp_StartTime.Visible = false;
+                    lbl_StartTime.Visible = false;
+
                 }
+                
                 else if (radioDay.Checked)
                 {
                     // 整天选择模式
                     dtp_StartTime.CustomFormat = "yyyy-MM-dd";
                     dtp_EndTime.CustomFormat = "yyyy-MM-dd";
+                    dtp_StartTime.Visible = true;
+                    lbl_StartTime.Visible = true;
+
                 }
-                else
+                else if(MonthBtb.Checked)
                 {
                     radioDay.Enabled = true;
                     dtp_EndTime.Enabled = true;
+                    dtp_StartTime.Visible = false;
+                    lbl_StartTime.Visible = false;
                 }
             }
         }

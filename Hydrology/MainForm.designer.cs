@@ -409,22 +409,21 @@
             // ReadAndSetting
             // 
             this.ReadAndSetting.Name = "ReadAndSetting";
-            this.ReadAndSetting.Size = new System.Drawing.Size(180, 22);
+            this.ReadAndSetting.Size = new System.Drawing.Size(152, 22);
             this.ReadAndSetting.Tag = "读取与设置";
             this.ReadAndSetting.Text = "参数配置...";
             // 
             // BatchTransmit
             // 
             this.BatchTransmit.Name = "BatchTransmit";
-            this.BatchTransmit.Size = new System.Drawing.Size(180, 22);
+            this.BatchTransmit.Size = new System.Drawing.Size(152, 22);
             this.BatchTransmit.Tag = "批量传输";
-            this.BatchTransmit.Text = "批量传输...";
-            this.BatchTransmit.Visible = false;
+            this.BatchTransmit.Text = "远程下载...";
             // 
             // MI_SysTimerAdjust
             // 
             this.MI_SysTimerAdjust.Name = "MI_SysTimerAdjust";
-            this.MI_SysTimerAdjust.Size = new System.Drawing.Size(180, 22);
+            this.MI_SysTimerAdjust.Size = new System.Drawing.Size(152, 22);
             this.MI_SysTimerAdjust.Tag = "系统对时";
             this.MI_SysTimerAdjust.Text = "批量远程...";
             this.MI_SysTimerAdjust.Visible = false;
@@ -445,7 +444,7 @@
             // OneStationMonth
             // 
             this.OneStationMonth.Name = "OneStationMonth";
-            this.OneStationMonth.Size = new System.Drawing.Size(180, 22);
+            this.OneStationMonth.Size = new System.Drawing.Size(148, 22);
             this.OneStationMonth.Tag = "单站月";
             this.OneStationMonth.Text = "单站月报表...";
             this.OneStationMonth.Visible = false;
@@ -453,7 +452,7 @@
             // MoreStationMonth
             // 
             this.MoreStationMonth.Name = "MoreStationMonth";
-            this.MoreStationMonth.Size = new System.Drawing.Size(180, 22);
+            this.MoreStationMonth.Size = new System.Drawing.Size(148, 22);
             this.MoreStationMonth.Tag = "多站月";
             this.MoreStationMonth.Text = "多站月报表...";
             this.MoreStationMonth.Visible = false;
@@ -461,7 +460,7 @@
             // MoreStationDay
             // 
             this.MoreStationDay.Name = "MoreStationDay";
-            this.MoreStationDay.Size = new System.Drawing.Size(180, 22);
+            this.MoreStationDay.Size = new System.Drawing.Size(148, 22);
             this.MoreStationDay.Tag = "多站日";
             this.MoreStationDay.Text = "多站日报表...";
             this.MoreStationDay.Visible = false;
@@ -469,7 +468,7 @@
             // Communicate
             // 
             this.Communicate.Name = "Communicate";
-            this.Communicate.Size = new System.Drawing.Size(180, 22);
+            this.Communicate.Size = new System.Drawing.Size(148, 22);
             this.Communicate.Tag = "畅通率";
             this.Communicate.Text = "畅通率报表...";
             this.Communicate.Visible = false;
@@ -477,7 +476,7 @@
             // OneStationYear
             // 
             this.OneStationYear.Name = "OneStationYear";
-            this.OneStationYear.Size = new System.Drawing.Size(180, 22);
+            this.OneStationYear.Size = new System.Drawing.Size(148, 22);
             this.OneStationYear.Tag = "单站年";
             this.OneStationYear.Text = "单站年报表...";
             this.OneStationYear.Visible = false;
@@ -485,7 +484,7 @@
             // EvaCount
             // 
             this.EvaCount.Name = "EvaCount";
-            this.EvaCount.Size = new System.Drawing.Size(180, 22);
+            this.EvaCount.Size = new System.Drawing.Size(148, 22);
             this.EvaCount.Tag = "蒸发统计";
             this.EvaCount.Text = "蒸发统计报表";
             // 

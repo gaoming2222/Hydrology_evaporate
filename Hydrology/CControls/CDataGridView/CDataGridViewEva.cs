@@ -26,7 +26,8 @@ namespace Hydrology.CControls
         public static readonly string CS_Voltage = "电压(V)";
         public static readonly string CS_Temp = "温度值(℃)";
         public static readonly string CS_EvaPZ = "蒸发桶排注水(mm)";
-        public static readonly string CS_DH = "蒸发器水面高度(mm)";
+        public static readonly string CS_DH = "蒸发小时排注水量(mm)";
+        public static readonly string CS_DDH = "蒸发排注水量(mm)";
         public static readonly string CS_P8 = "8点-20点雨量和(mm)";
         public static readonly string CS_P20 = "20点-8点雨量和(mm)";
         public static readonly string CS_RawEva = "蒸发器示数(mm)";
@@ -36,6 +37,7 @@ namespace Hydrology.CControls
         public static readonly string CS_eleNeed = "电测针读数(mm)";
         public static readonly string CS_TimeFormat = "yyy-MM-dd HH:mm:ss";
         public static readonly string CS_RawACT = "排注水操作";
+        public static readonly string CS_RawContent = "数据说明";
         #endregion  ///<STATIC_STRING
 
         #region 数据成员
@@ -87,7 +89,7 @@ namespace Hydrology.CControls
             // 设定标题栏,默认有个隐藏列,默认非编辑模式
             this.Header = new string[]
             {
-                CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain ,CS_Temp, CS_Voltage
+                CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain ,CS_Temp, CS_Voltage,CS_DH
             };
             //base.HideColomns = new int[] { 7 };
 
@@ -154,6 +156,11 @@ namespace Hydrology.CControls
                             strStationName = station.StationName;
                             strStationId = station.StationID;
                         }
+                        string dh = "--";
+                        if(listEva[i].hourEChange != null)
+                        {
+                            dh = listEva[i].hourEChange.ToString();
+                        }
                         newRow = new string[]
                         {
                         strStationId,
@@ -162,8 +169,8 @@ namespace Hydrology.CControls
                         listEva[i].Eva.ToString(), /*蒸发*/
                         listEva[i].Rain.ToString(), /*雨量*/
                         listEva[i].Temperature.ToString(), /*温度*/
-                        listEva[i].Voltage.ToString() /*电压*/
-                        //listEva[i].DH.ToString() /*高度差*/
+                        listEva[i].Voltage.ToString(), /*电压*/
+                        dh /*高度差*/
                         };
 
                         newRows.Add(newRow);
@@ -230,6 +237,11 @@ namespace Hydrology.CControls
                             strStationName = station.StationName;
                             strStationId = station.StationID;
                         }
+                        string content = "温度正常";
+                        if(listEva[i].Temperature < 4)
+                        {
+                            content = "温度异常";
+                        }
                         newRow = new string[]
                         {
                         strStationId,
@@ -242,7 +254,8 @@ namespace Hydrology.CControls
                         listEva[i].Temperature.ToString(), /*温度*/
                         listEva[i].P8.ToString(), /*8-20*/
                         listEva[i].P20.ToString(), /*20-8*/
-                        listEva[i].dayEChange.ToString()
+                        listEva[i].dayEChange.ToString(),
+                        content
                         };
 
                         newRows.Add(newRow);
@@ -280,6 +293,7 @@ namespace Hydrology.CControls
                         listEva[i].Eva.ToString(), /*蒸发*/
                         //evaF,
                         listEva[i].Rain.ToString(), /*雨量*/
+                        listEva[i].dayEChange.ToString()
                         //listEva[i].Temperature.ToString(), /*温度*/
                         //listEva[i].P8.ToString(), /*8-20*/
                         //listEva[i].P20.ToString(), /*20-8*/
@@ -337,9 +351,9 @@ namespace Hydrology.CControls
                         {
                             act = "蒸发器补水";
                         }
-                        if (listEva[i].act.ToString().Contains("ER"))
+                        if (listEva[i].act.ToString().Contains("EER"))
                         {
-                            act = "人工维护";
+                            act = "排水";
                         }
                     }
                     newRow = new string[]
@@ -448,6 +462,61 @@ namespace Hydrology.CControls
             }
         }
 
+
+        public bool SetFilter_1(string strStationId, DateTime timeStart, DateTime timeEnd, bool isRawData)
+        {
+            ClearAllState();
+            m_strStaionId = strStationId;
+            m_dateTimeStart = timeStart;
+            m_dateTimeEnd = timeEnd;
+            if (isRawData)
+            {
+                //TODO
+                m_proxyEva.SetFilter(strStationId, timeStart.AddHours(-1), timeEnd, true);
+                if (-1 == m_proxyEva.GetPageCount())
+                {
+                    // 查询失败
+                    MessageBox.Show("数据库忙，查询失败，请稍后再试！");
+                    return false;
+                }
+                else
+                {
+                    // 并查询数据，显示第一页
+                    this.OnMenuFirstPage(this, null);
+                    base.TotalPageCount = m_proxyEva.GetPageCount();
+                    base.TotalRowCount = m_proxyEva.GetRowCount();
+                    List<CEntityEva> evaList = new List<CEntityEva>();
+                    List<CEntityEva> eva8List = new List<CEntityEva>();
+                    evaList = m_proxyEva.GetPageData(1, false);
+                    if(evaList == null)
+                    {
+                        return false;
+                    }
+                    for (int i = 0; i < evaList.Count; i++)
+                    {
+                        //如果是8：00数据
+                        if(evaList[i].TimeCollect.Hour == 8 && evaList[i].TimeCollect.Minute == 0)
+                        {
+                            eva8List.Add(evaList[i]);
+                        }
+                        else if(evaList[i].act != null && (evaList[i].act == "PP" || evaList[i].act == "PE" || evaList[i].act == "ZE") )
+                        {
+                            eva8List.Add(evaList[i]);
+                            if (i <= evaList.Count - 2)
+                            {
+                                eva8List.Add(evaList[i + 1]);
+                            }
+                        }
+                    }
+                    base.TotalRowCount = eva8List.Count;
+                    SetREva(eva8List);
+                    return true;
+                }
+            }
+            return true;
+            
+        }
+
         // 添加电压记录
         public void AddEva(CEntityEva entity)
         {
@@ -492,6 +561,20 @@ namespace Hydrology.CControls
                     }
                     else
                     {
+                        //1.根据时间获取原始数据
+                        foreach(CEntityEva item in m_listUpdated)
+                        {
+                            string stationid = item.StationID;
+                            DateTime timeCollect = item.TimeCollect;
+                            CEntityEva eva = m_proxyDEva.GetEva1ByTime(stationid, timeCollect);
+
+                            if (eva.dayEChange.HasValue)
+                            {
+                                //item.dayEChange = eva.dayEChange + (eva.P - item.Rain) + (item.Eva - eva.E);
+                                item.dayEChange = item.dayEChange;
+                            }
+                        }
+                        //2.更新数据
                         m_proxyDEva.UpdateRows(m_listUpdated);
 
                     }
@@ -564,7 +647,7 @@ namespace Hydrology.CControls
                 //};
                 this.Header = new string[]
                 {
-                     CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva,CS_Rain
+                     CS_Delete,CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva,CS_Rain,CS_DDH
                 };
 
                 //开启编辑模式,设置可编辑列
@@ -591,6 +674,16 @@ namespace Hydrology.CControls
 
                 };
                 base.SetColumnEditStyle(5, Rain);
+
+                //蒸发排注水量可编辑
+                DataGridViewNumericUpDownColumn DDH = new DataGridViewNumericUpDownColumn()
+                {
+                    Minimum = -9999,
+                    Maximum = 65537,
+                    DecimalPlaces = 3 /*好像是设置小数点后面的位数*/
+
+                };
+                base.SetColumnEditStyle(6, DDH);
                 //// 雨量编辑列
                 //DataGridViewNumericUpDownColumn Rain = new DataGridViewNumericUpDownColumn()
                 //{
@@ -668,7 +761,7 @@ namespace Hydrology.CControls
                     //  是日蒸发表
                     this.Header = new string[]
                     {
-                        CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva,CS_RawEvaF,CS_Rain, CS_Temp, CS_P8, CS_P20,CS_EvaPZ
+                        CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva,CS_RawEvaF,CS_Rain, CS_Temp, CS_P8, CS_P20,CS_EvaPZ,CS_RawContent
                     };
                 }
                 else
@@ -757,7 +850,7 @@ namespace Hydrology.CControls
                     //  是日蒸发表
                     this.Header = new string[]
                     {
-                        CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage
+                        CS_StationID,CS_StationName,CS_TimeCollected, CS_Eva, CS_Rain, CS_Temp, CS_Voltage,CS_DH
                     };
                     //base.HideColomns = new int[] { 7 };
                 }
@@ -1360,6 +1453,7 @@ namespace Hydrology.CControls
                 Eva.TimeCollect = DateTime.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_TimeCollected].Value.ToString()).AddDays(1).AddHours(8);
                 Eva.Rain = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Rain].Value.ToString());
                 Eva.Eva = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Eva].Value.ToString());
+                Eva.dayEChange = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_DDH].Value.ToString());
                 //Eva.Temperature = Decimal.Parse(base.Rows[listUpdatedRows[i]].Cells[CS_Temp].Value.ToString());
                 //if (m_bIsHEva)
                 //{

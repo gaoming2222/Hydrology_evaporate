@@ -555,13 +555,23 @@ namespace Hydrology.CControls
             result.Add(entity.TimeDeviceGained.ToString());
             result.Add(entity.TimeReceived.ToString());
 
-            result.Add(entity.LastDayRain >= 0 ? entity.LastDayRain.Value.ToString() : CS_NullUIStr);
-            result.Add(entity.LastDayEva >= 0 ? entity.LastDayEva.Value.ToString() : CS_NullUIStr);
-            result.Add(entity.DayRain >= 0 ? entity.DayRain.Value.ToString() : CS_NullUIStr);
-            result.Add(entity.DayEva >= 0 ? entity.DayEva.Value.ToString() : CS_NullUIStr);
+            //result.Add(entity.LastDayRain >= 0 ? entity.LastDayRain.Value.ToString() : CS_NullUIStr);
+            //result.Add(entity.LastDayEva >= 0 ? entity.LastDayEva.Value.ToString() : CS_NullUIStr);
+            //result.Add(entity.DayRain >= 0 ? entity.DayRain.Value.ToString() : CS_NullUIStr);
+            //result.Add(entity.DayEva >= 0 ? entity.DayEva.Value.ToString() : CS_NullUIStr);
+            //result.Add(entity.Eva >= 0 ? entity.Eva.Value.ToString() : CS_NullUIStr);
+            //result.Add(entity.Rain.HasValue ? entity.Rain.ToString() : CS_NullUIStr);
 
-            result.Add(entity.Eva >= 0 ? entity.Eva.Value.ToString() : CS_NullUIStr);
+
+            result.Add(entity.LastDayRain.ToString());
+            result.Add(entity.LastDayEva.ToString());
+            result.Add(entity.DayRain.ToString());
+            result.Add(entity.DayEva.ToString());
+            result.Add(entity.Eva.ToString());
             result.Add(entity.Rain.HasValue ? entity.Rain.ToString() : CS_NullUIStr);
+
+
+
             result.Add(entity.Temperature.HasValue ? entity.Temperature.ToString() : CS_NullUIStr);
             result.Add(entity.RawEva >= 0 ? entity.RawEva.Value.ToString() : CS_NullUIStr);
             result.Add(entity.RawRain >= 0 ? entity.RawRain.Value.ToString() : CS_NullUIStr);
@@ -582,7 +592,7 @@ namespace Hydrology.CControls
             }
             else if (entity.act.Contains("ER"))
             {
-                result.Add("人工维护" + entity.TimeDeviceGained.ToString());
+                result.Add("排水" + entity.TimeDeviceGained.ToString());
             }
             else
             {

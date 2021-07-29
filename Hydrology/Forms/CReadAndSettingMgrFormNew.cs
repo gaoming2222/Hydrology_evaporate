@@ -108,13 +108,13 @@ namespace Hydrology.Forms
             {
                 m_vSensorLists.Add(item.Value);
             }
-            this.vSensorType.DataSource = m_vSensorLists;
+            //this.vSensorType.DataSource = m_vSensorLists;
             //  初始化水位选择
             foreach (var item in ProtocolMaps.WaterType4UIMap)
             {
                 m_vWaterLists.Add(item.Value);
             }
-            this.cmbWater.DataSource = m_vWaterLists;
+            //this.cmbWater.DataSource = m_vWaterLists;
             //  初始化主用信道
             m_vMainChannelLists = new List<String>()
             {
@@ -141,7 +141,7 @@ namespace Hydrology.Forms
             {
                 m_vSelectCollectionParagraphsLists.Add(item.Value);
             }
-            this.vSelectCollectionParagraphs.DataSource = m_vSelectCollectionParagraphsLists;
+            //this.vSelectCollectionParagraphs.DataSource = m_vSelectCollectionParagraphsLists;
         }
         private void Init()
         {
@@ -164,9 +164,9 @@ namespace Hydrology.Forms
             this.vTimeChoice.SelectedIndex = 0;
             /************通訊配置*****************/
             //  初始化主备信道
-            this.vMainChannel.SelectedIndex = 0;
+            //this.vMainChannel.SelectedIndex = 0;
             //  初始化备用信道
-            this.vViceChannel.SelectedIndex = 1;
+            //this.vViceChannel.SelectedIndex = 1;
             //  初始化目的地手机
             this.vDestPhoneNum.Text = string.Empty;
             //  初始化SIM卡号
@@ -180,23 +180,23 @@ namespace Hydrology.Forms
 
             /************工作配置*****************/
             //  初始化测站类型
-            this.vStationType.Text = string.Empty;
-            //  初始化水位
-            this.vWater.Value = 0;
-            //  初始化雨量
-            this.vRain.Value = 0;
+            //this.vStationType.Text = string.Empty;
+            ////  初始化水位
+            //this.vWater.Value = 0;
+            ////  初始化雨量
+            //this.vRain.Value = 0;
             //  初始化水位加报值
-            this.vWaterPlusReportedValue.Value = 0;
-            //  初始化雨量加报值
-            this.vRainPlusReportedValue.Value = 0;
-            //  初始化K
-            this.vK.Text = string.Empty;
-            //  初始化C
-            this.vC.Text = string.Empty;
-            //  初始化平均时间           
-            this.vAvegTime.Text = string.Empty;
-            //  初始化采集端次选
-            this.vSelectCollectionParagraphs.SelectedIndex = 0;
+            //this.vWaterPlusReportedValue.Value = 0;
+            ////  初始化雨量加报值
+            //this.vRainPlusReportedValue.Value = 0;
+            ////  初始化K
+            //this.vK.Text = string.Empty;
+            ////  初始化C
+            //this.vC.Text = string.Empty;
+            ////  初始化平均时间           
+            //this.vAvegTime.Text = string.Empty;
+            ////  初始化采集端次选
+            //this.vSelectCollectionParagraphs.SelectedIndex = 0;
 
             this.lblWarning.Text = string.Empty;
         }
@@ -242,7 +242,7 @@ namespace Hydrology.Forms
                             //    //SetWarningInfo(string.Format("{0}{1}站点数据为ATE0!", m_CmdStr, m_StatusIDStr), Color.Red);
                             //}
                             //else 
-                            if (msg.Contains("TRU"))
+                            if (msg.Contains("OK"))
                             {
                                 SetWarningInfo(string.Format("{0}{1}站点数据成功!", m_CmdStr, m_StatusIDStr), Color.Green);
                                 m_RSStatus = EReadOrSetStatus.None;
@@ -414,6 +414,7 @@ namespace Hydrology.Forms
                         }
                         catch (Exception exp) { Debug.WriteLine(exp.Message); }
                     }
+                    ///蒸发条目
                     if (!String.IsNullOrEmpty(info.DestPhoneNum))
                     {
                         try
@@ -426,6 +427,45 @@ namespace Hydrology.Forms
                         }
                         catch (Exception exp) { Debug.WriteLine(exp.Message); }
                     }
+                    if (!String.IsNullOrEmpty(info.StationID))
+                    {
+                        try
+                        {
+                            this.textBox7.Invoke((Action)delegate
+                            {
+                                this.textBox7.Text = info.StationID;
+                                HighlightControl(this.textBox7);
+                            });
+                        }
+                        catch (Exception exp) { Debug.WriteLine(exp.Message); }
+                    }
+                    //雨量筒液位
+                    if (info.storeWater.HasValue)
+                    {
+                        try
+                        {
+                            this.textBox6.Invoke((Action)delegate
+                            {
+                                this.textBox6.Text = info.storeWater.Value.ToString();
+                                HighlightControl(this.textBox6);
+                            });
+                        }
+                        catch (Exception exp) { Debug.WriteLine(exp.Message); }
+                    }
+
+                    if (info.realWater.HasValue)
+                    {
+                        try
+                        {
+                            this.textBox5.Invoke((Action)delegate
+                            {
+                                this.textBox5.Text = info.realWater.Value.ToString();
+                                HighlightControl(this.textBox5);
+                            });
+                        }
+                        catch (Exception exp) { Debug.WriteLine(exp.Message); }
+                    }
+
                     if (!String.IsNullOrEmpty(info.TerminalNum))
                     {
                         try
@@ -454,11 +494,11 @@ namespace Hydrology.Forms
                     {
                         try
                         {
-                            this.vAvegTime.Invoke((Action)delegate
-                            {
-                                this.vAvegTime.Text = info.AvegTime.Value.ToString();
-                                HighlightControl(this.vAvegTime);
-                            });
+                            //this.vAvegTime.Invoke((Action)delegate
+                            //{
+                            //    this.vAvegTime.Text = info.AvegTime.Value.ToString();
+                            //    HighlightControl(this.vAvegTime);
+                            //});
                         }
                         catch (Exception exp) { Debug.WriteLine(exp.Message); }
                     }
@@ -466,19 +506,19 @@ namespace Hydrology.Forms
                     {
                         try
                         {
-                            this.vRainPlusReportedValue.Invoke((Action)delegate
-                            {
-                                if (m_CurrentStation == null)
-                                {
-                                    AddLog("未选择站点,或者该站点雨量精度不合法");
-                                }
-                                else
-                                {
-                                    decimal rainAccuracy = (decimal)m_CurrentStation.DRainAccuracy;
-                                    this.vRainPlusReportedValue.Value = info.RainPlusReportedValue.Value * rainAccuracy;
-                                    HighlightControl(this.vRainPlusReportedValue);
-                                }
-                            });
+                            //this.vRainPlusReportedValue.Invoke((Action)delegate
+                            //{
+                            //    if (m_CurrentStation == null)
+                            //    {
+                            //        AddLog("未选择站点,或者该站点雨量精度不合法");
+                            //    }
+                            //    else
+                            //    {
+                            //        decimal rainAccuracy = (decimal)m_CurrentStation.DRainAccuracy;
+                            //        this.vRainPlusReportedValue.Value = info.RainPlusReportedValue.Value * rainAccuracy;
+                            //        HighlightControl(this.vRainPlusReportedValue);
+                            //    }
+                            //});
                         }
                         catch (Exception exp) { Debug.WriteLine(exp.Message); }
                     }
@@ -493,20 +533,20 @@ namespace Hydrology.Forms
                         {
                             try
                             {
-                                this.vK.Invoke((Action)delegate
-                                {
-                                    this.vK.Text = info.KC.Substring(0, 10);
-                                    HighlightControl(this.vK);
-                                });
+                                //this.vK.Invoke((Action)delegate
+                                //{
+                                //    this.vK.Text = info.KC.Substring(0, 10);
+                                //    HighlightControl(this.vK);
+                                //});
                             }
                             catch (Exception exp) { Debug.WriteLine(exp.Message); }
                             try
                             {
-                                this.vC.Invoke((Action)delegate
-                                {
-                                    this.vC.Text = info.KC.Substring(10, 10);
-                                    HighlightControl(this.vC);
-                                });
+                                //this.vC.Invoke((Action)delegate
+                                //{
+                                //    this.vC.Text = info.KC.Substring(10, 10);
+                                //    HighlightControl(this.vC);
+                                //});
                             }
                             catch (Exception exp) { Debug.WriteLine(exp.Message); }
                         }
@@ -515,19 +555,19 @@ namespace Hydrology.Forms
                     {
                         try
                         {
-                            this.vRain.Invoke((Action)delegate
-                            {
-                                if (m_CurrentStation == null || m_CurrentStation.DRainAccuracy.ToString() == "无")
-                                {
-                                    AddLog("未选择站点,或者该站点雨量精度不合法");
-                                }
-                                else
-                                {
-                                    decimal rainAccuracy = (decimal)m_CurrentStation.DRainAccuracy;
-                                    this.vRain.Value = info.Rain.Value * rainAccuracy;
-                                    HighlightControl(this.vRain);
-                                }
-                            });
+                            //this.vRain.Invoke((Action)delegate
+                            //{
+                            //    if (m_CurrentStation == null || m_CurrentStation.DRainAccuracy.ToString() == "无")
+                            //    {
+                            //        AddLog("未选择站点,或者该站点雨量精度不合法");
+                            //    }
+                            //    else
+                            //    {
+                            //        decimal rainAccuracy = (decimal)m_CurrentStation.DRainAccuracy;
+                            //        this.vRain.Value = info.Rain.Value * rainAccuracy;
+                            //        HighlightControl(this.vRain);
+                            //    }
+                            //});
                         }
                         catch (Exception exp) { Debug.WriteLine(exp.Message); }
                     }
@@ -535,11 +575,11 @@ namespace Hydrology.Forms
                     {
                         try
                         {
-                            this.vWater.Invoke((Action)delegate
-                            {
-                                this.vWater.Value = info.storeWater.Value * (decimal)0.01;
-                                HighlightControl(this.vWater);
-                            });
+                            //this.vWater.Invoke((Action)delegate
+                            //{
+                            //    this.vWater.Value = info.storeWater.Value * (decimal)0.01;
+                            //    HighlightControl(this.vWater);
+                            //});
                         }
                         catch (Exception exp) { Debug.WriteLine(exp.Message); }
                     }
@@ -547,11 +587,11 @@ namespace Hydrology.Forms
                     {
                         try
                         {
-                            this.vWater.Invoke((Action)delegate
-                            {
-                                this.vWater.Value = info.realWater.Value * (decimal)0.01;
-                                HighlightControl(this.vWater);
-                            });
+                            //this.vWater.Invoke((Action)delegate
+                            //{
+                            //    this.vWater.Value = info.realWater.Value * (decimal)0.01;
+                            //    HighlightControl(this.vWater);
+                            //});
                         }
                         catch (Exception exp) { Debug.WriteLine(exp.Message); }
                     }
@@ -559,11 +599,11 @@ namespace Hydrology.Forms
                     {
                         try
                         {
-                            this.vWaterPlusReportedValue.Invoke((Action)delegate
-                            {
-                                this.vWaterPlusReportedValue.Value = info.WaterPlusReportedValue.Value;
-                                HighlightControl(this.vWaterPlusReportedValue);
-                            });
+                            //this.vWaterPlusReportedValue.Invoke((Action)delegate
+                            //{
+                            //    this.vWaterPlusReportedValue.Value = info.WaterPlusReportedValue.Value;
+                            //    HighlightControl(this.vWaterPlusReportedValue);
+                            //});
                         }
                         catch (Exception exp) { Debug.WriteLine(exp.Message); }
                     }
@@ -571,11 +611,11 @@ namespace Hydrology.Forms
                     {
                         try
                         {
-                            this.vSelectCollectionParagraphs.Invoke((Action)delegate
-                            {
-                                this.vSelectCollectionParagraphs.Text = ProtocolMaps.SelectCollectionParagraphs4UIMap.FindValue(info.SelectCollectionParagraphs.Value);
-                                HighlightControl(this.vSelectCollectionParagraphs);
-                            });
+                            //this.vSelectCollectionParagraphs.Invoke((Action)delegate
+                            //{
+                            //    this.vSelectCollectionParagraphs.Text = ProtocolMaps.SelectCollectionParagraphs4UIMap.FindValue(info.SelectCollectionParagraphs.Value);
+                            //    HighlightControl(this.vSelectCollectionParagraphs);
+                            //});
                         }
                         catch (Exception exp) { Debug.WriteLine(exp.Message); }
                     }
@@ -583,11 +623,11 @@ namespace Hydrology.Forms
                     {
                         try
                         {
-                            this.vStationType.Invoke((Action)delegate
-                            {
-                                this.vStationType.Text = ProtocolMaps.StationType4ProtoChineseMap.FindValue(info.StationType.Value);
-                                HighlightControl(this.vStationType);
-                            });
+                            //this.vStationType.Invoke((Action)delegate
+                            //{
+                            //    this.vStationType.Text = ProtocolMaps.StationType4ProtoChineseMap.FindValue(info.StationType.Value);
+                            //    HighlightControl(this.vStationType);
+                            //});
                         }
                         catch (Exception exp) { Debug.WriteLine(exp.Message); }
                     }
@@ -595,11 +635,11 @@ namespace Hydrology.Forms
                     {
                         try
                         {
-                            this.vSensorType.Invoke((Action)delegate
-                            {
-                                this.vSensorType.Text = ProtocolMaps.SensorType4UIMap.FindValue(info.SensorType.Value);
-                                HighlightControl(this.vSensorType);
-                            });
+                            //this.vSensorType.Invoke((Action)delegate
+                            //{
+                            //    this.vSensorType.Text = ProtocolMaps.SensorType4UIMap.FindValue(info.SensorType.Value);
+                            //    HighlightControl(this.vSensorType);
+                            //});
                         }
                         catch (Exception exp) { Debug.WriteLine(exp.Message); }
                     }
@@ -681,11 +721,14 @@ namespace Hydrology.Forms
                 //  配置参数
                 #region 配置参数
                 var cmds = new List<EDownParam>();
+                var cmdsEV = new List<EDownParamEV>();
+                CDownConfEV downEV = new CDownConfEV();
                 if (tabControl1.SelectedIndex == 0)
                 {
                     if (this.chkClock.Checked)
                     {
                         cmds.Add(EDownParam.Clock);
+                        cmdsEV.Add(EDownParamEV.Clock);
                     }
                     if (this.chkVoltage.Checked)
                     {
@@ -694,7 +737,9 @@ namespace Hydrology.Forms
                     if (this.chkStationCmdID.Checked)
                     {
                         cmds.Add(EDownParam.StationCmdID);
+                        cmdsEV.Add(EDownParamEV.ID);
                     }
+                    
                     if (this.chkNormalState.Checked)
                     {
                         cmds.Add(EDownParam.NormalState);
@@ -715,6 +760,17 @@ namespace Hydrology.Forms
                     {
                         cmds.Add(EDownParam.TimeChoice);
                     }
+                    if (this.chkDestPhoneNum1.Checked)
+                    {
+                        cmds.Add(EDownParam.DestPhoneNum);
+                        cmdsEV.Add(EDownParamEV.TelephoneNum);
+                    }
+
+                    if (this.chkTimePeriod.Checked)
+                    {
+                        cmds.Add(EDownParam.TimeChoice);
+                        cmdsEV.Add(EDownParamEV.HeightLimit);
+                    }
                 }
                 else if (tabControl1.SelectedIndex == 1)
                 {
@@ -723,9 +779,10 @@ namespace Hydrology.Forms
                     {
                         cmds.Add(EDownParam.StandbyChannel);
                     }
-                    if (this.chkDestPhoneNum.Checked)
+                    if (this.chkDestPhoneNum1.Checked)
                     {
                         cmds.Add(EDownParam.DestPhoneNum);
+                        cmdsEV.Add(EDownParamEV.TelephoneNum);
                     }
                     if (this.chkTeleNum.Checked)
                     {
@@ -747,53 +804,53 @@ namespace Hydrology.Forms
                 else if (tabControl1.SelectedIndex == 2)
                 {
 
-                    if (this.chkAvegTime.Checked)
-                    {
-                        cmds.Add(EDownParam.AvegTime);
-                    }
-                    if (this.chkStationType.Checked)
-                    {
-                        cmds.Add(EDownParam.StationType);
-                    }
-                    if (this.chkWater.Checked)
-                    {
-                        if (cmbWater.Text == "存储水位")
-                        {
-                            cmds.Add(EDownParam.storeWater);
-                        }
-                        else
-                        {
-                            cmds.Add(EDownParam.realWater);
-                        }
-                    }
-                    if (this.chkWaterPlusReportedValue.Checked)
-                    {
-                        cmds.Add(EDownParam.WaterPlusReportedValue);
-                    }
-                    if (this.chkRain.Checked)
-                    {
-                        cmds.Add(EDownParam.Rain);
-                    }
-                    if (this.chkRainPlusReportedValue.Checked)
-                    {
-                        cmds.Add(EDownParam.RainPlusReportedValue);
-                    }
-                    if (this.chkK.Checked)
-                    {
-                        cmds.Add(EDownParam.KC);
-                    }
-                    if (this.chkSelectCollectionParagraphs.Checked)
-                    {
-                        cmds.Add(EDownParam.SelectCollectionParagraphs);
-                    }
-                    if (this.chkFlashClear.Checked)
-                    {
-                        cmds.Add(EDownParam.FlashClear);
-                    }
-                    if (this.chkSensor.Checked)
-                    {
-                        cmds.Add(EDownParam.SensorType);
-                    }
+                    //if (this.chkAvegTime.Checked)
+                    //{
+                    //    cmds.Add(EDownParam.AvegTime);
+                    //}
+                    //if (this.chkStationType.Checked)
+                    //{
+                    //    cmds.Add(EDownParam.StationType);
+                    //}
+                    //if (this.chkWater.Checked)
+                    //{
+                    //    if (cmbWater.Text == "存储水位")
+                    //    {
+                    //        cmds.Add(EDownParam.storeWater);
+                    //    }
+                    //    else
+                    //    {
+                    //        cmds.Add(EDownParam.realWater);
+                    //    }
+                    //}
+                    //if (this.chkWaterPlusReportedValue.Checked)
+                    //{
+                    //    cmds.Add(EDownParam.WaterPlusReportedValue);
+                    //}
+                    //if (this.chkRain.Checked)
+                    //{
+                    //    cmds.Add(EDownParam.Rain);
+                    //}
+                    //if (this.chkRainPlusReportedValue.Checked)
+                    //{
+                    //    cmds.Add(EDownParam.RainPlusReportedValue);
+                    //}
+                    //if (this.chkK.Checked)
+                    //{
+                    //    cmds.Add(EDownParam.KC);
+                    //}
+                    //if (this.chkSelectCollectionParagraphs.Checked)
+                    //{
+                    //    cmds.Add(EDownParam.SelectCollectionParagraphs);
+                    //}
+                    //if (this.chkFlashClear.Checked)
+                    //{
+                    //    cmds.Add(EDownParam.FlashClear);
+                    //}
+                    //if (this.chkSensor.Checked)
+                    //{
+                    //    cmds.Add(EDownParam.SensorType);
+                    //}
                 }
                 //if (this.chkUserName.Checked)
                 //{
@@ -829,7 +886,7 @@ namespace Hydrology.Forms
                 }
                 if (gprsNum.Length == 11)
                 {
-                    query = CPortDataMgr.Instance.SendReadHDMsg(gprsNum, sid, cmds, this.m_channelType);
+                    query = CPortDataMgr.Instance.SendReadEVHDMsg(gprsNum, sid, cmdsEV, this.m_channelType);
                 }
                
                 m_RSStatus = EReadOrSetStatus.Read;
@@ -1247,18 +1304,81 @@ namespace Hydrology.Forms
                         cmdsEV.Add(EDownParamEV.Clock);
                         downEV.Date = this.chkLocalTime.Checked ? DateTime.Now.ToString("yy/MM/dd,HH:mm:ss") : this.vClock.Value.ToString("yy/MM/dd,HH:mm:ss");
                     }
+
+                    if (this.chkDestPhoneNum1.Checked)
+                    {
+                        cmds.Add(EDownParam.DestPhoneNum);
+                        string temp = this.vDestPhoneNum.Text.Trim();
+                        if (!CStringUtil.IsDigitStrWithSpecifyLength(temp, 11))
+                        {
+                            MessageBox.Show("目的地手机号码 长度必须为11位，而且是数字!");
+                            return;
+                        }
+                        down.DestPhoneNum = temp;
+
+                        cmdsEV.Add(EDownParamEV.TelephoneNum);
+                        downEV.TelephoneNumD = this.vDestPhoneNum.Text.Trim();
+                    }
+
+                    if (this.chkStationCmdID.Checked)
+                    {
+                        //MessageBox.Show("站号不允许设置");
+                        //this.chkStationCmdID.Checked = false;
+                        //return;
+                        string temp = this.textBox7.Text.Trim();
+                        if(temp.Length != 8)
+                        {
+                            MessageBox.Show("目的地手机号码 长度必须为11位，而且是数字!");
+                            return;
+                        }
+                        cmds.Add(EDownParam.StationCmdID);
+                        down.StationID = this.textBox7.Text.Trim();
+                        cmdsEV.Add(EDownParamEV.ID);
+                        downEV.ID = this.textBox7.Text.Trim();
+                    }
+
+                    if (this.chkTimePeriod.Checked)
+                    {
+                        cmds.Add(EDownParam.TerminalNum);
+                        string rainLimit = this.textBox6.Text.Trim();
+                        string evaLimit = this.textBox5.Text.Trim();
+                        if (!CStringUtil.IsDigit(rainLimit))
+                        {
+                            MessageBox.Show("所有位必须全部为数字!");
+                            return;
+                        }
+                        if (!CStringUtil.IsDigit(evaLimit))
+                        {
+                            MessageBox.Show("所有位必须全部为数字!");
+                            return;
+                        }
+                        
+                        if(int.Parse(rainLimit) > 260 || int.Parse(rainLimit) < 180)
+                        {
+                            MessageBox.Show("雨量筒液位限制最高为260mm，最低为180mm");
+                            return;
+                        }
+
+                        if (int.Parse(evaLimit) > 310 || int.Parse(evaLimit) < 60)
+                        {
+                            MessageBox.Show("蒸发筒液位限制最高为310mm，最低为60mm");
+                            return;
+                        }if(evaLimit.Length == 2)
+                        {
+                            evaLimit = "0" + evaLimit.Length;
+                        }
+                        down.TerminalNum = rainLimit;
+                        cmdsEV.Add(EDownParamEV.HeightLimit);
+                        downEV.HeightLimit = this.textBox6.Text.Trim() + this.textBox5.Text.Trim();
+                    }
+
                     if (this.chkVoltage.Checked)
                     {
                         MessageBox.Show("电压不允许设置");
                         this.chkVoltage.Checked = false;
                         return;
                     }
-                    if (this.chkStationCmdID.Checked)
-                    {
-                        MessageBox.Show("站号不允许设置");
-                        this.chkStationCmdID.Checked = false;
-                        return;
-                    }
+                    
                     if (this.chkNormalState.Checked)
                     {
                         cmds.Add(EDownParam.NormalState);
@@ -1279,12 +1399,12 @@ namespace Hydrology.Forms
                         this.chkVersionNum.Checked = false;
                         return;
                     }
-                    if (this.chkFlashClear.Checked)
-                    {
-                        MessageBox.Show("清除Flash不允许设置");
-                        this.chkFlashClear.Checked = false;
-                        return;
-                    }
+                    //if (this.chkFlashClear.Checked)
+                    //{
+                    //    MessageBox.Show("清除Flash不允许设置");
+                    //    this.chkFlashClear.Checked = false;
+                    //    return;
+                    //}
                     if (this.chkWorkStatus.Checked)
                     {
                         cmds.Add(EDownParam.WorkStatus);
@@ -1354,7 +1474,7 @@ namespace Hydrology.Forms
                         down.MainChannel = ProtocolMaps.ChannelType4UIMap.FindKey(mainChannel);
                         down.ViceChannel = ProtocolMaps.ChannelType4UIMap.FindKey(viceChannel);
                     }
-                    if (this.chkDestPhoneNum.Checked)
+                    if (this.chkDestPhoneNum1.Checked)
                     {
                         cmds.Add(EDownParam.DestPhoneNum);
                         string temp = this.vDestPhoneNum.Text.Trim();
@@ -1422,109 +1542,109 @@ namespace Hydrology.Forms
                 }
                 else if (tabControl1.SelectedIndex == 2)
                 {
-                    if (this.chkAvegTime.Checked)
-                    {
-                        cmds.Add(EDownParam.AvegTime);
-                        down.AvegTime = Decimal.Parse(this.vAvegTime.Text);
-                    }
-                    if (this.chkStationType.Checked)
-                    {
-                        // MessageBox.Show("测站类型不允许设置");
-                        cmds.Add(EDownParam.StationType);
-                        if (this.vStationType.Text == "雨量站")
-                            down.StationType = EStationTypeProto.ERainFall;
-                        if (this.vStationType.Text == "并行水位站")
-                            down.StationType = EStationTypeProto.EParallelRiverWater;
-                        if (this.vStationType.Text == "并行水文站")
-                            down.StationType = EStationTypeProto.EParallelEHydrology;
-                        if (this.vStationType.Text == "串行水位站")
-                            down.StationType = EStationTypeProto.ESerialRiverWater;
-                        if (this.vStationType.Text == "串行水文站")
-                            down.StationType = EStationTypeProto.ESerialEHydrology;
-                        //this.chkStationType.Checked = false;
-                        //return;
+                //    if (this.chkAvegTime.Checked)
+                //    {
+                //        cmds.Add(EDownParam.AvegTime);
+                //        down.AvegTime = Decimal.Parse(this.vAvegTime.Text);
+                //    }
+                //    if (this.chkStationType.Checked)
+                //    {
+                //        // MessageBox.Show("测站类型不允许设置");
+                //        cmds.Add(EDownParam.StationType);
+                //        if (this.vStationType.Text == "雨量站")
+                //            down.StationType = EStationTypeProto.ERainFall;
+                //        if (this.vStationType.Text == "并行水位站")
+                //            down.StationType = EStationTypeProto.EParallelRiverWater;
+                //        if (this.vStationType.Text == "并行水文站")
+                //            down.StationType = EStationTypeProto.EParallelEHydrology;
+                //        if (this.vStationType.Text == "串行水位站")
+                //            down.StationType = EStationTypeProto.ESerialRiverWater;
+                //        if (this.vStationType.Text == "串行水文站")
+                //            down.StationType = EStationTypeProto.ESerialEHydrology;
+                //        //this.chkStationType.Checked = false;
+                //        //return;
 
-                    }
-                    if (this.chkWater.Checked)
-                    {
-                        if (this.cmbWater.Text == "存储水位")
-                        {
-                            MessageBox.Show("存储水位不允许设置");
-                            this.chkWater.Checked = false;
-                            return;
-                        }
-                        cmds.Add(EDownParam.realWater);
-                        down.realWater = this.vWater.Value * (decimal)100;
-                    }
-                    if (this.chkWaterPlusReportedValue.Checked)
-                    {
-                        cmds.Add(EDownParam.WaterPlusReportedValue);
-                        down.WaterPlusReportedValue = Decimal.Parse(this.vWaterPlusReportedValue.Text);
-                    }
-                    if (this.chkRain.Checked)
-                    {
-                        cmds.Add(EDownParam.Rain);
-                        decimal rainAcc = (decimal)m_CurrentStation.DRainAccuracy;
-                        if (rainAcc == 0)
-                        {
-                            MessageBox.Show("站点的雨量精度不能为0!");
-                            return;
-                        }
-                        down.Rain = this.vRain.Value / rainAcc;
-                    }
-                    if (this.chkRainPlusReportedValue.Checked)
-                    {
-                        cmds.Add(EDownParam.RainPlusReportedValue);
-                        decimal rainAcc = (decimal)m_CurrentStation.DRainAccuracy;
-                        if (rainAcc == 0)
-                        {
-                            MessageBox.Show("站点的雨量精度不能为0!");
-                            return;
-                        }
-                        down.RainPlusReportedValue = this.vRainPlusReportedValue.Value / rainAcc;
-                    }
-                    if (this.chkK.Checked)
-                    {
-                        string k = this.vK.Text.Trim();
-                        string c = this.vC.Text.Trim();
-                        if (!CStringUtil.IsDigitStrWithSpecifyLength(k, 10))
-                        {
-                            MessageBox.Show("K值长度必须为10位数字!");
-                            return;
-                        }
-                        if (!CStringUtil.IsDigitStrWithSpecifyLength(c, 10))
-                        {
-                            MessageBox.Show("C值长度必须为10位数字!");
-                            return;
-                        }
-                        cmds.Add(EDownParam.KC);
-                        down.KC = this.vK.Text + this.vC.Text;
-                    }
-                    if (this.chkSelectCollectionParagraphs.Checked)
-                    {
-                        string temp = this.vSelectCollectionParagraphs.Text;
-                        if (!this.m_vSelectCollectionParagraphsLists.Contains(temp))
-                        {
-                            MessageBox.Show("采集段次 参数不是合法的!");
-                            return;
-                        }
-                        cmds.Add(EDownParam.SelectCollectionParagraphs);
-                        down.SelectCollectionParagraphs = ProtocolMaps.SelectCollectionParagraphs4UIMap.FindKey(temp);
-                    }
-                    if (this.chkSensor.Checked)
-                    {
-                        cmds.Add(EDownParam.SensorType);
-                        string temp = this.vSensorType.Text;
-                        if (this.m_vSensorLists.Contains(temp))
-                        {
-                            down.SensorType = ProtocolMaps.SensorType4UIMap.FindKey(temp);
-                        }
-                        else
-                        {
-                            MessageBox.Show("传感器配置 参数不是合法的!");
-                            return;
-                        }
-                    }
+                //    }
+                //    if (this.chkWater.Checked)
+                //    {
+                //        if (this.cmbWater.Text == "存储水位")
+                //        {
+                //            MessageBox.Show("存储水位不允许设置");
+                //            this.chkWater.Checked = false;
+                //            return;
+                //        }
+                //        cmds.Add(EDownParam.realWater);
+                //        down.realWater = this.vWater.Value * (decimal)100;
+                //    }
+                //    if (this.chkWaterPlusReportedValue.Checked)
+                //    {
+                //        cmds.Add(EDownParam.WaterPlusReportedValue);
+                //        down.WaterPlusReportedValue = Decimal.Parse(this.vWaterPlusReportedValue.Text);
+                //    }
+                //    if (this.chkRain.Checked)
+                //    {
+                //        cmds.Add(EDownParam.Rain);
+                //        decimal rainAcc = (decimal)m_CurrentStation.DRainAccuracy;
+                //        if (rainAcc == 0)
+                //        {
+                //            MessageBox.Show("站点的雨量精度不能为0!");
+                //            return;
+                //        }
+                //        down.Rain = this.vRain.Value / rainAcc;
+                //    }
+                //    if (this.chkRainPlusReportedValue.Checked)
+                //    {
+                //        cmds.Add(EDownParam.RainPlusReportedValue);
+                //        decimal rainAcc = (decimal)m_CurrentStation.DRainAccuracy;
+                //        if (rainAcc == 0)
+                //        {
+                //            MessageBox.Show("站点的雨量精度不能为0!");
+                //            return;
+                //        }
+                //        down.RainPlusReportedValue = this.vRainPlusReportedValue.Value / rainAcc;
+                //    }
+                //    if (this.chkK.Checked)
+                //    {
+                //        string k = this.vK.Text.Trim();
+                //        string c = this.vC.Text.Trim();
+                //        if (!CStringUtil.IsDigitStrWithSpecifyLength(k, 10))
+                //        {
+                //            MessageBox.Show("K值长度必须为10位数字!");
+                //            return;
+                //        }
+                //        if (!CStringUtil.IsDigitStrWithSpecifyLength(c, 10))
+                //        {
+                //            MessageBox.Show("C值长度必须为10位数字!");
+                //            return;
+                //        }
+                //        cmds.Add(EDownParam.KC);
+                //        down.KC = this.vK.Text + this.vC.Text;
+                //    }
+                //    if (this.chkSelectCollectionParagraphs.Checked)
+                //    {
+                //        string temp = this.vSelectCollectionParagraphs.Text;
+                //        if (!this.m_vSelectCollectionParagraphsLists.Contains(temp))
+                //        {
+                //            MessageBox.Show("采集段次 参数不是合法的!");
+                //            return;
+                //        }
+                //        cmds.Add(EDownParam.SelectCollectionParagraphs);
+                //        down.SelectCollectionParagraphs = ProtocolMaps.SelectCollectionParagraphs4UIMap.FindKey(temp);
+                //    }
+                //    if (this.chkSensor.Checked)
+                //    {
+                //        cmds.Add(EDownParam.SensorType);
+                //        string temp = this.vSensorType.Text;
+                //        if (this.m_vSensorLists.Contains(temp))
+                //        {
+                //            down.SensorType = ProtocolMaps.SensorType4UIMap.FindKey(temp);
+                //        }
+                //        else
+                //        {
+                //            MessageBox.Show("传感器配置 参数不是合法的!");
+                //            return;
+                //        }
+                //    }
                 }
                 
                 if (cmds.Count == 0)
@@ -1607,26 +1727,26 @@ namespace Hydrology.Forms
                     chkbox.Checked = isChecked;
                 }
             }
-            foreach (var control in this.CommGroupBox.Controls)
-            {
-                var chkbox = control as CheckBox;
-                if (chkbox == null || chkbox.Tag == null)
-                    continue;
-                if (chkbox.Tag.ToString().Equals("key"))
-                {
-                    chkbox.Checked = isChecked;
-                }
-            }
-            foreach (var control in this.SensorGroupBox.Controls)
-            {
-                var chkbox = control as CheckBox;
-                if (chkbox == null || chkbox.Tag == null)
-                    continue;
-                if (chkbox.Tag.ToString().Equals("key"))
-                {
-                    chkbox.Checked = isChecked;
-                }
-            }
+            //foreach (var control in this.CommGroupBox.Controls)
+            //{
+            //    var chkbox = control as CheckBox;
+            //    if (chkbox == null || chkbox.Tag == null)
+            //        continue;
+            //    if (chkbox.Tag.ToString().Equals("key"))
+            //    {
+            //        chkbox.Checked = isChecked;
+            //    }
+            //}
+            //foreach (var control in this.SensorGroupBox.Controls)
+            //{
+            //    var chkbox = control as CheckBox;
+            //    if (chkbox == null || chkbox.Tag == null)
+            //        continue;
+            //    if (chkbox.Tag.ToString().Equals("key"))
+            //    {
+            //        chkbox.Checked = isChecked;
+            //    }
+            //}
         }
         private void chkLocalTime_CheckedChanged(object sender, EventArgs e)
         {
@@ -1723,8 +1843,8 @@ namespace Hydrology.Forms
 
         private void ResetAllControlsBackColor()
         {
-            UnHighlightGroupBox(this.SensorGroupBox);
-            UnHighlightGroupBox(this.CommGroupBox);
+            //UnHighlightGroupBox(this.SensorGroupBox);
+            //UnHighlightGroupBox(this.CommGroupBox);
             UnHighlightGroupBox(this.WorkGroupBox);
             this.label19.Hide();
         }
@@ -1781,8 +1901,8 @@ namespace Hydrology.Forms
                 this.vStationCmdID.Enabled = true;
             if (Object.ReferenceEquals(control, this.vVersionNum))
                 this.vVersionNum.Enabled = true;
-            if (Object.ReferenceEquals(control, this.vStationType))
-                this.vStationType.Enabled = true;
+            //if (Object.ReferenceEquals(control, this.vStationType))
+            //    this.vStationType.Enabled = true;
         }
 
         private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)

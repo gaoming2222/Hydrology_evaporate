@@ -46,35 +46,35 @@ namespace Hydrology.Forms
                 return;
             }
 
-            if (username == "admin" && password == "admin")
-            {
-                bAdministrator = true;
-                autority = 1;
-                CCurrentLoginUser.Instance.Login(username, password, bAdministrator);
-                //登陆成功,通知主界面进入管理员或者普通用户模式
-                if (UserModeChanged != null)
-                {
-                    CSystemInfoMgr.Instance.AddInfo(string.Format("用户{0}登录,权限：{1}", username, bAdministrator ? "管理员" : "普通用户"));
-                    UserModeChanged.Invoke(this, new CEventSingleArgs<int>(autority));
-                }
-                this.Close();
-                return;
-            }
+            //if (username == "admin" && password == "admin")
+            //{
+            //    bAdministrator = true;
+            //    autority = 1;
+            //    CCurrentLoginUser.Instance.Login(username, password, bAdministrator);
+            //    //登陆成功,通知主界面进入管理员或者普通用户模式
+            //    if (UserModeChanged != null)
+            //    {
+            //        CSystemInfoMgr.Instance.AddInfo(string.Format("用户{0}登录,权限：{1}", username, bAdministrator ? "管理员" : "普通用户"));
+            //        UserModeChanged.Invoke(this, new CEventSingleArgs<int>(autority));
+            //    }
+            //    this.Close();
+            //    return;
+            //}
 
-            if (username == "SA" && password == "SA@82829687")
-            {
-                bAdministrator = true;
-                autority = 2;
-                CCurrentLoginUser.Instance.Login(username, password, bAdministrator);
-                //登陆成功,通知主界面进入管理员或者普通用户模式
-                if (UserModeChanged != null)
-                {
-                    CSystemInfoMgr.Instance.AddInfo(string.Format("用户{0}登录,权限：{1}", username, bAdministrator ? "管理员" : "普通用户"));
-                    UserModeChanged.Invoke(this, new CEventSingleArgs<int>(autority));
-                }
-                this.Close();
-                return;
-            }
+            //if (username == "SA" && password == "SA@82829687")
+            //{
+            //    bAdministrator = true;
+            //    autority = 2;
+            //    CCurrentLoginUser.Instance.Login(username, password, bAdministrator);
+            //    //登陆成功,通知主界面进入管理员或者普通用户模式
+            //    if (UserModeChanged != null)
+            //    {
+            //        CSystemInfoMgr.Instance.AddInfo(string.Format("用户{0}登录,权限：{1}", username, bAdministrator ? "管理员" : "普通用户"));
+            //        UserModeChanged.Invoke(this, new CEventSingleArgs<int>(autority));
+            //    }
+            //    this.Close();
+            //    return;
+            //}
             try
             {
                 if (CDBDataMgr.Instance.GetUserProxy().UserLogin(username, password, ref bAdministrator))
@@ -83,6 +83,7 @@ namespace Hydrology.Forms
                     //登陆成功,通知主界面进入管理员或者普通用户模式
                     if (UserModeChanged != null)
                     {
+                        autority = 2;
                         CSystemInfoMgr.Instance.AddInfo(string.Format("用户{0}登录,权限：{1}", username, bAdministrator ? "管理员" : "普通用户"));
                         UserModeChanged.Invoke(this, new CEventSingleArgs<int>(autority));
                     }

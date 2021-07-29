@@ -39,6 +39,7 @@
             this.chk_Water = new System.Windows.Forms.CheckBox();
             this.chk_Rain = new System.Windows.Forms.CheckBox();
             this.chk_Voltage = new System.Windows.Forms.CheckBox();
+            this.cmb_AddDataType = new System.Windows.Forms.ComboBox();
             this.label16 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.number_Voltage = new System.Windows.Forms.NumericUpDown();
@@ -70,7 +71,6 @@
             this.cmb_StationId = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.cmb_AddDataType = new System.Windows.Forms.ComboBox();
             this.panel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.number_Voltage)).BeginInit();
@@ -111,7 +111,7 @@
             this.btn_Apply.Name = "btn_Apply";
             this.btn_Apply.Size = new System.Drawing.Size(117, 36);
             this.btn_Apply.TabIndex = 10;
-            this.btn_Apply.Text = "完成添加";
+            this.btn_Apply.Text = "保存";
             this.btn_Apply.UseVisualStyleBackColor = true;
             this.btn_Apply.Click += new System.EventHandler(this.btn_Apply_Click);
             // 
@@ -121,7 +121,7 @@
             this.btn_Cancel.Name = "btn_Cancel";
             this.btn_Cancel.Size = new System.Drawing.Size(117, 36);
             this.btn_Cancel.TabIndex = 9;
-            this.btn_Cancel.Text = "取消添加";
+            this.btn_Cancel.Text = "取消";
             this.btn_Cancel.UseVisualStyleBackColor = true;
             this.btn_Cancel.Click += new System.EventHandler(this.btn_Cancel_Click);
             // 
@@ -156,6 +156,7 @@
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "数据参数";
+            this.groupBox3.Enter += new System.EventHandler(this.GroupBox3_Enter);
             // 
             // label19
             // 
@@ -191,24 +192,37 @@
             // chk_Rain
             // 
             this.chk_Rain.AutoSize = true;
+            this.chk_Rain.Checked = true;
+            this.chk_Rain.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chk_Rain.Location = new System.Drawing.Point(213, 25);
             this.chk_Rain.Name = "chk_Rain";
-            this.chk_Rain.Size = new System.Drawing.Size(48, 16);
+            this.chk_Rain.Size = new System.Drawing.Size(60, 16);
             this.chk_Rain.TabIndex = 22;
-            this.chk_Rain.Text = "雨量";
+            this.chk_Rain.Text = "日数据";
             this.chk_Rain.UseVisualStyleBackColor = true;
-            this.chk_Rain.Visible = false;
             // 
             // chk_Voltage
             // 
             this.chk_Voltage.AutoSize = true;
+            this.chk_Voltage.Checked = true;
+            this.chk_Voltage.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chk_Voltage.Location = new System.Drawing.Point(91, 25);
             this.chk_Voltage.Name = "chk_Voltage";
-            this.chk_Voltage.Size = new System.Drawing.Size(48, 16);
+            this.chk_Voltage.Size = new System.Drawing.Size(72, 16);
             this.chk_Voltage.TabIndex = 21;
-            this.chk_Voltage.Text = "电压";
+            this.chk_Voltage.Text = "原始数据";
             this.chk_Voltage.UseVisualStyleBackColor = true;
-            this.chk_Voltage.Visible = false;
+            // 
+            // cmb_AddDataType
+            // 
+            this.cmb_AddDataType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmb_AddDataType.FormattingEnabled = true;
+            this.cmb_AddDataType.Location = new System.Drawing.Point(88, 23);
+            this.cmb_AddDataType.Name = "cmb_AddDataType";
+            this.cmb_AddDataType.Size = new System.Drawing.Size(143, 20);
+            this.cmb_AddDataType.TabIndex = 5;
+            this.cmb_AddDataType.Visible = false;
+            this.cmb_AddDataType.SelectedIndexChanged += new System.EventHandler(this.cmb_AddDataType_SelectedIndexChanged);
             // 
             // label16
             // 
@@ -217,7 +231,8 @@
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(11, 12);
             this.label16.TabIndex = 20;
-            this.label16.Text = "v";
+            this.label16.Text = "m";
+            this.label16.Visible = false;
             // 
             // label17
             // 
@@ -227,12 +242,11 @@
             this.label17.Size = new System.Drawing.Size(65, 12);
             this.label17.TabIndex = 4;
             this.label17.Text = "选择数据：";
-            this.label17.Visible = false;
             // 
             // number_Voltage
             // 
             this.number_Voltage.DecimalPlaces = 2;
-            this.number_Voltage.Location = new System.Drawing.Point(88, 56);
+            this.number_Voltage.Location = new System.Drawing.Point(124, 56);
             this.number_Voltage.Maximum = new decimal(new int[] {
             -1530494977,
             232830,
@@ -247,9 +261,9 @@
             this.label15.AutoSize = true;
             this.label15.Location = new System.Drawing.Point(17, 62);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(41, 12);
+            this.label15.Size = new System.Drawing.Size(113, 12);
             this.label15.TabIndex = 18;
-            this.label15.Text = "电压：";
+            this.label15.Text = "蒸发器换算后读数：";
             // 
             // number_WaterFlow
             // 
@@ -278,7 +292,7 @@
             // number_WaterStage
             // 
             this.number_WaterStage.DecimalPlaces = 2;
-            this.number_WaterStage.Location = new System.Drawing.Point(88, 128);
+            this.number_WaterStage.Location = new System.Drawing.Point(270, 56);
             this.number_WaterStage.Maximum = new decimal(new int[] {
             -1530494977,
             232830,
@@ -292,7 +306,7 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(17, 134);
+            this.label13.Location = new System.Drawing.Point(211, 62);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(41, 12);
             this.label13.TabIndex = 14;
@@ -372,9 +386,9 @@
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(385, 94);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(41, 12);
+            this.label9.Size = new System.Drawing.Size(59, 12);
             this.label9.TabIndex = 7;
-            this.label9.Text = "水温：";
+            this.label9.Text = "8时水温：";
             // 
             // label8
             // 
@@ -419,6 +433,7 @@
             this.dtp_TimeReceived.Name = "dtp_TimeReceived";
             this.dtp_TimeReceived.Size = new System.Drawing.Size(153, 21);
             this.dtp_TimeReceived.TabIndex = 7;
+            this.dtp_TimeReceived.Visible = false;
             // 
             // dtp_CollectTime
             // 
@@ -444,9 +459,9 @@
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(17, 28);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(65, 12);
+            this.label5.Size = new System.Drawing.Size(41, 12);
             this.label5.TabIndex = 4;
-            this.label5.Text = "采集时间：";
+            this.label5.Text = "日期：";
             // 
             // cmb_DataType
             // 
@@ -456,6 +471,7 @@
             this.cmb_DataType.Name = "cmb_DataType";
             this.cmb_DataType.Size = new System.Drawing.Size(164, 20);
             this.cmb_DataType.TabIndex = 1;
+            this.cmb_DataType.Visible = false;
             // 
             // cmb_ChannelType
             // 
@@ -476,6 +492,7 @@
             this.label3.Size = new System.Drawing.Size(65, 12);
             this.label3.TabIndex = 2;
             this.label3.Text = "接收时间：";
+            this.label3.Visible = false;
             // 
             // label4
             // 
@@ -485,6 +502,7 @@
             this.label4.Size = new System.Drawing.Size(65, 12);
             this.label4.TabIndex = 0;
             this.label4.Text = "报文类型：";
+            this.label4.Visible = false;
             // 
             // groupBox1
             // 
@@ -535,17 +553,6 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "选择站点：";
             // 
-            // cmb_AddDataType
-            // 
-            this.cmb_AddDataType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmb_AddDataType.FormattingEnabled = true;
-            this.cmb_AddDataType.Location = new System.Drawing.Point(88, 23);
-            this.cmb_AddDataType.Name = "cmb_AddDataType";
-            this.cmb_AddDataType.Size = new System.Drawing.Size(143, 20);
-            this.cmb_AddDataType.TabIndex = 5;
-            this.cmb_AddDataType.Visible = false;
-            this.cmb_AddDataType.SelectedIndexChanged += new System.EventHandler(this.cmb_AddDataType_SelectedIndexChanged);
-            // 
             // CStationDataAddForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -557,7 +564,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "CStationDataAddForm";
-            this.Text = "添加日数据";
+            this.Text = "人工录入";
             this.panel1.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();

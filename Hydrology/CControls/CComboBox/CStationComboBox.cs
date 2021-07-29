@@ -255,7 +255,8 @@ namespace Hydrology.CControls
             {
                 if ((station.StationType == EStationType.EHydrology
                         || station.StationType == EStationType.ERainFall
-                        || station.StationType == EStationType.ERiverWater))
+                        || station.StationType == EStationType.ERiverWater
+                        || station.StationType == EStationType.EEva))
                 {
                     m_listStations.Add(station);
                     //this.Items.Add(GetDisplayStationName(station));

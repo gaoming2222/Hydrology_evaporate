@@ -246,19 +246,19 @@
             // 
             // btnNewRecord
             // 
-            this.btnNewRecord.Location = new System.Drawing.Point(115, 400);
+            this.btnNewRecord.Location = new System.Drawing.Point(43, 420);
             this.btnNewRecord.Name = "btnNewRecord";
-            this.btnNewRecord.Size = new System.Drawing.Size(75, 23);
+            this.btnNewRecord.Size = new System.Drawing.Size(102, 23);
             this.btnNewRecord.TabIndex = 12;
-            this.btnNewRecord.Text = "新增...";
+            this.btnNewRecord.Text = "人工录入";
             this.btnNewRecord.UseVisualStyleBackColor = true;
             this.btnNewRecord.Click += new System.EventHandler(this.btnNewRecord_Click);
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(14, 400);
+            this.btnApply.Location = new System.Drawing.Point(43, 464);
             this.btnApply.Name = "btnApply";
-            this.btnApply.Size = new System.Drawing.Size(75, 23);
+            this.btnApply.Size = new System.Drawing.Size(102, 23);
             this.btnApply.TabIndex = 11;
             this.btnApply.Text = "保存";
             this.btnApply.UseVisualStyleBackColor = true;
@@ -278,9 +278,9 @@
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(115, 362);
+            this.btnExit.Location = new System.Drawing.Point(45, 503);
             this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(75, 23);
+            this.btnExit.Size = new System.Drawing.Size(100, 23);
             this.btnExit.TabIndex = 9;
             this.btnExit.Text = "退出";
             this.btnExit.UseVisualStyleBackColor = true;
@@ -297,9 +297,9 @@
             // 
             // btnQuery
             // 
-            this.btnQuery.Location = new System.Drawing.Point(14, 362);
+            this.btnQuery.Location = new System.Drawing.Point(45, 371);
             this.btnQuery.Name = "btnQuery";
-            this.btnQuery.Size = new System.Drawing.Size(75, 23);
+            this.btnQuery.Size = new System.Drawing.Size(100, 23);
             this.btnQuery.TabIndex = 8;
             this.btnQuery.Text = "查询";
             this.btnQuery.UseVisualStyleBackColor = true;

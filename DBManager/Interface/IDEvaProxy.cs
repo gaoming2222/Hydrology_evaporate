@@ -45,5 +45,7 @@ namespace Hydrology.DBManager.Interface
         List<CEntityEva> get4InitEva();
 
         bool UpdateRows(List<CEntityEva> evaList);
+
+        CEntityEva GetEva1ByTime(string stationId, DateTime datatime);
     }
 }

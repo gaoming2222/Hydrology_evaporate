@@ -88,7 +88,10 @@ namespace Hydrology.Entity
         /// <summary>
         /// 按天传   02
         /// </summary>
-        ByDay
+        ByDay,
+
+        ByMonth
+
     }
 
     /// <summary>

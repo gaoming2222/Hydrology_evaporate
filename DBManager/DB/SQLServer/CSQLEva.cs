@@ -73,6 +73,7 @@ namespace Hydrology.DBManager.DB.SQLServer
             m_tableDataAdded.Columns.Add(CN_TRain);
 
             m_tableDataAdded.Columns.Add(CN_ACT);
+            m_tableDataAdded.Columns.Add(CN_PChange);
             m_tableDataAdded.Columns.Add(CN_EChange);
             // 分页查询相关
             m_strStaionId = null;
@@ -134,7 +135,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_Voltage, CN_Voltage);
                     bulkCopy.ColumnMappings.Add(CN_Rain, CN_Rain);
                     bulkCopy.ColumnMappings.Add(CN_ACT, CN_ACT);
-                    //bulkCopy.ColumnMappings.Add(CN_PChange, CN_PChange);
+                    bulkCopy.ColumnMappings.Add(CN_PChange, CN_PChange);
                     bulkCopy.ColumnMappings.Add(CN_EChange, CN_EChange);
 
                     try
@@ -189,6 +190,7 @@ namespace Hydrology.DBManager.DB.SQLServer
             row[CN_Rain] = Eva.Rain;
             row[CN_ACT] = Eva.type;
             row[CN_EChange] = Eva.eChange;
+            row[CN_PChange] = Eva.pChange;
             row[CN_TEva] = Eva.TE;
             row[CN_TRain] = Eva.TP;
             m_tableDataAdded.Rows.Add(row);
@@ -231,7 +233,9 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_Voltage] = Eva.Voltage;
                 row[CN_Rain] = Eva.Rain;
                 row[CN_ACT] = Eva.type;
+                row[CN_PChange] = Eva.pChange;
                 row[CN_EChange] = Eva.eChange;
+                
                 m_tableDataAdded.Rows.Add(row);
             }
             if (m_tableDataAdded.Rows.Count >= CDBParams.GetInstance().AddBufferMax)
@@ -262,6 +266,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                 row[CN_Rain] = Eva.Rain;
                 row[CN_ACT] = Eva.type;
                 row[CN_EChange] = Eva.eChange;
+                row[CN_PChange] =Eva.pChange;
                 //row[CN_TransType] = CEnumHelper.ChannelTypeToDBStr(Eva.ChannelType);
                 m_tableDataAdded.Rows.Add(row);
 
@@ -492,6 +497,7 @@ namespace Hydrology.DBManager.DB.SQLServer
                     bulkCopy.ColumnMappings.Add(CN_ACT, CN_ACT);
                     bulkCopy.ColumnMappings.Add(CN_TRain, CN_TRain);
                     bulkCopy.ColumnMappings.Add(CN_TEva, CN_TEva);
+                    bulkCopy.ColumnMappings.Add(CN_PChange, CN_PChange);
                     bulkCopy.ColumnMappings.Add(CN_EChange, CN_EChange);
 
 

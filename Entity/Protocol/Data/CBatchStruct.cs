@@ -26,5 +26,9 @@ namespace Hydrology.Entity
         public DateTime Time;
         //public Int32 Data;
         public string Data;
+        public Nullable<decimal> rain;
+        public Nullable<decimal>  eva;
+        public Nullable<decimal> tmprt;
+        public string act;
     }
 }

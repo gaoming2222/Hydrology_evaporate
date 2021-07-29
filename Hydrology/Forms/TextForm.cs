@@ -1,20 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Hydrology.CControls;
 using Hydrology.Entity;
 using Hydrology.DataMgr;
-using System.Globalization;
 using System.IO;
 using Hydrology.DBManager.Interface;
 using Hydrology.DBManager.DB.SQLServer;
-using Entity;
-using NPOI.XSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.HSSF.UserModel;
 
@@ -256,23 +248,15 @@ namespace Hydrology.Forms
 
         private void export_Click(object sender, EventArgs e)
         {
-            //DateTime startTimeTmp = DateTimer.Value;
-            //DateTime endTimeTmp = endDateTime.Value;
-            //DateTime startTime = new DateTime(startTimeTmp.Year, startTimeTmp.Month, startTimeTmp.Day, 0, 0, 0);
-            //DateTime endTime = new DateTime(endTimeTmp.Year, endTimeTmp.Month, endTimeTmp.Day, 0, 0, 0);
-
+           
             DateTime ExlTimeTmp = ExldateTime.Value;
-            DateTime ExlTimeStrt = new DateTime(ExlTimeTmp.Year, ExlTimeTmp.Month, 1, 0, 0, 0);
-            DateTime ExlTimeEnd = new DateTime(ExlTimeTmp.Year, ExlTimeTmp.Month+1, 1, 0, 0, 0);
             string dte = ExlTimeTmp.Year.ToString() + "年" + ExlTimeTmp.Month.ToString();
             string month = ExlTimeTmp.Month.ToString();
-
             // 获取是雨量还是水位类型
             string type = getType();
             // 获取被选择的站点
             // 获取站点信息 默认为全部站点
             List<string> stationSelected = new List<string>();
-            
             int flagInt = 0;
             for (int i = 0; i < StationSelect.Items.Count; i++)
             {
@@ -300,24 +284,26 @@ namespace Hydrology.Forms
             }
             #region 导出蒸发雨量月表
             string sourcePath = @"models/" + models.Text;
-            if(models.Text == "降水量、蒸发量月报表.xls")
+            if (models.Text == "降水量、蒸发量月报表.xls")
             {
+                DateTime ExlTimeStrt = new DateTime(ExlTimeTmp.Year, ExlTimeTmp.Month, 2, 0, 0, 0);
+                DateTime ExlTimeEnd = new DateTime(ExlTimeTmp.AddMonths(1).Year, ExlTimeTmp.AddMonths(1).Month, 2, 0, 0, 0);
                 string errMsg = "";
                 for (int i = 0; i < stationSelected.Count; i++)
                 {
                     string stationName = stationSelected[i].Split('|')[1].Trim();
-                    string stationid = stationSelected[i].Split('|')[0].Trim() ;
-                    string prefixName = stationSelected[i].Split('|')[1] + stationSelected[i].Split('|')[0] + "站" + dte.Substring(0,5) + "降水量、蒸发量月报表.xls";
+                    string stationid = stationSelected[i].Split('|')[0].Trim();
+                    string prefixName = stationSelected[i].Split('|')[1] + stationSelected[i].Split('|')[0] + "站" + dte.Substring(0) + "月降水量、蒸发量月报表.xls";
                     string fileName = "ZfExcels/" + prefixName;
-                     //string targetPath = @"ZfExcels/" + stationSelected[i].Split('|')[0] + stationSelected[i].Split('|')[1] + ExlTimeTmp.ToString() + "降水量、蒸发量月报表.xls";
+                    //string targetPath = @"ZfExcels/" + stationSelected[i].Split('|')[0] + stationSelected[i].Split('|')[1] + ExlTimeTmp.ToString() + "降水量、蒸发量月报表.xls";
                     string targetPath = @fileName;
-                    Dictionary<String,Object> result =  getAndSetExcelValueZf(sourcePath, targetPath,stationid,stationName, dte, ExlTimeStrt, ExlTimeEnd);
-                    if(result["ERR"].ToString() != "0")
+                    Dictionary<String, Object> result = getAndSetExcelValueZf(sourcePath, targetPath, stationid, stationName, dte, ExlTimeStrt, ExlTimeEnd);
+                    if (result["ERR"].ToString() != "0")
                     {
                         errMsg = errMsg + result["ID"].ToString() + result["ERR"].ToString() + "/r/n";
                     }
                 }
-                if(errMsg != "" && errMsg.Length > 0)
+                if (errMsg != "" && errMsg.Length > 0)
                 {
                     MessageBox.Show(errMsg);
                 }
@@ -327,14 +313,16 @@ namespace Hydrology.Forms
                 }
 
             }
-            if(models.Text == "蒸发观测记录表.xls")
+            if (models.Text == "蒸发观测记录表.xls")
             {
+                DateTime ExlTimeStrt = new DateTime(ExlTimeTmp.Year, ExlTimeTmp.Month, 1, 0, 0, 0);
+                DateTime ExlTimeEnd = new DateTime(ExlTimeTmp.AddMonths(1).Year, ExlTimeTmp.AddMonths(1).Month, 1, 0, 0, 0);
                 string errMsg = "";
                 for (int i = 0; i < stationSelected.Count; i++)
                 {
                     string stationName = stationSelected[i].Split('|')[1].Trim();
                     string stationid = stationSelected[i].Split('|')[0].Trim();
-                    string prefixName = stationSelected[i].Split('|')[1] + stationSelected[i].Split('|')[0] + "站" + dte + "蒸发观测记录表.xls";
+                    string prefixName = stationSelected[i].Split('|')[1] + stationSelected[i].Split('|')[0] + "站" + dte + "月蒸发观测记录表.xls";
                     string fileName = "GcExcels/" + prefixName;
                     string targetPath = @fileName;
                     Dictionary<string, object> result = new Dictionary<string, object>();
@@ -350,17 +338,73 @@ namespace Hydrology.Forms
                     }
                 }
             }
-            if (models.Text == "蒸发观测记录表.xls")
+            #region 蒸发特殊处理
+            if (models.Text == "自动蒸发观测记载表.xls")
             {
+                DateTime ExlTimeStrt = new DateTime(ExlTimeTmp.Year, ExlTimeTmp.Month, 1, 0, 0, 0);
+                DateTime ExlTimeEnd = new DateTime(ExlTimeTmp.AddMonths(1).Year, ExlTimeTmp.AddMonths(1).Month, 1, 0, 0, 0);
+                string errMsg = "";
+                for (int i = 0; i < stationSelected.Count; i++)
+                {
+                    string stationName = stationSelected[i].Split('|')[1].Trim();
+                    string stationid = stationSelected[i].Split('|')[0].Trim();
+                    string prefixName = stationSelected[i].Split('|')[1] + stationSelected[i].Split('|')[0] + "站" + dte + "月蒸发观测记录表.xls";
+                    string fileName = "GcExcels/" + prefixName;
+                    string targetPath = @fileName;
+                    Dictionary<string, object> result = new Dictionary<string, object>();
 
+                    result = getAndSetExcelValueCMGc(sourcePath, targetPath, stationid, stationName, dte, ExlTimeStrt, ExlTimeEnd);
+                    if (errMsg != "" && errMsg.Length > 0)
+                    {
+                        MessageBox.Show(errMsg);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Excel导出成功！");
+                    }
+                }
+            }
+            #endregion
+
+            if (models.Text == "逐日蒸发量年表.xls")
+            {
+                DateTime ExlTimeStrt = new DateTime(ExlTimeTmp.Year, ExlTimeTmp.Month, 2, 0, 0, 0);
+                DateTime ExlTimeEnd = new DateTime(ExlTimeTmp.AddMonths(1).Year, ExlTimeTmp.AddMonths(1).Month, 2, 0, 0, 0);
+                string errMsg = "";
+                for (int i = 0; i < stationSelected.Count; i++)
+                {
+                    DateTime strtTime = new DateTime(ExlTimeTmp.Year, 1, 2, 0, 0, 0);
+                    DateTime endTime = new DateTime(ExlTimeTmp.Year + 1, 1, 2, 0, 0, 0);
+                    string stationName = stationSelected[i].Split('|')[1].Trim();
+                    string stationid = stationSelected[i].Split('|')[0].Trim();
+                    string prefixName = stationSelected[i].Split('|')[1] + stationSelected[i].Split('|')[0] + "站" + dte.Substring(0, 5) + "逐日蒸发量年表.xls";
+                    string fileName = "ZfExcels/" + prefixName;
+                    //string targetPath = @"ZfExcels/" + stationSelected[i].Split('|')[0] + stationSelected[i].Split('|')[1] + ExlTimeTmp.ToString() + "降水量、蒸发量月报表.xls";
+                    string targetPath = @fileName;
+                    Dictionary<String, Object> result = setYearExeZf(sourcePath, targetPath, stationid, stationName, dte, strtTime, endTime);
+                    if (result["ERR"].ToString() != "0")
+                    {
+                        errMsg = errMsg + result["ID"].ToString() + result["ERR"].ToString() + "/r/n";
+                    }
+                }
+                if (errMsg != "" && errMsg.Length > 0)
+                {
+                    MessageBox.Show(errMsg);
+                }
+                else
+                {
+                    MessageBox.Show("Excel导出成功！");
+                }
             }
             if (models.Text == "蒸发观测记录表.txt")
             {
                 string errMsg = "";
                 for (int i = 0; i < stationSelected.Count; i++)
                 {
+                    DateTime ExlTimeStrt = new DateTime(ExlTimeTmp.Year, ExlTimeTmp.Month, 2, 0, 0, 0);
+                    DateTime ExlTimeEnd = new DateTime(ExlTimeTmp.AddMonths(1).Year, ExlTimeTmp.AddMonths(1).Month, 2, 0, 0, 0);
                     DateTime strtTime = new DateTime(ExlTimeTmp.Year, 1, 2, 0, 0, 0);
-                    DateTime endTime = new DateTime(ExlTimeTmp.Year+1, 1, 2, 0, 0, 0);
+                    DateTime endTime = new DateTime(ExlTimeTmp.Year + 1, 1, 2, 0, 0, 0);
                     string stationName = stationSelected[i].Split('|')[1].Trim();
                     string stationid = stationSelected[i].Split('|')[0].Trim();
                     string prefixName = stationSelected[i].Split('|')[1] + stationSelected[i].Split('|')[0] + "站" + dte + "南方片年数据.txt";
@@ -383,7 +427,7 @@ namespace Hydrology.Forms
                 }
             }
             #endregion
-                
+
         }
 
         private void center_SelectedIndexChanged(object sender, EventArgs e)
@@ -396,7 +440,7 @@ namespace Hydrology.Forms
         private void TableTypeChanged(object sender, EventArgs e)
         {
             string type = getType();
-            
+
         }
 
         private void EHCheckAllChanged(object sender, EventArgs e)
@@ -424,8 +468,8 @@ namespace Hydrology.Forms
         #region 帮助方法
         public int getDayOfYear(DateTime date)
         {
-            DateTime startDate = new DateTime(DateTime.Now.Year, 1, 1,0,0,0);
-            int dayOfYear = (date - startDate).Days + 1 ;
+            DateTime startDate = new DateTime(DateTime.Now.Year, 1, 1, 0, 0, 0);
+            int dayOfYear = (date - startDate).Days + 1;
             return dayOfYear;
         }
 
@@ -443,7 +487,7 @@ namespace Hydrology.Forms
                     sw.WriteLine(list[i]);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 MessageBox.Show("导出水位数据失败11");
             }
@@ -466,15 +510,15 @@ namespace Hydrology.Forms
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public Dictionary<String,Object> getAndSetExcelValueZf(String sourcePath,String resultPaht,string stationid,string stationName,string dte, DateTime strtTime, DateTime endTime)
+        public Dictionary<String, Object> getAndSetExcelValueZf(String sourcePath, String resultPaht, string stationid, string stationName, string dte, DateTime strtTime, DateTime endTime)
         {
-            
+
             Dictionary<String, Object> result = new Dictionary<string, object>();
             result["ERR"] = "0";
             //查询获取所需数据
             List<CEntityEva> evaList = new List<CEntityEva>();
             evaList = CDBDataMgr.GetInstance().getEvaByTime(stationid, strtTime, endTime);
-            if(evaList == null || evaList.Count == 0)
+            if (evaList == null || evaList.Count == 0)
             {
                 result["ERR"] = "数据库无数据";
                 result["ID"] = stationid;
@@ -491,38 +535,42 @@ namespace Hydrology.Forms
             string maxEDay = " 日";
             Decimal minE = 9999;
             string minEDay = " 日";
+            foreach (CEntityEva eva in evaList)
+            {
+                eva.TimeCollect = eva.TimeCollect.AddDays(-1);
+            }
 
-            foreach(CEntityEva eva in evaList)
+            foreach (CEntityEva eva in evaList)
             {
                 exlData[eva.TimeCollect.Day.ToString()] = eva;
                 if (eva.P.HasValue)
                 {
                     totalP = totalP + eva.P.Value;
-                    if(eva.P.Value > 0)
+                    if (eva.P.Value > 0)
                     {
                         totalePDays = totalePDays + 1;
                     }
-                    
-                    if(eva.P.Value > maxP)
+
+                    if (eva.P.Value > maxP)
                     {
                         maxP = eva.P.Value;
                         maxPDay = eva.TimeCollect.Day.ToString() + "日";
                     }
-                    
+
                 }
                 if (eva.E.HasValue)
                 {
                     totalE = totalE + eva.E.Value;
-                    if(eva.E.Value > maxE)
+                    if (eva.E.Value > maxE)
                     {
                         maxE = eva.E.Value;
                         maxEDay = eva.TimeCollect.Day.ToString() + "日";
                     }
-                    if(eva.E.Value < minE)
+                    if (eva.E.Value < minE)
                     {
                         minE = eva.E.Value;
                         minEDay = eva.TimeCollect.Day.ToString() + "日";
-                        if(minE < 0)
+                        if (minE < 0)
                         {
                             minE = 0;
                         }
@@ -561,7 +609,7 @@ namespace Hydrology.Forms
                             if (cell.ColumnIndex == 0)
                             {
                                 cell.SetCellType(CellType.String);
-                                cell.SetCellValue(stationName + "站" + dte);
+                                cell.SetCellValue(stationName + "站" + dte + "月份降水量、蒸发量月报表（-）");
                             }
                         }
 
@@ -589,12 +637,12 @@ namespace Hydrology.Forms
                             if (cell.ColumnIndex == 4)
                             {
                                 cell.SetCellType(CellType.String);
-                                cell.SetCellValue(totalP.ToString());
+                                cell.SetCellValue(totalP.ToString("0.0"));
                             }
                             if (cell.ColumnIndex == 10)
                             {
                                 cell.SetCellType(CellType.String);
-                                cell.SetCellValue(totalE.ToString());
+                                cell.SetCellValue(totalE.ToString("0.0"));
                             }
                         }
                         continue;
@@ -611,7 +659,7 @@ namespace Hydrology.Forms
                             if (cell.ColumnIndex == 10)
                             {
                                 cell.SetCellType(CellType.String);
-                                cell.SetCellValue(maxE.ToString());
+                                cell.SetCellValue(maxE.ToString("0.0"));
                             }
                             if (cell.ColumnIndex == 12)
                             {
@@ -629,7 +677,7 @@ namespace Hydrology.Forms
                             if (cell.ColumnIndex == 4)
                             {
                                 cell.SetCellType(CellType.String);
-                                cell.SetCellValue(maxP.ToString());
+                                cell.SetCellValue(maxP.ToString("0.0"));
                             }
                             if (cell.ColumnIndex == 6)
                             {
@@ -639,7 +687,7 @@ namespace Hydrology.Forms
                             if (cell.ColumnIndex == 10)
                             {
                                 cell.SetCellType(CellType.String);
-                                cell.SetCellValue(minE.ToString());
+                                cell.SetCellValue(minE.ToString("0.0"));
                             }
                             if (cell.ColumnIndex == 12)
                             {
@@ -674,47 +722,47 @@ namespace Hydrology.Forms
                          */
                         if (cell.ColumnIndex == 1)
                         {
-                            if(tmp.P20 != null && tmp.P20.ToString() != "")
+                            if (tmp.P20 != null && tmp.P20.ToString() != "")
                             {
-                                if(tmp.P20.Value > 0)
+                                if (tmp.P20.Value > 0)
                                 {
                                     cell.SetCellType(CellType.String);
                                     cell.SetCellValue(tmp.P20.Value.ToString("0.0"));
                                 }
-                                
+
                             }
-                            
+
                         }
                         if (cell.ColumnIndex == 5)
                         {
                             if (tmp.P8 != null && tmp.P8.ToString() != "")
                             {
-                                if(tmp.P8.Value > 0)
+                                if (tmp.P8.Value > 0)
                                 {
                                     cell.SetCellType(CellType.String);
                                     cell.SetCellValue(tmp.P8.Value.ToString("0.0"));
                                 }
-                                
+
                             }
-                            
+
                         }
                         if (cell.ColumnIndex == 7)
                         {
-                            if(tmp.P !=  null && tmp.P.ToString() != "")
+                            if (tmp.P != null && tmp.P.ToString() != "")
                             {
-                                if(tmp.P > 0)
+                                if (tmp.P > 0)
                                 {
                                     cell.SetCellType(CellType.String);
                                     cell.SetCellValue(tmp.P.Value.ToString("0.0"));
                                 }
                             }
-                            
+
                         }
                         if (cell.ColumnIndex == 10)
                         {
-                            if(tmp.E != null && tmp.E.ToString() != "")
+                            if (tmp.E != null && tmp.E.ToString() != "")
                             {
-                                if(tmp.E > 0)
+                                if (tmp.E >= 0)
                                 {
                                     cell.SetCellType(CellType.String);
                                     cell.SetCellValue(tmp.E.Value.ToString("0.0"));
@@ -728,8 +776,9 @@ namespace Hydrology.Forms
                 FileStream fs2 = File.Create(resultPaht);
                 workbook.Write(fs2);
                 fs2.Close();
-                
-            }catch(Exception e)
+
+            }
+            catch (Exception e)
             {
                 result["ERR"] = e.Message;
                 result["ID"] = stationid;
@@ -752,6 +801,19 @@ namespace Hydrology.Forms
         /// <returns></returns>
         public Dictionary<String, Object> getAndSetExcelValueGc(String sourcePath, String resultPaht, string stationid, string stationName, string dte, DateTime strtTime, DateTime endTime)
         {
+            //判定是测针读数还是蒸发转换系数
+            Boolean flag = true;
+            if (this.water.Checked)
+            {
+                flag = true;
+            }else if (this.rain.Checked)
+            {
+                flag = false;
+            }
+            if (!flag)
+            {
+                resultPaht = resultPaht.Replace("GcExcels", "GcExcels2");
+            }
             Dictionary<String, Object> result = new Dictionary<string, object>();
             result["ERR"] = "0";
             Dictionary<string, CEntityEva> dataDic = new Dictionary<string, CEntityEva>();
@@ -764,7 +826,7 @@ namespace Hydrology.Forms
             {
                 //1.根据站点ID获取站点获取站点基本信息
                 CEntityStation station = CDBDataMgr.GetInstance().GetStationById(stationid);
-                
+
                 //2.查询原始数据、小时数据、日数据
                 endTime = endTime.AddDays(1);
                 //2.1查询获取小时数据
@@ -773,7 +835,7 @@ namespace Hydrology.Forms
 
                 //2.2查询日数据
                 List<CEntityEva> evaList = new List<CEntityEva>();
-                evaList = CDBDataMgr.GetInstance().getEvaByTime(stationid, strtTime, endTime);
+                evaList = CDBDataMgr.GetInstance().getEvaByTime(stationid, strtTime.AddDays(1), endTime);
 
                 //2.3查询原始数据
                 List<CEntityEva> evaSpList = new List<CEntityEva>();
@@ -786,7 +848,6 @@ namespace Hydrology.Forms
                     return result;
                 }
                 //3 组合数据 计算数据
-                
                 for (int i = 1; i <= 31; i++)
                 {
                     CEntityEva tmp = new CEntityEva();
@@ -797,7 +858,15 @@ namespace Hydrology.Forms
                         {
                             tmp.StationID = item.StationID;
                             tmp.TimeCollect = item.TimeCollect;
-                            tmp.DH = item.DH;
+                            if (flag)
+                            {
+                                tmp.DH = item.DH;
+                            }
+                            else
+                            {
+                                tmp.DH = (item.DH + station.DWaterChange) * station.DWaterMax;
+                            }
+                            
                             break;
                         }
                     }
@@ -807,7 +876,7 @@ namespace Hydrology.Forms
 
                         if (item.TimeCollect.AddDays(-1).Day == i)
                         {
-                            totalEva = totalEva + item.E.Value;
+                          totalEva = totalEva + item.E.Value;
                             if (item.E.Value > maxEva)
                             {
                                 maxEva = item.E.Value;
@@ -821,6 +890,7 @@ namespace Hydrology.Forms
                             tmp.E = item.E;
                             tmp.P = item.P;
                             tmp.dayEChange = item.dayEChange;
+                            
                         }
                     }
                     //原始数据
@@ -838,12 +908,13 @@ namespace Hydrology.Forms
 
                     dataDic[i.ToString()] = tmp;
                 }
-            }catch(Exception ee)
+            }
+            catch (Exception ee)
             {
                 result["ERR"] = ee.Message;
             }
-            
-            
+
+
             //写入数据库
             try
             {
@@ -887,7 +958,7 @@ namespace Hydrology.Forms
                              * Excel数据Cell有不同的类型，当我们试图从一个数字类型的Cell读取出一个字符串并写入数据库时，就会出现Cannot get a text value from a numeric cell的异常错误。
                              * 解决办法：先设置Cell的类型，然后就可以把纯数字作为String类型读进来了
                              */
-                            
+
                             if (cell.ColumnIndex == 13)
                             {
                                 cell.SetCellType(CellType.String);
@@ -896,7 +967,7 @@ namespace Hydrology.Forms
                         }
                         continue;
                     }
-                    for(int j = 5; j <= 35; j++)
+                    for (int j = 5; j <= 35; j++)
                     {
                         if (i == j)
                         {
@@ -945,7 +1016,7 @@ namespace Hydrology.Forms
                                             cell.SetCellType(CellType.String);
                                             cell.SetCellValue(evaData.act.ToString().Substring(2));
                                         }
-                                        
+
                                     }
                                 }
 
@@ -964,15 +1035,15 @@ namespace Hydrology.Forms
                                 {
                                     if (evaData.act != null && evaData.act.ToString() != "")
                                     {
-                                        if (evaData.act.Trim().StartsWith("ER"))
+                                        if (evaData.act.Trim().StartsWith("EER"))
                                         {
                                             cell.SetCellType(CellType.String);
-                                            cell.SetCellValue(evaData.act.ToString().Substring(2));
+                                            cell.SetCellValue(evaData.act.ToString().Substring(3));
                                         }
-                                        
+
                                     }
                                 }
-                                if(cell.ColumnIndex == 10)
+                                if (cell.ColumnIndex == 10)
                                 {
                                     if (evaData.dayEChange != null && evaData.dayEChange.ToString() != "")
                                     {
@@ -1052,10 +1123,300 @@ namespace Hydrology.Forms
                 return result;
             }
             return result;
+        }
+
+        /// <summary>
+        /// 崇明月观察记录表
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="resultPaht"></param>
+        /// <param name="stationid"></param>
+        /// <param name="stationName"></param>
+        /// <param name="dte"></param>
+        /// <param name="strtTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        public Dictionary<String, Object> getAndSetExcelValueCMGc(String sourcePath, String resultPaht, string stationid, string stationName, string dte, DateTime strtTime, DateTime endTime)
+        {
+            //判定是测针读数还是蒸发转换系数
+            Boolean flag = true;
+            if (this.water.Checked)
+            {
+                flag = true;
+            }
+            else if (this.rain.Checked)
+            {
+                flag = false;
+            }
+            if (!flag)
+            {
+                resultPaht = resultPaht.Replace("GcExcels", "GcExcels2");
+            }
+            Dictionary<String, Object> result = new Dictionary<string, object>();
+            result["ERR"] = "0";
+            Dictionary<string, CEntityEva> dataDic = new Dictionary<string, CEntityEva>();
+            decimal totalEva = 0;
+            decimal maxEva = 0;
+            decimal minEva = 100;
+            DateTime maxDate = DateTime.Now;
+            DateTime minDate = DateTime.Now;
+            try
+            {
+                //1.根据站点ID获取站点获取站点基本信息
+                CEntityStation station = CDBDataMgr.GetInstance().GetStationById(stationid);
+                //2.查询原始数据、小时数据、日数据
+                endTime = endTime.AddDays(1);
+                //2.1查询获取小时数据
+                List<CEntityEva> hourEvaList = new List<CEntityEva>();
+                hourEvaList = CDBDataMgr.GetInstance().QueryForHourEvaList4Table(stationid, strtTime, endTime);
+                //2.2查询日数据
+                List<CEntityEva> evaList = new List<CEntityEva>();
+                evaList = CDBDataMgr.GetInstance().getEvaByTime(stationid, strtTime.AddDays(1), endTime);
+                //2.3查询原始数据
+                List<CEntityEva> evaSpList = new List<CEntityEva>();
+                evaSpList = CDBDataMgr.GetInstance().getSpEvaByTime(stationid, strtTime, endTime);
+                if (evaList == null || evaList.Count == 0)
+                {
+                    result["ERR"] = "数据库无数据";
+                    result["ID"] = stationid;
+                    return result;
+                }
+                //3 组合数据 计算数据
+                for (int i = 1; i <= 31; i++)
+                {
+                    CEntityEva tmp = new CEntityEva();
+                    //8点小时数据
+                    foreach (CEntityEva item in hourEvaList)
+                    {
+                        if (item.TimeCollect.Day == i)
+                        {
+                            tmp.StationID = item.StationID;
+                            tmp.TimeCollect = item.TimeCollect;
+                            if (flag)
+                            {
+                                tmp.DH = item.DH;
+                            }
+                            else
+                            {
+                                tmp.DH = (item.DH + station.DWaterChange) * station.DWaterMax;
+                            }
+
+                            break;
+                        }
+                    }
+                    //日数据
+                    foreach (CEntityEva item in evaList)
+                    {
+                        if (item.TimeCollect.AddDays(-1).Day == i)
+                        {
+                            totalEva = totalEva +  decimal.Round(item.E.Value, 1, MidpointRounding.AwayFromZero);
+                            if (item.E.Value > decimal.Round(maxEva, 1, MidpointRounding.AwayFromZero))
+                            {
+                                maxEva = decimal.Round(item.E.Value, 1, MidpointRounding.AwayFromZero);
+                                maxDate = item.TimeCollect;
+                            }
+                            if (item.E.Value < decimal.Round(minEva, 1, MidpointRounding.AwayFromZero))
+                            {
+                                minEva = decimal.Round(item.E.Value, 1, MidpointRounding.AwayFromZero);
+                                minDate = item.TimeCollect;
+                            }
+                            tmp.E = item.E;
+                            tmp.P = item.P;
+                            tmp.dayEChange = item.dayEChange;
+
+                        }
+                    }
+                    //原始数据
+                    if (evaSpList != null && evaSpList.Count > 0)
+                    {
+                        foreach (CEntityEva item in evaSpList)
+                        {
+
+                            if (item.TimeCollect.Day == i)
+                            {
+                                tmp.act = item.act;
+                            }
+                        }
+                    }
+
+                    dataDic[i.ToString()] = tmp;
+                }
+            }
+            catch (Exception ee)
+            {
+                result["ERR"] = ee.Message;
+            }
+
+
+            //写入数据库
+            try
+            {
+                FileStream fs = File.OpenRead(sourcePath);
+                //把文件内容写到工作簿中，然后关闭文件
+                //XSSFWorkbook workbook = new XSSFWorkbook(file);
+                //HSSFWorkbook workbook = new HSSFWorkbook(file)
+                IWorkbook workbook = new HSSFWorkbook(fs);
+                fs.Close();
+                //获取第一个sheet
+                ISheet sheet = workbook.GetSheetAt(0);
+                //获取蒸发日表数据
+                #region 降水量、蒸发量月报表
+                for (int i = 0; i <= sheet.LastRowNum; i++)
+                {
+                    if (i == 0)
+                    {
+                        //A1 站名 + 时间
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            /*
+                             * Excel数据Cell有不同的类型，当我们试图从一个数字类型的Cell读取出一个字符串并写入数据库时，就会出现Cannot get a text value from a numeric cell的异常错误。
+                             * 解决办法：先设置Cell的类型，然后就可以把纯数字作为String类型读进来了
+                             */
+                            if (cell.ColumnIndex == 6)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(stationName + "站");
+                            }
+                        }
+                        continue;
+                    }
+
+                    if (i == 1)
+                    {
+                        //A1 站名 + 时间
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            /*
+                             * Excel数据Cell有不同的类型，当我们试图从一个数字类型的Cell读取出一个字符串并写入数据库时，就会出现Cannot get a text value from a numeric cell的异常错误。
+                             * 解决办法：先设置Cell的类型，然后就可以把纯数字作为String类型读进来了
+                             */
+
+                            if (cell.ColumnIndex == 6)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(dte + "月");
+                            }
+                        }
+                        continue;
+                    }
+                    for (int j = 4; j <= 34; j++)
+                    {
+                        if (i == j)
+                        {
+                            CEntityEva evaData = dataDic[(j - 3).ToString()];
+                            foreach (ICell cell in sheet.GetRow(i).Cells)
+                            {
+                                //蒸发器水面高度
+                                if (cell.ColumnIndex == 2)
+                                {
+                                    if (evaData.DH != null && evaData.DH.ToString() != "")
+                                    {
+                                        cell.SetCellType(CellType.String);
+                                        cell.SetCellValue(evaData.DH.Value.ToString("0.0"));
+                                    }
+                                }
+                                //注入水量
+                                if (cell.ColumnIndex == 3)
+                                {
+                                    if (evaData.dayEChange != null && evaData.dayEChange.HasValue && evaData.dayEChange.ToString() != "" && evaData.dayEChange.Value > 0)
+                                    {
+                                        cell.SetCellType(CellType.String);
+                                        cell.SetCellValue(evaData.dayEChange.Value.ToString("0.0"));
+                                    }
+                                }
+                                //排除水量
+                                if (cell.ColumnIndex == 4)
+                                {
+                                    if (evaData.dayEChange != null && evaData.dayEChange.HasValue && evaData.dayEChange.ToString() != "" && evaData.dayEChange.Value < 0)
+                                    {
+                                        cell.SetCellType(CellType.String);
+                                        cell.SetCellValue(Math.Abs(evaData.dayEChange.Value).ToString("0.0"));
+                                    }
+                                }
+                                if (cell.ColumnIndex == 5)
+                                {
+                                    if (evaData.P != null && evaData.P.ToString() != "" && evaData.P > 0)
+                                    {
+                                        cell.SetCellType(CellType.String);
+                                        cell.SetCellValue(evaData.P.Value.ToString("0.0"));
+                                    }
+                                }
+
+                                if (cell.ColumnIndex == 6)
+                                {
+                                    if (evaData.E != null && evaData.E.ToString() != "" && evaData.E >= 0)
+                                    {
+                                        cell.SetCellType(CellType.String);
+                                        cell.SetCellValue(evaData.E.Value.ToString("0.0"));
+                                    }
+                                }
+
+                                if (cell.ColumnIndex == 7)
+                                {
+                                    if (evaData.act != null && evaData.act.ToString() != "")
+                                    {
+                                        if (evaData.act.Contains("ER"))
+                                        {
+                                            cell.SetCellType(CellType.String);
+                                            cell.SetCellValue(evaData.dayEChange.Value.ToString("0.0"));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (i == 35)
+                    {
+                        //A1 站名 + 时间
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            if (cell.ColumnIndex == 2)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(totalEva.ToString("0.0") + "mm");
+                            }
+                            if (cell.ColumnIndex == 4)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(maxEva.ToString("0.0") + "mm  " + maxDate.AddDays(-1).Day.ToString() + "日");
+                            }
+                            if (cell.ColumnIndex == 6)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue(minEva.ToString("0.0") + "mm  " + minDate.AddDays(-1).Day.ToString() + "日");
+                            }
+                        }
+                        continue;
+                    }
+
+                }
+                #endregion
+                FileStream fs2 = File.Create(resultPaht);
+                workbook.Write(fs2);
+                fs2.Close();
+
+            }
+            catch (Exception e)
+            {
+                result["ERR"] = e.Message;
+                result["ID"] = stationid;
+                return result;
+            }
+            return result;
 
         }
 
-
+        /// <summary>
+        /// 南方片txt文档
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="resultPaht"></param>
+        /// <param name="stationid"></param>
+        /// <param name="stationName"></param>
+        /// <param name="dte"></param>
+        /// <param name="strtTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
         public Dictionary<String, Object> setYearTxtZf(String sourcePath, String resultPaht, string stationid, string stationName, string dte, DateTime strtTime, DateTime endTime)
         {
             Dictionary<String, Object> result = new Dictionary<string, object>();
@@ -1073,7 +1434,7 @@ namespace Hydrology.Forms
             StreamWriter sw;
             try
             {
-                
+
                 //1.判断文件是否存在，如果存在则直接写入，不存在则先创建文件
                 if (!System.IO.File.Exists(resultPaht))
                 {
@@ -1092,18 +1453,18 @@ namespace Hydrology.Forms
                 DateTime time1 = new DateTime(strtTime.Year, 1, 2, 8, 0, 0);
                 DateTime time2 = new DateTime(strtTime.Year + 1, 1, 1, 8, 0, 0);
                 //2.1将list放入Dic,方便查找
-                for (int i = 0;i< evaList.Count; i++)
+                for (int i = 0; i < evaList.Count; i++)
                 {
-                    
-                    evaDic.Add((evaList[i].TimeCollect.Month * 31 + evaList[i].TimeCollect.Day), evaList[i]);
+
+                    evaDic.Add((evaList[i].TimeCollect.AddDays(-1).Month * 31 + evaList[i].TimeCollect.AddDays(-1).Day), evaList[i]);
                 }
                 //变量1-31日，变量1-12月，在DIC中查找相关值
-                for(int day = 1;day <= 31; day++)
+                for (int day = 1; day <= 31; day++)
                 {
-                    StringBuilder data = new StringBuilder( day.ToString() + ",");
-                    for(int month = 1;month <= 12; month++)
+                    StringBuilder data = new StringBuilder(day.ToString() + ",");
+                    for (int month = 1; month <= 12; month++)
                     {
-                        if(evaDic.ContainsKey(month * 31 + day) && evaDic[month * 31 + day].E.HasValue)
+                        if (evaDic.ContainsKey(month * 31 + day) && evaDic[month * 31 + day].E.HasValue)
                         {
                             data.Append(evaDic[month * 31 + day].E.Value.ToString("0.0"));
                         }
@@ -1112,14 +1473,301 @@ namespace Hydrology.Forms
                     data.Append(",");
                     sw.WriteLine(data.ToString());//开始写入值
                 }
-                
+
                 //2.3
                 sw.Close();
                 fs.Close();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
 
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 导出年表
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="resultPaht"></param>
+        /// <param name="stationid"></param>
+        /// <param name="stationName"></param>
+        /// <param name="dte"></param>
+        /// <param name="strtTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        public Dictionary<String, Object> setYearExeZf(String sourcePath, String resultPaht, string stationid, string stationName, string dte, DateTime strtTime, DateTime endTime)
+        {
+            Dictionary<String, Object> result = new Dictionary<string, object>();
+            result["ERR"] = "0";
+            //查询获取所需数据
+            List<CEntityEva> evaList = new List<CEntityEva>();
+            evaList = CDBDataMgr.GetInstance().getEvaByTime(stationid, strtTime, endTime);
+            if (evaList == null || evaList.Count == 0)
+            {
+                result["ERR"] = "数据库无数据";
+                result["ID"] = stationid;
+                return result;
+            }
+            decimal yearEvaSum = 0;
+            decimal? minEva = null;
+            decimal? maxEva = null;
+            DateTime minDate = DateTime.Now.AddYears(10);
+            DateTime maxDate = DateTime.Now.AddYears(10);
+
+            Dictionary<int, CEntityEva> evaDic = new Dictionary<int, CEntityEva>();
+            //1.统计年数据
+            for (int i = 0; i < evaList.Count; i++)
+            {
+                evaDic.Add((evaList[i].TimeCollect.AddDays(-1).Month * 31 + evaList[i].TimeCollect.AddDays(-1).Day), evaList[i]);
+                if (evaList[i].E.HasValue)
+                {
+                    yearEvaSum = yearEvaSum + evaList[i].E.Value;
+                    if (minEva == null || evaList[i].E.Value < minEva)
+                    {
+                        minEva = evaList[i].E.Value;
+                        minDate = evaList[i].TimeCollect.AddDays(-1);
+                    }
+                    if (maxEva == null || evaList[i].E.Value > maxEva)
+                    {
+                        maxEva = evaList[i].E.Value;
+                        maxDate = evaList[i].TimeCollect.AddDays(-1);
+                    }
+                }
+            }
+            //2.统计每个月的数据
+            decimal[] monthSum = new decimal[12];
+            int[] dayCount = new int[12];
+            decimal?[] monthMax = new decimal?[12];
+            decimal?[] monthMin = new decimal?[12];
+            for (int month = 1; month <= 12; month++)
+            {
+                for (int k = 0; k < evaList.Count; k++)
+                {
+                    if (evaList[k].TimeCollect.AddDays(-1).Month == month)
+                    {
+                        if (evaList[k].E.HasValue)
+                        {
+                            monthSum[month - 1] = monthSum[month - 1] + evaList[k].E.Value;
+                            dayCount[month - 1] = dayCount[month - 1] + 1;
+                            if (monthMax[month - 1] == null || monthMax[month - 1] < evaList[k].E.Value)
+                            {
+                                monthMax[month - 1] = evaList[k].E.Value;
+                            }
+                            if (monthMin[month - 1] == null || monthMin[month - 1] > evaList[k].E.Value)
+                            {
+                                monthMin[month - 1] = evaList[k].E.Value;
+                            }
+                        }
+
+                    }
+                }
+            }
+            try
+            {
+                FileStream fs = File.OpenRead(sourcePath);
+                //把文件内容写到工作簿中，然后关闭文件
+                //XSSFWorkbook workbook = new XSSFWorkbook(file);
+                //HSSFWorkbook workbook = new HSSFWorkbook(file)
+                IWorkbook workbook = new HSSFWorkbook(fs);
+                fs.Close();
+                //获取第一个sheet
+                ISheet sheet = workbook.GetSheetAt(0);
+
+
+                #region 逐日蒸发年表
+                for (int i = 0; i <= sheet.LastRowNum; i++)
+                {
+                    #region  表头 表尾 
+                    //3.补充表头
+                    if (i == 0)
+                    {
+                        //A1 站名 + 时间
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            /*
+                             * Excel数据Cell有不同的类型，当我们试图从一个数字类型的Cell读取出一个字符串并写入数据库时，就会出现Cannot get a text value from a numeric cell的异常错误。
+                             * 解决办法：先设置Cell的类型，然后就可以把纯数字作为String类型读进来了
+                             */
+                            cell.SetCellType(CellType.String);
+                            cell.SetCellValue(stationName + "站逐日水面蒸发量表");
+                            //int iiii = cell.ColumnIndex;
+                            //if (cell.ColumnIndex == 0)
+                            //{
+                            //cell.SetCellType(CellType.String);
+                            //cell.SetCellValue(stationName + "站逐日水面蒸发量表");
+                            //}
+                        }
+
+                        continue;
+                    }
+                    else if (i == 1)
+                    {
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            /*
+                             * Excel数据Cell有不同的类型，当我们试图从一个数字类型的Cell读取出一个字符串并写入数据库时，就会出现Cannot get a text value from a numeric cell的异常错误。
+                             * 解决办法：先设置Cell的类型，然后就可以把纯数字作为String类型读进来了
+                             */
+                            cell.SetCellType(CellType.String);
+                            cell.SetCellValue(stationName + "站逐日蒸发量表");
+                            if (cell.ColumnIndex == 0)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue("年份:" + strtTime.Year + " 测站编码：" + stationid);
+                            }
+                            if (cell.ColumnIndex == 4)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue("蒸发器位置特征：");
+                            }
+                            if (cell.ColumnIndex == 8)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue("蒸发器型式:E601型蒸发器");
+                            }
+                            if (cell.ColumnIndex == 11)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue("单位:水面蒸发量,(mm)");
+                            }
+                        }
+                        continue;
+                    }
+                    else if (i == 2)
+                    {
+                        //F1 站名
+                        continue;
+                    }
+                    else if (i == 3)
+                    {
+                        //F1 站名
+                        continue;
+                    }
+                    //4.补充月统计数据
+                    else if (i == 35) //月总量
+                    {
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            for (int colume = 2; colume <= 13; colume++)
+                            {
+                                if (cell.ColumnIndex == colume)
+                                {
+                                    cell.SetCellType(CellType.String);
+                                    cell.SetCellValue(monthSum[colume - 2].ToString("0.0"));
+                                    break;
+                                }
+                            }
+
+                        }
+                        continue;
+                    }
+                    else if (i == 36) //月最大量
+                    {
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            for (int colume = 2; colume <= 13; colume++)
+                            {
+                                if (cell.ColumnIndex == colume)
+                                {
+                                    if(monthMax[colume - 2].HasValue)
+                                    {
+                                        cell.SetCellType(CellType.String);
+                                        cell.SetCellValue(monthMax[colume - 2].Value.ToString("0.0"));
+                                    }
+                                    
+                                    break;
+                                }
+                            }
+
+                        }
+                        continue;
+                    }
+                    else if (i == 37) //月最小量
+                    {
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            for (int colume = 2; colume <= 13; colume++)
+                            {
+                                if (cell.ColumnIndex == colume)
+                                {
+                                    if(monthMin[colume - 2].HasValue)
+                                    {
+                                        cell.SetCellType(CellType.String);
+                                        cell.SetCellValue(monthMin[colume - 2].Value.ToString("0.0"));
+                                    }
+                                    
+                                    break;
+                                }
+                            }
+
+                        }
+                        continue;
+                    }
+                    else if (i == 38) //年量统计
+                    {
+                        foreach (ICell cell in sheet.GetRow(i).Cells)
+                        {
+                            if (cell.ColumnIndex == 2)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue("蒸发量：" + yearEvaSum.ToString("0.0"));
+                            }
+                            if (cell.ColumnIndex == 5)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue("最大日蒸发量:：" + maxEva.Value.ToString("0.0") + "  " + maxDate.Month + "月" + maxDate.Day + "日");
+                            }
+                            if (cell.ColumnIndex == 9)
+                            {
+                                cell.SetCellType(CellType.String);
+                                cell.SetCellValue("最小日蒸发量:：" + minEva.Value.ToString("0.0") + "  " + minDate.Month + "月" + minDate.Day + "日");
+                            }
+                        }
+
+                        continue;
+                    }
+                    else
+                    {
+                        for (int j = 4; j <= 34; j++)
+                        {
+                            if (i == j)
+                            {
+                                foreach (ICell cell in sheet.GetRow(i).Cells)
+                                {
+                                    if (cell.ColumnIndex >= 2 && cell.ColumnIndex <= 13)
+                                    {
+                                        int flag = (cell.ColumnIndex - 1) * 31 + (j - 3);
+                                        if (evaDic.ContainsKey(flag) && evaDic[flag].E.HasValue)
+                                        {
+                                            cell.SetCellType(CellType.String);
+                                            cell.SetCellValue(evaDic[flag].E.Value.ToString("0.0"));
+                                        }
+                                        else
+                                        {
+                                            cell.SetCellType(CellType.String);
+                                            cell.SetCellValue("");
+                                        }
+                                    }
+                                }
+                                continue;
+                            }
+                        }
+                    }
+                    #endregion
+
+                }
+                #endregion
+                FileStream fs2 = File.Create(resultPaht);
+                workbook.Write(fs2);
+                fs2.Close();
+
+            }
+            catch (Exception e)
+            {
+                result["ERR"] = e.Message;
+                result["ID"] = stationid;
+                return result;
             }
             return result;
         }
@@ -1128,19 +1776,12 @@ namespace Hydrology.Forms
         {
             List<String> result = new List<string>();
             string[] files = Directory.GetFiles(sourcePath, "*.*");
-            foreach(String name in files)
+            foreach (String name in files)
             {
                 result.Add(name);
             }
             return result;
         }
-
         #endregion
-
-
-
     }
-
-
-    
 }
